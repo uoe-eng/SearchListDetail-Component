@@ -1,22 +1,46 @@
 <template>
-  <div id="table-search">
+  <div v-if="!options.mobile" id="table-search">
     <hot-table ref="topTable" :settings="tableSettings"></hot-table>
     <div v-if="expandedID != null">
-      ID ({{ expandedID }}) Details: {{ JSON.stringify(getRow(expandedID)) }}
-      <button @click="closeDetails">close</button>
+      <CardView
+        :collectionName="collectionName"
+        :allColumnNames="allColumnNames"
+        :id="expandedID"
+        :options="options"
+        :closeAction="closeDetails"
+        :readOnly="false"
+        :previewMode="false"
+      ></CardView>
     </div>
     <hot-table ref="bottomTable" :settings="tableSettings"></hot-table>
+  </div>
+  <div v-else>
+    <CardSearch
+      :collectionNames="[collectionName]"
+      :allColumnNames="{
+        [collectionName]: allColumnNames,
+      }"
+      :previewColumnNames="{
+        [collectionName]: previewColumnNames,
+      }"
+      :options="options"
+      :onClick="() => {}"
+      :expandOnClick="true"
+    ></CardSearch>
   </div>
 </template>
 
 <script>
 import { HotTable } from '@handsontable/vue'
 import Handsontable from 'handsontable'
+import CardView from './CardView'
+import CardSearch from './CardSearch'
 
 export default {
   props: {
     collectionName: String,
-    columnNames: Array,
+    allColumnNames: Array,
+    previewColumnNames: Array,
     options: Object,
     expandedProp: {
       type: String,
@@ -27,9 +51,9 @@ export default {
     return {
       // row of the table that will expand to see details
       expandedID: this.expandedProp,
-      // common settings for both the top and bottom table
+      // common settings for both the top and bottom table (no data)
       tableSettings: {
-        colHeaders: [this.options.detailsTitle].concat(this.columnNames),
+        colHeaders: [this.options.detailsTitle].concat(this.allColumnNames),
         multiColumnSorting: true,
         manualColumnResize: true,
         selectionMode: 'single',
@@ -50,7 +74,7 @@ export default {
       // for each id in the collection we need to compute the data for the row
       let data = ids.map((id) => {
         // the row items will be determined by the columnNames prop
-        const row = this.columnNames.map((column) => {
+        const row = this.allColumnNames.map((column) => {
           return collection[id][column]
         })
 
@@ -65,7 +89,7 @@ export default {
       const start = isTop ? 0 : halfwayPoint + 1
       const end = isTop ? halfwayPoint : ids.length
 
-      if (halfwayPoint === -1) {
+      if (halfwayPoint == -1) {
         // if halfwayPoint is -1, nothing is expanded, so show only the top table
         data = isTop ? data : []
         ids = isTop ? ids : []
@@ -89,6 +113,10 @@ export default {
     populateTables() {
       // wait for the next tick when the table is loaded into the DOM
       this.$nextTick(() => {
+        // stop if the tables don't exist (for example in mobile view)
+        if (!this.$refs.topTable || !this.$refs.bottomTable) {
+          return
+        }
         const topTableInstance = this.$refs.topTable.hotInstance
         const topTableData = this.getData(true, this.expandedID)
         // add data to the table
@@ -146,6 +174,8 @@ export default {
   },
   components: {
     HotTable,
+    CardView,
+    CardSearch,
   },
 }
 </script>

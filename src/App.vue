@@ -1,9 +1,18 @@
 <template>
   <div id="app">
     <SearchListDetail
-      :collectionNames="collections"
-      :columnNames="columns"
-      :options="options"
+      :collectionNames="['person', 'widget']"
+      :allColumnNames="{
+        person: ['name', 'title', 'job'],
+        widget: ['name', 'color'],
+      }"
+      :previewColumnNames="{
+        person: ['name', 'title'],
+        widget: ['name'],
+      }"
+      :firstAttrAsCardTitle="true"
+      detailsTitle="details"
+      detailsText="+"
     ></SearchListDetail>
   </div>
 </template>
@@ -18,25 +27,11 @@ export default {
     SearchListDetail,
   },
   store,
-  data() {
-    return {
-      collections: ['person', 'widget'],
-      columns: {
-        person: ['name', 'title', 'job'],
-        widget: ['name', 'color'],
-      },
-      options: {
-        firstAttrAsCardTitle: true,
-        detailsTitle: 'details',
-        detailsText: '+',
-      },
-    }
-  },
 }
 </script>
 
 <style lang="scss">
-body {
+* {
   font-family: 'Montserrat', sans-serif;
 }
 </style>
