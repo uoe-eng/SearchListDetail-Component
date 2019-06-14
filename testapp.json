@@ -1,0 +1,92 @@
+{
+  "person": {
+    "data": [
+      {
+        "type": "person",
+        "id": 1,
+        "attributes": {
+          "title": "Mr",
+          "name": "John Smith",
+          "job": "Admin"
+        }
+      },
+      {
+        "type": "person",
+        "id": 2,
+        "attributes": {
+          "title": "Ms",
+          "name": "Johanna Smith",
+          "job":"Admin"
+        }
+      },
+      {
+        "type": "person",
+        "id": 3,
+        "attributes": {
+          "title": "Mr",
+          "name": "John Smith",
+          "job": "Technician"
+        }
+      },
+      {
+        "type": "person",
+        "id": 4,
+        "attributes": {
+          "title": "Ms",
+          "name": "Johanna Smith",
+          "job":"Technician"
+        }
+      }
+    ]
+  },
+  "widget": {
+    "data": [
+      {
+        "type": "widget",
+        "id": "1",
+        "attributes": {
+          "name": "sprocket",
+          "color": "black"
+        },
+        "relationships": {
+          "widgets": {
+            "data": {
+              "type": "widget",
+              "id": "3"
+            }
+          }
+        }
+      },
+      {
+        "type": "widget",
+        "id": "2",
+        "attributes": {
+          "name": "gear",
+          "color": "blue"
+        },
+        "relationships": {
+          "widgets": {
+            "data": [
+              {
+                "type": "widget",
+                "id": "1"
+              },
+              {
+                "type": "widget",
+                "id": "3"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "type": "widget",
+        "id": "3",
+        "attributes": {
+          "name": "spring",
+          "color": "silver"
+        }
+      }
+    ]
+  }
+}
