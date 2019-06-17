@@ -12,7 +12,7 @@
           <td class="column">{{ column }}:</td>
           <td class="value">
             <span v-if="readOnlyLocal">{{ details[column] }}</span>
-            <input type="text" v-else v-model="details[column]" />
+            <input ref="input" type="text" v-else v-model="details[column]" />
           </td>
         </tr>
       </table>
@@ -32,28 +32,29 @@ export default {
     previewColumnNames: Array,
     allColumnNames: Array,
     id: String,
-    options: Object,
-    onClick: Function,
-    closeAction: Function,
+    globalOptions: Object,
     readOnly: Boolean,
     previewMode: Boolean,
     expandOnClick: Boolean,
+    onClick: Function,
+    closeAction: Function,
+    onTabOutUp: {
+      type: Function,
+      default: () => {},
+    },
+    onTabOutDown: {
+      type: Function,
+      default: () => {},
+    },
   },
   data() {
     return {
       // save as local data so that it can be modified dynamically
       readOnlyLocal: this.readOnly,
       previewModeLocal: this.previewMode,
-      // really hacky, but the handleClick function always runs after this,
-      // which means that the card closes then opens again
       closeActionLocal: this.expandOnClick
-        ? () => {
-          setTimeout(() => {
-            this.readOnlyLocal = true
-            this.previewModeLocal = true
-          }, 1);
-        }
-        : this.closeAction
+        ? this.collapseCard
+        : this.closeAction,
     }
   },
   computed: {
@@ -65,7 +66,7 @@ export default {
         this.collectionName + '/' + this.id
       )
       // don't set the title unless specified
-      if (this.options.firstAttrAsCardTitle) {
+      if (this.globalOptions.firstAttrAsCardTitle) {
         return details[this.allColumnNames[0]]
       } else {
         return null
@@ -77,12 +78,18 @@ export default {
         : this.allColumnNames
       // the first attribute reserved for title if specified, so remove from body of card
       // card must also be read-only, since when editing it will be needed in the body
-      if (this.options.firstAttrAsCardTitle && this.readOnly) {
+      if (this.globalOptions.firstAttrAsCardTitle && this.readOnly) {
         return columnsToShow.slice(1)
       } else {
         return columnsToShow
       }
     },
+  },
+  updated() {
+    this.addKeyboardControls()
+  },
+  created() {
+    this.addKeyboardControls()
   },
   methods: {
     handleClick() {
@@ -96,6 +103,42 @@ export default {
     },
     save() {
       alert('not done yet!')
+    },
+    collapseCard() {
+      // really hacky, but the handleClick function always runs after this,
+      // which means that the card closes then opens again.
+      // the timeout makes this run after handleClick
+      setTimeout(() => {
+        this.readOnlyLocal = true
+        this.previewModeLocal = true
+      }, 1)
+    },
+    addKeyboardControls() {
+      this.$nextTick(() => {
+        if (!this.$refs.input || this.$refs.input.length <= 0) {
+          return
+        }
+        const inputBoxes = this.$refs.input
+
+        // focus on the first input box
+        inputBoxes[0].focus()
+        // add listener to the first input box to tab out upwards
+        inputBoxes[0].addEventListener('keydown', (e) => {
+          if (e.key == 'Tab' && e.shiftKey) {
+            // prevent default here doesn't prevent the tabbing on the tables
+            // e.preventDefault()
+            this.onTabOutUp(e)
+          }
+        })
+
+        // add listener to the last input box to tab out downwards
+        inputBoxes[inputBoxes.length - 1].addEventListener('keydown', (e) => {
+          e.preventDefault()
+          if (e.key == 'Tab' && !e.shiftKey) {
+            this.onTabOutDown(e)
+          }
+        })
+      })
     },
   },
 }

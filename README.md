@@ -9,6 +9,7 @@
 
 ## Next steps
 * Make the data editable from the cards and from the tables directly.
+* Make navigation by keyboard possible
 
 ## Project setup
 ```

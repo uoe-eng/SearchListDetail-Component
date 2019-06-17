@@ -36,6 +36,24 @@
           "name": "Johanna Smith",
           "job":"Technician"
         }
+      },
+      {
+        "type": "person",
+        "id": 5,
+        "attributes": {
+          "title": "Mr",
+          "name": "Adam Smith",
+          "job": "Technician"
+        }
+      },
+      {
+        "type": "person",
+        "id": 6,
+        "attributes": {
+          "title": "Mr",
+          "name": "Adam Smith",
+          "job": "Admin"
+        }
       }
     ]
   },

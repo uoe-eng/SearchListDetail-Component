@@ -6,14 +6,15 @@
       :selected="view"
     ></NavBar>
     <div id="nav-bar-spacer"></div>
+    <!-- temporary way to see the mobile version -->
     <label><input type="checkbox" v-model="mobile" /> Mobile version</label>
     <CardSearch
       v-if="view == 'All'"
       :collectionNames="selectedCollections"
       :allColumnNames="allColumnNames"
       :previewColumnNames="previewColumnNames"
-      :options="options"
-      :onClick="mobile ? ()=>{} : setView"
+      :globalOptions="globalOptions"
+      :onClick="mobile ? () => {} : setView"
       :expandOnClick="mobile"
     ></CardSearch>
     <TableSearch
@@ -21,7 +22,7 @@
       :collectionName="view"
       :allColumnNames="allColumnNames[view]"
       :previewColumnNames="previewColumnNames[view]"
-      :options="options"
+      :globalOptions="globalOptions"
       :expandedProp="expandedID"
     ></TableSearch>
   </div>
@@ -64,27 +65,17 @@ export default {
       view: 'All',
       expandedID: null,
       mobile: false,
-      searchResult: {},
-      delWidgetId: undefined,
-      postWidget: {
-        _jv: {
-          type: 'widget',
-        },
-      },
     }
   },
   computed: {
     // group together all options to pass around in other components as a single prop
-    options() {
+    globalOptions() {
       return {
         firstAttrAsCardTitle: this.firstAttrAsCardTitle,
         detailsTitle: this.detailsTitle,
         detailsText: this.detailsText,
         mobile: this.mobile,
       }
-    },
-    sessions() {
-      return this.$store.state.jv._jv
     },
     selectedCollections() {
       if (this.view == 'All') {
@@ -107,9 +98,6 @@ export default {
   created() {
     this.collectionNames.forEach((collectionName) => {
       this.$store.dispatch('jv/get', collectionName)
-      this.$store.dispatch('jv/search', collectionName).then((res) => {
-        this.searchResult[collectionName] = res
-      })
     })
   },
 }

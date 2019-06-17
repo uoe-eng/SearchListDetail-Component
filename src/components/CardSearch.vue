@@ -7,7 +7,7 @@
           :allColumnNames="allColumnNames[collectionName]"
           :previewColumnNames="previewColumnNames[collectionName]"
           :id="id"
-          :options="options"
+          :globalOptions="globalOptions"
           :onClick="onClick"
           :readOnly="true"
           :previewMode="true"
@@ -27,7 +27,7 @@ export default {
     collectionNames: Array,
     allColumnNames: Object,
     previewColumnNames: Object,
-    options: Object,
+    globalOptions: Object,
     onClick: Function,
     expandOnClick: Boolean,
   },

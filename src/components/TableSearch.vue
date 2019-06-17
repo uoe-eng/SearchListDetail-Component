@@ -1,15 +1,21 @@
 <template>
-  <div v-if="!options.mobile" id="table-search">
+  <div v-if="!globalOptions.mobile" id="table-search">
     <hot-table ref="topTable" :settings="tableSettings"></hot-table>
     <div v-if="expandedID != null">
       <CardView
         :collectionName="collectionName"
         :allColumnNames="allColumnNames"
         :id="expandedID"
-        :options="options"
-        :closeAction="closeDetails"
+        :globalOptions="globalOptions"
+        :closeAction="
+          () => {
+            setExpandedID(null)
+          }
+        "
         :readOnly="false"
         :previewMode="false"
+        :onTabOutUp="onTabOutUp"
+        :onTabOutDown="onTabOutDown"
       ></CardView>
     </div>
     <hot-table ref="bottomTable" :settings="tableSettings"></hot-table>
@@ -23,7 +29,7 @@
       :previewColumnNames="{
         [collectionName]: previewColumnNames,
       }"
-      :options="options"
+      :globalOptions="globalOptions"
       :onClick="() => {}"
       :expandOnClick="true"
     ></CardSearch>
@@ -41,7 +47,7 @@ export default {
     collectionName: String,
     allColumnNames: Array,
     previewColumnNames: Array,
-    options: Object,
+    globalOptions: Object,
     expandedProp: {
       type: String,
       default: null,
@@ -53,7 +59,9 @@ export default {
       expandedID: this.expandedProp,
       // common settings for both the top and bottom table (no data)
       tableSettings: {
-        colHeaders: [this.options.detailsTitle].concat(this.allColumnNames),
+        colHeaders: [this.globalOptions.detailsTitle].concat(
+          this.allColumnNames
+        ),
         multiColumnSorting: true,
         manualColumnResize: true,
         selectionMode: 'single',
@@ -69,6 +77,7 @@ export default {
     getData(isTop, expandedID) {
       const collection = this.$store.getters['jv/get'](this.collectionName)
       // the order these ids are in will be the order the results are displayed in
+      // note: object.keys might be inconsistent
       let ids = Object.keys(collection)
 
       // for each id in the collection we need to compute the data for the row
@@ -79,7 +88,7 @@ export default {
         })
 
         // add the expand details cell to the left of each row
-        return [this.options.detailsText].concat(row)
+        return [this.globalOptions.detailsText].concat(row)
       })
 
       // using the list of ids find the index of the expanded id
@@ -105,12 +114,8 @@ export default {
         ids: ids,
       }
     },
-    getRow(id) {
-      const collection = this.$store.getters['jv/get'](this.collectionName)
-      return collection[id]
-    },
     // add data, meta, and hooks to each table
-    populateTables() {
+    populateTables(callback = () => {}) {
       // wait for the next tick when the table is loaded into the DOM
       this.$nextTick(() => {
         // stop if the tables don't exist (for example in mobile view)
@@ -146,11 +151,36 @@ export default {
           this.bottomTableClicked,
           bottomTableInstance
         )
+
+        callback()
       })
     },
-    closeDetails() {
-      this.expandedID = null
-      this.populateTables()
+    setExpandedID(id, callback = () => {}) {
+      this.expandedID = id
+      this.populateTables(callback)
+    },
+    onTabOutUp() {
+      const collection = this.$store.getters['jv/get'](this.collectionName)
+      const row = Object.keys(collection).indexOf(this.expandedID)
+      const rowToSelect = row - 1 < 0 ? row : row - 1
+      this.setExpandedID(null, () => {
+        // when no row is expanded only the top table shows
+        // hacky - the tab keypress happens after the cell is selected in the table
+        // here delay the cell selection so it can happen after the keypress
+        setTimeout(() => {
+          this.$refs.topTable.hotInstance.selectCell(rowToSelect, 1)
+        }, 1)
+      })
+    },
+    onTabOutDown() {
+      const collection = this.$store.getters['jv/get'](this.collectionName)
+      const row = Object.keys(collection).indexOf(this.expandedID)
+      this.setExpandedID(null, () => {
+        // hacky again, same as onTabOutUp
+        setTimeout(() => {
+          this.$refs.topTable.hotInstance.selectCell(row, 1)
+        }, 1)
+      })
     },
     // custom hooks added to the afterSelection listener, with differenciation between tables
     topTableClicked(row, column) {
@@ -167,9 +197,7 @@ export default {
       tableInstance.deselectCell()
       // read the cell meta value for id
       const id = tableInstance.getCellMeta(row, column).id
-      this.expandedID = id
-      // update the data
-      this.populateTables()
+      this.setExpandedID(id)
     },
   },
   components: {
