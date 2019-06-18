@@ -8,18 +8,31 @@
     <span class="subtitle">{{ collectionName }} / {{ id }}</span>
     <form v-on:submit.prevent="save">
       <table class="sld-card-view-details">
-        <tr v-for="column of columnsToShow" v-bind:key="column">
+        <tr v-for="(column, index) of columnsToShow" v-bind:key="column">
           <td class="column">{{ column }}:</td>
           <td class="value">
             <span v-if="readOnlyLocal">{{ details[column] }}</span>
-            <input ref="input" type="text" v-else v-model="details[column]" />
+            <!-- listener here -->
+            <input
+              v-else
+              @keydown="
+                (e) => {
+                  handleKeyDown(e, index)
+                }
+              "
+              ref="input"
+              type="text"
+              v-model="details[column]"
+            />
           </td>
         </tr>
       </table>
     </form>
     <div class="controls" v-if="!readOnlyLocal">
-      <span class="close" @click="closeActionLocal">Close</span>
-      <span class="save" @click="save">Save</span>
+      <span class="close" ref="close" tabIndex="0" @click="closeActionLocal">
+        Close
+      </span>
+      <span class="save" ref="save" tabindex="0" @click="save">Save</span>
     </div>
   </div>
 </template>
@@ -28,6 +41,7 @@
 export default {
   name: 'CardView',
   props: {
+    collection: Object,
     collectionName: String,
     previewColumnNames: Array,
     allColumnNames: Array,
@@ -55,19 +69,14 @@ export default {
       closeActionLocal: this.expandOnClick
         ? this.collapseCard
         : this.closeAction,
+      details: this.collection[this.id],
     }
   },
   computed: {
-    details() {
-      return this.$store.getters['jv/get'](this.collectionName + '/' + this.id)
-    },
     title() {
-      const details = this.$store.getters['jv/get'](
-        this.collectionName + '/' + this.id
-      )
       // don't set the title unless specified
       if (this.globalOptions.firstAttrAsCardTitle) {
-        return details[this.allColumnNames[0]]
+        return this.details[this.allColumnNames[0]]
       } else {
         return null
       }
@@ -85,11 +94,11 @@ export default {
       }
     },
   },
-  updated() {
-    this.addKeyboardControls()
-  },
   created() {
-    this.addKeyboardControls()
+    this.focusFirstInputBox()
+  },
+  updated() {
+    this.focusFirstInputBox()
   },
   methods: {
     handleClick() {
@@ -101,8 +110,23 @@ export default {
         this.previewModeLocal = false
       }
     },
+    handleKeyDown(e, index) {
+      const isFirst = index == 0
+      const isLast = index == this.allColumnNames.length - 1
+      const isTabForward = e.key == 'Tab' && !e.shiftKey
+      const isTabBackward = e.key == 'Tab' && e.shiftKey
+      if (isFirst && isTabBackward) {
+        e.preventDefault()
+        this.onTabOutUp()
+      }
+      if (isLast && isTabForward) {
+        e.preventDefault()
+        this.onTabOutDown()
+      }
+    },
     save() {
-      alert('not done yet!')
+      // (?) not sure how this works
+      this.patchRecord(this.details)
     },
     collapseCard() {
       // really hacky, but the handleClick function always runs after this,
@@ -111,34 +135,18 @@ export default {
       setTimeout(() => {
         this.readOnlyLocal = true
         this.previewModeLocal = true
-      }, 1)
+      }, 0)
     },
-    addKeyboardControls() {
+    focusFirstInputBox() {
       this.$nextTick(() => {
-        if (!this.$refs.input || this.$refs.input.length <= 0) {
-          return
+        const inputs = this.$refs.input
+        if (inputs && inputs.length > 0) {
+          inputs[0].focus()
         }
-        const inputBoxes = this.$refs.input
-
-        // focus on the first input box
-        inputBoxes[0].focus()
-        // add listener to the first input box to tab out upwards
-        inputBoxes[0].addEventListener('keydown', (e) => {
-          if (e.key == 'Tab' && e.shiftKey) {
-            // prevent default here doesn't prevent the tabbing on the tables
-            // e.preventDefault()
-            this.onTabOutUp(e)
-          }
-        })
-
-        // add listener to the last input box to tab out downwards
-        inputBoxes[inputBoxes.length - 1].addEventListener('keydown', (e) => {
-          e.preventDefault()
-          if (e.key == 'Tab' && !e.shiftKey) {
-            this.onTabOutDown(e)
-          }
-        })
       })
+    },
+    patchRecord(record) {
+      this.$store.dispatch('jv/patch', record)
     },
   },
 }

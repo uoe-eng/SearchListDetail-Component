@@ -10,6 +10,7 @@
     <label><input type="checkbox" v-model="mobile" /> Mobile version</label>
     <CardSearch
       v-if="view == 'All'"
+      :collections="collections"
       :collectionNames="selectedCollections"
       :allColumnNames="allColumnNames"
       :previewColumnNames="previewColumnNames"
@@ -19,6 +20,7 @@
     ></CardSearch>
     <TableSearch
       v-else
+      :collection="collections[view]"
       :collectionName="view"
       :allColumnNames="allColumnNames[view]"
       :previewColumnNames="previewColumnNames[view]"
@@ -65,6 +67,7 @@ export default {
       view: 'All',
       expandedID: null,
       mobile: false,
+      collections: {},
     }
   },
   computed: {
@@ -96,8 +99,16 @@ export default {
     },
   },
   created() {
+    // for each collection
     this.collectionNames.forEach((collectionName) => {
-      this.$store.dispatch('jv/get', collectionName)
+      // get collection from server
+      // sparse fields not working?
+      const url = `${collectionName}`
+      this.$store.dispatch('jv/get', url).then(() => {
+        // then copy into memory from store (contains all columns)
+        const collectionInMemory = this.$store.getters['jv/get'](collectionName)
+        this.$set(this.collections, collectionName, collectionInMemory)
+      })
     })
   },
 }

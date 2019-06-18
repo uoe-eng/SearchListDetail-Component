@@ -3,6 +3,7 @@
     <hot-table ref="topTable" :settings="tableSettings"></hot-table>
     <div v-if="expandedID != null">
       <CardView
+        :collection="collection"
         :collectionName="collectionName"
         :allColumnNames="allColumnNames"
         :id="expandedID"
@@ -16,6 +17,7 @@
         :previewMode="false"
         :onTabOutUp="onTabOutUp"
         :onTabOutDown="onTabOutDown"
+        ref="cardview"
       ></CardView>
     </div>
     <hot-table ref="bottomTable" :settings="tableSettings"></hot-table>
@@ -38,12 +40,13 @@
 
 <script>
 import { HotTable } from '@handsontable/vue'
-import Handsontable from 'handsontable'
 import CardView from './CardView'
 import CardSearch from './CardSearch'
+import TableHooks from './TableHooks'
 
 export default {
   props: {
+    collection: Object,
     collectionName: String,
     allColumnNames: Array,
     previewColumnNames: Array,
@@ -70,21 +73,45 @@ export default {
     }
   },
   created() {
-    this.populateTables()
+    this.populateTables(() => {
+      TableHooks.addAfterBeginEditing(this)
+      TableHooks.addTableToCard(this)
+      TableHooks.addTableWraparound(this)
+    })
   },
   methods: {
+    collectionKeys() {
+      return Object.keys(this.collection).sort()
+    },
+    rowNumberFromID(id) {
+      return this.collectionKeys().indexOf(id)
+    },
+    setExpandedID(id, callback = () => {}) {
+      this.expandedID = id
+      this.populateTables(callback)
+    },
+    onTabOutUp() {
+      setTimeout(() => {
+        const topTable = this.$refs.topTable.hotInstance
+        topTable.selectCell(topTable.countRows() - 1, topTable.countCols() - 1)
+      }, 0)
+    },
+    onTabOutDown() {
+      setTimeout(() => {
+        this.$refs.bottomTable.hotInstance.selectCell(0, 0)
+      }, 0)
+    },
     // returns the data for either top or bottom table
     getData(isTop, expandedID) {
-      const collection = this.$store.getters['jv/get'](this.collectionName)
       // the order these ids are in will be the order the results are displayed in
       // note: object.keys might be inconsistent
-      let ids = Object.keys(collection)
+      let ids = this.collectionKeys()
 
       // for each id in the collection we need to compute the data for the row
       let data = ids.map((id) => {
         // the row items will be determined by the columnNames prop
         const row = this.allColumnNames.map((column) => {
-          return collection[id][column]
+          return this.collection[id][column]
         })
 
         // add the expand details cell to the left of each row
@@ -131,14 +158,6 @@ export default {
         topTableData.ids.forEach((id, index) => {
           topTableInstance.setCellMeta(index, 0, 'id', id)
         })
-
-        // provide custom hook for the cell selection listener in order to differenciate
-        // between the top and bottom table (otherwise it will trigger twice)
-        Handsontable.hooks.add(
-          'afterSelection',
-          this.topTableClicked,
-          topTableInstance
-        )
         // exact same thing for the bottom table
         const bottomTableInstance = this.$refs.bottomTable.hotInstance
         const bottomTableData = this.getData(false, this.expandedID)
@@ -146,50 +165,10 @@ export default {
         bottomTableData.ids.forEach((id, index) => {
           bottomTableInstance.setCellMeta(index, 0, 'id', id)
         })
-        Handsontable.hooks.add(
-          'afterSelection',
-          this.bottomTableClicked,
-          bottomTableInstance
-        )
-
         callback()
       })
     },
-    setExpandedID(id, callback = () => {}) {
-      this.expandedID = id
-      this.populateTables(callback)
-    },
-    onTabOutUp() {
-      const collection = this.$store.getters['jv/get'](this.collectionName)
-      const row = Object.keys(collection).indexOf(this.expandedID)
-      const rowToSelect = row - 1 < 0 ? row : row - 1
-      this.setExpandedID(null, () => {
-        // when no row is expanded only the top table shows
-        // hacky - the tab keypress happens after the cell is selected in the table
-        // here delay the cell selection so it can happen after the keypress
-        setTimeout(() => {
-          this.$refs.topTable.hotInstance.selectCell(rowToSelect, 1)
-        }, 1)
-      })
-    },
-    onTabOutDown() {
-      const collection = this.$store.getters['jv/get'](this.collectionName)
-      const row = Object.keys(collection).indexOf(this.expandedID)
-      this.setExpandedID(null, () => {
-        // hacky again, same as onTabOutUp
-        setTimeout(() => {
-          this.$refs.topTable.hotInstance.selectCell(row, 1)
-        }, 1)
-      })
-    },
-    // custom hooks added to the afterSelection listener, with differenciation between tables
-    topTableClicked(row, column) {
-      this.afterSelection(row, column, this.$refs.topTable.hotInstance)
-    },
-    bottomTableClicked(row, column) {
-      this.afterSelection(row, column, this.$refs.bottomTable.hotInstance)
-    },
-    afterSelection(row, column, tableInstance) {
+    handleEdit(row, column, tableInstance) {
       // ignore normal cell selections
       if (column != 0) {
         return
