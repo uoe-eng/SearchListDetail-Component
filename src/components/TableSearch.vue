@@ -1,20 +1,15 @@
 <template>
-  <div v-if="!globalOptions.mobile" id="table-search">
+  <div v-if="!componentOptions.mobile" id="table-search">
     <hot-table ref="topTable" :settings="tableSettings"></hot-table>
-    <div v-if="expandedID != null">
+    <div v-if="expandedID.id != null">
       <CardView
         :collection="collection"
-        :collectionName="collectionName"
-        :allColumnNames="allColumnNames"
-        :id="expandedID"
-        :globalOptions="globalOptions"
-        :closeAction="
-          () => {
-            setExpandedID(null)
-          }
-        "
-        :readOnly="false"
-        :previewMode="false"
+        :id="expandedID.id"
+        :componentOptions="componentOptions"
+        :onClose="onCardClose"
+        :onSave="onCardSave"
+        :isReadOnly="false"
+        :isExpanded="true"
         :onTabOutUp="onTabOutUp"
         :onTabOutDown="onTabOutDown"
         ref="cardview"
@@ -24,16 +19,15 @@
   </div>
   <div v-else>
     <CardSearch
-      :collectionNames="[collectionName]"
-      :allColumnNames="{
-        [collectionName]: allColumnNames,
+      :collections="{
+        [collection.type]: collection,
       }"
-      :previewColumnNames="{
-        [collectionName]: previewColumnNames,
-      }"
-      :globalOptions="globalOptions"
-      :onClick="() => {}"
-      :expandOnClick="true"
+      :page="collection.type"
+      :expandedID="expandedID"
+      :onClick="expandCard"
+      :onClose="onCardClose"
+      :onSave="onCardSave"
+      :componentOptions="componentOptions"
     ></CardSearch>
   </div>
 </template>
@@ -47,125 +41,78 @@ import TableHooks from './TableHooks'
 export default {
   props: {
     collection: Object,
-    collectionName: String,
-    allColumnNames: Array,
-    previewColumnNames: Array,
-    globalOptions: Object,
-    expandedProp: {
-      type: String,
-      default: null,
-    },
+    expandedID: Object,
+    expandCard: Function,
+    onCardClose: Function,
+    onCardSave: Function,
+    componentOptions: Object,
   },
   data() {
     return {
-      // row of the table that will expand to see details
-      expandedID: this.expandedProp,
       // common settings for both the top and bottom table (no data)
       tableSettings: {
-        colHeaders: [this.globalOptions.detailsTitle].concat(
-          this.allColumnNames
+        colHeaders: [this.componentOptions.detailsTitle].concat(
+          this.collection.fullCols
         ),
         multiColumnSorting: true,
         manualColumnResize: true,
         selectionMode: 'single',
         licenseKey: 'non-commercial-and-evaluation',
       },
+      // data for the tables calculated from the collection and expanded id
+      tableData: this.collection.splitIntoTables(
+        this.expandedID,
+        this.componentOptions.detailsText
+      ),
     }
   },
   created() {
-    this.populateTables(() => {
-      TableHooks.addAfterBeginEditing(this)
-      TableHooks.addTableToCard(this)
-      TableHooks.addTableWraparound(this)
-    })
+    this.populateTables()
   },
   methods: {
-    collectionKeys() {
-      return Object.keys(this.collection).sort()
-    },
-    rowNumberFromID(id) {
-      return this.collectionKeys().indexOf(id)
-    },
-    setExpandedID(id, callback = () => {}) {
-      this.expandedID = id
-      this.populateTables(callback)
-    },
+    // select the end of the top table
     onTabOutUp() {
       setTimeout(() => {
         const topTable = this.$refs.topTable.hotInstance
         topTable.selectCell(topTable.countRows() - 1, topTable.countCols() - 1)
       }, 0)
     },
+    // select the start of the bottom table
     onTabOutDown() {
       setTimeout(() => {
         this.$refs.bottomTable.hotInstance.selectCell(0, 0)
       }, 0)
     },
-    // returns the data for either top or bottom table
-    getData(isTop, expandedID) {
-      // the order these ids are in will be the order the results are displayed in
-      // note: object.keys might be inconsistent
-      let ids = this.collectionKeys()
-
-      // for each id in the collection we need to compute the data for the row
-      let data = ids.map((id) => {
-        // the row items will be determined by the columnNames prop
-        const row = this.allColumnNames.map((column) => {
-          return this.collection[id][column]
-        })
-
-        // add the expand details cell to the left of each row
-        return [this.globalOptions.detailsText].concat(row)
-      })
-
-      // using the list of ids find the index of the expanded id
-      const halfwayPoint = ids.indexOf(expandedID)
-
-      // start + end points for this table
-      const start = isTop ? 0 : halfwayPoint + 1
-      const end = isTop ? halfwayPoint : ids.length
-
-      if (halfwayPoint == -1) {
-        // if halfwayPoint is -1, nothing is expanded, so show only the top table
-        data = isTop ? data : []
-        ids = isTop ? ids : []
-      } else {
-        // if halwayPoint is set, some subset of the whole data is needed for a table
-        data = data.slice(start, end)
-        ids = ids.slice(start, end)
-      }
-      // include an array of ids which corresponds to the ids of each row in the data
-      // this is needed to keep track of the id of the result for each row
-      return {
-        data: data,
-        ids: ids,
-      }
-    },
     // add data, meta, and hooks to each table
-    populateTables(callback = () => {}) {
+    populateTables() {
       // wait for the next tick when the table is loaded into the DOM
       this.$nextTick(() => {
         // stop if the tables don't exist (for example in mobile view)
         if (!this.$refs.topTable || !this.$refs.bottomTable) {
           return
         }
-        const topTableInstance = this.$refs.topTable.hotInstance
-        const topTableData = this.getData(true, this.expandedID)
-        // add data to the table
-        topTableInstance.loadData(topTableData.data)
 
+        // get the top table instance
+        const topTableInstance = this.$refs.topTable.hotInstance
+        // add top data to the table
+        topTableInstance.loadData(this.tableData.top)
         // for each details cell on the left, add the meta value for 'id'
-        topTableData.ids.forEach((id, index) => {
+        this.tableData.topIDs.forEach((id, index) => {
           topTableInstance.setCellMeta(index, 0, 'id', id)
         })
+
         // exact same thing for the bottom table
         const bottomTableInstance = this.$refs.bottomTable.hotInstance
-        const bottomTableData = this.getData(false, this.expandedID)
-        bottomTableInstance.loadData(bottomTableData.data)
-        bottomTableData.ids.forEach((id, index) => {
+        bottomTableInstance.loadData(this.tableData.bottom)
+        this.tableData.bottomIDs.forEach((id, index) => {
           bottomTableInstance.setCellMeta(index, 0, 'id', id)
         })
-        callback()
+
+        // add the hooks to the tables
+        TableHooks.addAfterChange(this)
+        TableHooks.addAfterBeginEditing(this)
+        TableHooks.addTableToCard(this)
+        TableHooks.addTableWraparound(this)
       })
     },
     handleEdit(row, column, tableInstance) {
@@ -176,7 +123,7 @@ export default {
       tableInstance.deselectCell()
       // read the cell meta value for id
       const id = tableInstance.getCellMeta(row, column).id
-      this.setExpandedID(id)
+      this.expandCard(this.collection.type, id, this.collection.type)
     },
   },
   components: {

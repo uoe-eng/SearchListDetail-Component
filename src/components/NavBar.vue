@@ -2,17 +2,17 @@
   <div id="nav-bar">
     <span
       class="nav-bar-item"
-      v-bind:class="{ selected: selected == 'All' }"
-      @click="to('All')"
+      v-bind:class="{ selected: selected == config.ALL_PAGE_NAME }"
+      @click="setPage(config.ALL_PAGE_NAME)"
     >
       All
     </span>
     <span
-      v-for="collection of collections"
+      v-for="collection of collectionNames"
       v-bind:key="collection"
       class="nav-bar-item"
       v-bind:class="{ selected: selected == collection }"
-      @click="to(collection)"
+      @click="setPage(collection)"
     >
       {{ collection }}
     </span>
@@ -20,17 +20,19 @@
 </template>
 
 <script>
+import config from './config'
+
 export default {
   name: 'NavBar',
   props: {
-    collections: Array,
-    setView: Function,
+    collectionNames: Array,
+    setPage: Function,
     selected: String,
   },
-  methods: {
-    to(collection) {
-      this.setView(collection, null)
-    },
+  data() {
+    return {
+      config: config,
+    }
   },
 }
 </script>

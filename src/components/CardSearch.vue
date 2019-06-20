@@ -1,18 +1,21 @@
 <template>
   <div id="card-search">
-    <div v-for="(collectionName, index) of collectionNames" v-bind:key="index">
-      <div v-for="(value, id) of collections[collectionName]" v-bind:key="id">
+    <div v-for="(collection, name) of collections" v-bind:key="name">
+      <div v-for="(entry, id) of collection.entries" v-bind:key="id">
         <CardView
-          :collection="collections[collectionName]"
-          :collectionName="collectionName"
-          :allColumnNames="allColumnNames[collectionName]"
-          :previewColumnNames="previewColumnNames[collectionName]"
+          :collection="collection"
           :id="id"
-          :globalOptions="globalOptions"
+          :page="page"
           :onClick="onClick"
-          :readOnly="true"
-          :previewMode="true"
-          :expandOnClick="expandOnClick"
+          :onClose="onClose"
+          :onSave="onSave"
+          :isReadOnly="
+            !(id == expandedID.id && collection.type == expandedID.type)
+          "
+          :isExpanded="
+            id == expandedID.id && collection.type == expandedID.type
+          "
+          :componentOptions="componentOptions"
         ></CardView>
       </div>
     </div>
@@ -26,12 +29,17 @@ export default {
   name: 'CardSearch',
   props: {
     collections: Object,
-    collectionNames: Array,
-    allColumnNames: Object,
-    previewColumnNames: Object,
-    globalOptions: Object,
+    page: String,
+    expandedID: Object,
     onClick: Function,
-    expandOnClick: Boolean,
+    onClose: Function,
+    onSave: Function,
+    componentOptions: Object,
+  },
+  data() {
+    return {
+      collectionNames: Object.keys(this.collections),
+    }
   },
   components: {
     CardView,

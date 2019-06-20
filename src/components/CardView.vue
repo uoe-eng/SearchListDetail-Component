@@ -1,18 +1,17 @@
 <template>
   <div
     class="sld-card-view"
-    v-bind:class="{ pointer: onClick && previewMode }"
+    v-bind:class="{ pointer: onClick && !isExpanded }"
     @click="handleClick"
   >
     <span v-if="title != null" class="title">{{ title }}</span>
-    <span class="subtitle">{{ collectionName }} / {{ id }}</span>
+    <span class="subtitle">{{ collection.type }} / {{ id }}</span>
     <form v-on:submit.prevent="save">
       <table class="sld-card-view-details">
         <tr v-for="(column, index) of columnsToShow" v-bind:key="column">
           <td class="column">{{ column }}:</td>
           <td class="value">
-            <span v-if="readOnlyLocal">{{ details[column] }}</span>
-            <!-- listener here -->
+            <span v-if="isReadOnly">{{ entry[column] }}</span>
             <input
               v-else
               @keydown="
@@ -22,36 +21,47 @@
               "
               ref="input"
               type="text"
-              v-model="details[column]"
+              v-model="entry[column]"
             />
           </td>
         </tr>
       </table>
     </form>
-    <div class="controls" v-if="!readOnlyLocal">
-      <span class="close" ref="close" tabIndex="0" @click="closeActionLocal">
-        Close
+    <div class="controls" v-if="!isReadOnly">
+      <span
+        class="close"
+        :ref="config.CLOSE_BUTTON_REF"
+        tabIndex="0"
+        @click="handleClose"
+      >
+        {{ config.CLOSE_BUTTON_TEXT }}
       </span>
-      <span class="save" ref="save" tabindex="0" @click="save">Save</span>
+      <span
+        class="save"
+        :ref="config.SAVE_BUTTON_REF"
+        tabindex="0"
+        @click="handleSave"
+      >
+        {{ config.SAVE_BUTTON_TEXT }}
+      </span>
     </div>
   </div>
 </template>
 
 <script>
+import config from './config'
+
 export default {
   name: 'CardView',
   props: {
     collection: Object,
-    collectionName: String,
-    previewColumnNames: Array,
-    allColumnNames: Array,
-    id: String,
-    globalOptions: Object,
-    readOnly: Boolean,
-    previewMode: Boolean,
-    expandOnClick: Boolean,
+    id: String, // id of row in collection
+    page: String, // page on which this card is showing
+    isReadOnly: Boolean,
+    isExpanded: Boolean,
     onClick: Function,
-    closeAction: Function,
+    onClose: Function,
+    onSave: Function,
     onTabOutUp: {
       type: Function,
       default: () => {},
@@ -60,34 +70,33 @@ export default {
       type: Function,
       default: () => {},
     },
+    componentOptions: Object,
   },
   data() {
     return {
-      // save as local data so that it can be modified dynamically
-      readOnlyLocal: this.readOnly,
-      previewModeLocal: this.previewMode,
-      closeActionLocal: this.expandOnClick
-        ? this.collapseCard
-        : this.closeAction,
-      details: this.collection[this.id],
+      config: config,
+      entry: this.collection.entries[this.id],
     }
   },
   computed: {
+    // the string for the title of the card (null if titles are disabled)
     title() {
       // don't set the title unless specified
-      if (this.globalOptions.firstAttrAsCardTitle) {
-        return this.details[this.allColumnNames[0]]
+      if (this.componentOptions.firstAttrAsCardTitle) {
+        return this.entry[this.collection.fullCols[0]]
       } else {
         return null
       }
     },
+    // the columns that will show in the body of the card
     columnsToShow() {
-      const columnsToShow = this.previewModeLocal
-        ? this.previewColumnNames
-        : this.allColumnNames
-      // the first attribute reserved for title if specified, so remove from body of card
+      // choose the columns to display, expanded means show all columns
+      const columnsToShow = this.isExpanded
+        ? this.collection.fullCols
+        : this.collection.previewCols
+      // the first attribute is reserved for the title if specified, so remove it from body of card
       // card must also be read-only, since when editing it will be needed in the body
-      if (this.globalOptions.firstAttrAsCardTitle && this.readOnly) {
+      if (this.componentOptions.firstAttrAsCardTitle && this.isReadOnly) {
         return columnsToShow.slice(1)
       } else {
         return columnsToShow
@@ -97,56 +106,55 @@ export default {
   created() {
     this.focusFirstInputBox()
   },
-  updated() {
-    this.focusFirstInputBox()
-  },
   methods: {
     handleClick() {
       if (this.onClick) {
-        this.onClick(this.collectionName, this.id)
-      }
-      if (this.expandOnClick) {
-        this.readOnlyLocal = false
-        this.previewModeLocal = false
+        this.onClick(this.collection.type, this.id, this.page)
       }
     },
+    handleClose() {
+      if (this.onClose) {
+        this.onClose(this.collection.type, this.id, this.page)
+      }
+    },
+    handleSave() {
+      if (this.onSave) {
+        this.onSave(this.collection, this.id, this.page)
+      }
+    },
+    // handles keypresses from the input boxes
     handleKeyDown(e, index) {
       const isFirst = index == 0
-      const isLast = index == this.allColumnNames.length - 1
+      const isLast = index == this.collection.fullCols.length - 1
       const isTabForward = e.key == 'Tab' && !e.shiftKey
       const isTabBackward = e.key == 'Tab' && e.shiftKey
+      const isEnter = e.key == 'Enter'
+      const isEscape = e.key == 'Escape'
+      // tab out of the card upwards
       if (isFirst && isTabBackward) {
         e.preventDefault()
         this.onTabOutUp()
       }
+      // tab out of the card downwards
       if (isLast && isTabForward) {
         e.preventDefault()
         this.onTabOutDown()
       }
-    },
-    save() {
-      // (?) not sure how this works
-      this.patchRecord(this.details)
-    },
-    collapseCard() {
-      // really hacky, but the handleClick function always runs after this,
-      // which means that the card closes then opens again.
-      // the timeout makes this run after handleClick
-      setTimeout(() => {
-        this.readOnlyLocal = true
-        this.previewModeLocal = true
-      }, 0)
+      if (isEnter) {
+        this.handleSave()
+      }
+      if (isEscape) {
+        this.handleClose()
+      }
     },
     focusFirstInputBox() {
+      // wait for the card to load into the DOM
       this.$nextTick(() => {
         const inputs = this.$refs.input
         if (inputs && inputs.length > 0) {
           inputs[0].focus()
         }
       })
-    },
-    patchRecord(record) {
-      this.$store.dispatch('jv/patch', record)
     },
   },
 }

@@ -1,31 +1,31 @@
 <template>
   <div id="sld">
     <NavBar
-      :collections="collectionNames"
-      :setView="setView"
-      :selected="view"
+      :collectionNames="collectionNames"
+      :setPage="setPage"
+      :selected="page"
     ></NavBar>
     <div id="nav-bar-spacer"></div>
     <!-- temporary way to see the mobile version -->
     <label><input type="checkbox" v-model="mobile" /> Mobile version</label>
     <CardSearch
-      v-if="view == 'All'"
+      v-if="page == config.ALL_PAGE_NAME"
       :collections="collections"
-      :collectionNames="selectedCollections"
-      :allColumnNames="allColumnNames"
-      :previewColumnNames="previewColumnNames"
-      :globalOptions="globalOptions"
-      :onClick="mobile ? () => {} : setView"
-      :expandOnClick="mobile"
+      :page="config.ALL_PAGE_NAME"
+      :expandedID="expandedIDs[config.ALL_PAGE_NAME]"
+      :onClick="expandCard"
+      :onClose="closeCard"
+      :onSave="saveCard"
+      :componentOptions="componentOptions"
     ></CardSearch>
     <TableSearch
-      v-else
-      :collection="collections[view]"
-      :collectionName="view"
-      :allColumnNames="allColumnNames[view]"
-      :previewColumnNames="previewColumnNames[view]"
-      :globalOptions="globalOptions"
-      :expandedProp="expandedID"
+      v-else-if="page"
+      :collection="collections[page]"
+      :expandedID="expandedIDs[page]"
+      :expandCard="expandCard"
+      :onCardClose="closeCard"
+      :onCardSave="saveCard"
+      :componentOptions="componentOptions"
     ></TableSearch>
   </div>
 </template>
@@ -34,13 +34,17 @@
 import TableSearch from './TableSearch'
 import CardSearch from './CardSearch'
 import NavBar from './NavBar'
+import config from './config'
+import Collection from './Collection'
 
 export default {
   name: 'SearchListDetail',
   props: {
+    // array of string names for all collections
+    // need to keep this so that the order is consistent
     collectionNames: Array,
     // shown when details are expanded
-    allColumnNames: Object,
+    fullColumnNames: Object,
     // shown in a card when not expanded
     previewColumnNames: Object,
     // extra configuration options
@@ -50,11 +54,11 @@ export default {
     },
     detailsTitle: {
       type: String,
-      default: 'details',
+      default: config.DEFAULT_DETAILS_TITLE,
     },
     detailsText: {
       type: String,
-      default: '+',
+      default: config.DEFAULT_DETAILS_TEXT,
     },
   },
   components: {
@@ -62,17 +66,20 @@ export default {
     CardSearch,
     TableSearch,
   },
-  data: () => {
+  data() {
     return {
-      view: 'All',
-      expandedID: null,
+      config: config,
+      page: config.ALL_PAGE_NAME,
+      expandedIDs: this.initExpandedIDs(),
       mobile: false,
+      // use prop information to create the collections
+      // computed after collections are retrieved from the server
       collections: {},
     }
   },
   computed: {
     // group together all options to pass around in other components as a single prop
-    globalOptions() {
+    componentOptions() {
       return {
         firstAttrAsCardTitle: this.firstAttrAsCardTitle,
         detailsTitle: this.detailsTitle,
@@ -80,24 +87,71 @@ export default {
         mobile: this.mobile,
       }
     },
+    // if it's the "all" page, return all collections, otherwise just return one
     selectedCollections() {
-      if (this.view == 'All') {
+      if (this.page == config.ALL_PAGE_NAME) {
         return this.collectionNames
       } else {
-        return [this.view]
+        return [this.page]
       }
     },
   },
   methods: {
-    setView: function(view, expandedID) {
-      // really strange bug ?? can't go straight to the other view
-      this.view = 'All'
-      this.expandedID = expandedID
+    setPage(page) {
+      // strange bug ?? need to set to null first, can't go straight to the other page
+      this.page = null
       this.$nextTick().then(() => {
-        this.view = view
+        this.page = page
       })
     },
+    expandCard(type, id, fromPage) {
+      // if on mobile, don't navigate to the page for the card type
+      // instead stay on the same page
+      const pageToNavTo = this.mobile ? fromPage : type
+
+      // set the expanded ID for the collection type
+      this.$set(this.expandedIDs, pageToNavTo, {
+        id: id,
+        type: type,
+      })
+      // then switch to that page
+      this.setPage(pageToNavTo)
+    },
+    closeCard(type, id, fromPage) {
+      // since the user's click will also trigger expandCard()
+      // force this event to happen after (hacky?)
+      setTimeout(() => {
+        this.expandCard(type, null, fromPage)
+      }, 0)
+    },
+    // patch the collection to the server
+    saveCard(type, id, fromPage) {
+      alert('save not yet implemented')
+    },
+    setExpandedID(id, page = this.page) {
+      if (id != undefined) {
+        this.expandedIDs[page] = id
+        this.setPage(page)
+      }
+    },
+    // initialise the structure for the expandedIDs object
+    initExpandedIDs() {
+      let expandedIDs = {
+        [config.ALL_PAGE_NAME]: {
+          id: null,
+          type: null,
+        },
+      }
+      this.collectionNames.forEach((name) => {
+        expandedIDs[name] = {
+          id: null,
+          type: null,
+        }
+      })
+      return expandedIDs
+    },
   },
+  // on creation, fetch the collections from the server
   created() {
     // for each collection
     this.collectionNames.forEach((collectionName) => {
@@ -105,9 +159,14 @@ export default {
       // sparse fields not working?
       const url = `${collectionName}`
       this.$store.dispatch('jv/get', url).then(() => {
-        // then copy into memory from store (contains all columns)
-        const collectionInMemory = this.$store.getters['jv/get'](collectionName)
-        this.$set(this.collections, collectionName, collectionInMemory)
+        // create a reactive object from the collection in the store
+        let collection = new Collection(
+          collectionName,
+          this.$store.getters['jv/get'](collectionName),
+          this.fullColumnNames[collectionName],
+          this.previewColumnNames[collectionName]
+        )
+        this.$set(this.collections, collectionName, collection)
       })
     })
   },

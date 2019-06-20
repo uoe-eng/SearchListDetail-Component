@@ -2,7 +2,7 @@
   <div id="app">
     <SearchListDetail
       :collectionNames="['person', 'widget']"
-      :allColumnNames="{
+      :fullColumnNames="{
         person: ['name', 'title', 'job'],
         widget: ['name', 'color'],
       }"
