@@ -29,10 +29,6 @@
           previewOrder: ['name'],
         },
       }"
-      :fullColumnNames="{
-        person: ['name', 'title', 'job'],
-        widget: ['name', 'color'],
-      }"
       :previewColumnNames="{
         person: ['name', 'title'],
         widget: ['name'],

@@ -40,9 +40,6 @@ export default {
   name: 'SearchListDetail',
   props: {
     resultOptions: Object,
-    // array of string names for all collections
-    // need to keep this so that the order is consistent
-    fullColumnNames: Object,
     // shown in a card when not expanded
     previewColumnNames: Object,
     // extra configuration options
@@ -85,6 +82,7 @@ export default {
         mobile: this.mobile,
       }
     },
+    // the collections that will be shown
     // if it's the "all" page, return all collections, otherwise just return one
     selectedCollections() {
       if (this.page == config.ALL_PAGE_NAME) {
@@ -93,6 +91,20 @@ export default {
       } else {
         return [this.page]
       }
+    },
+    // column names that are shown in the table and expanded card view
+    fullColumnNames() {
+      let names = {}
+      const collectionNames = Object.keys(this.resultOptions)
+      collectionNames.forEach((collectionName) => {
+        // array of column names, each column in a collection has a name
+        names[collectionName] = this.resultOptions[collectionName].columns.map(
+          (column) => {
+            return column.name
+          }
+        )
+      })
+      return names
     },
   },
   methods: {
