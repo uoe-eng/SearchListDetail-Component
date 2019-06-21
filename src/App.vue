@@ -29,10 +29,6 @@
           previewOrder: ['name'],
         },
       }"
-      :previewColumnNames="{
-        person: ['name', 'title'],
-        widget: ['name'],
-      }"
       :firstAttrAsCardTitle="true"
       detailsTitle="details"
       detailsText="+"

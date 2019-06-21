@@ -40,8 +40,6 @@ export default {
   name: 'SearchListDetail',
   props: {
     resultOptions: Object,
-    // shown in a card when not expanded
-    previewColumnNames: Object,
     // extra configuration options
     firstAttrAsCardTitle: {
       type: Boolean,
@@ -103,6 +101,24 @@ export default {
             return column.name
           }
         )
+      })
+      return names
+    },
+    // column names that are shown in the collapsed card view
+    previewColumnNames() {
+      let names = {}
+      const collectionNames = Object.keys(this.resultOptions)
+      collectionNames.forEach((collectionName) => {
+        const previewColumns = this.resultOptions[collectionName].previewOrder
+        if (previewColumns) {
+          names[collectionName] = previewColumns
+        } else {
+          names[collectionName] = this.resultOptions[
+            collectionName
+          ].columns.map((column) => {
+            return column.name
+          })
+        }
       })
       return names
     },
