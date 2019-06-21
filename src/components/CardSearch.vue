@@ -46,3 +46,11 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+#card-search {
+  max-height: 80vh;
+  overflow-y: scroll;
+}
+</style>
+

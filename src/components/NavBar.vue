@@ -39,12 +39,16 @@ export default {
 
 <style scoped>
 #nav-bar {
-  position: fixed;
   padding-top: 20px;
   padding-bottom: 20px;
+  margin-bottom: 10px;
   border-radius: 5px;
   background-color: #fff;
   box-shadow: rgba(0, 0, 0, 0.3) 0 1px 3px;
+  overflow-x: scroll;
+  white-space: nowrap;
+  width: fit-content;
+  max-width: 100%;
 }
 
 #nav-bar .nav-bar-item {

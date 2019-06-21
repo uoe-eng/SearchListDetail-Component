@@ -83,8 +83,6 @@ export default {
         const isTabForward = e.key == 'Tab' && !e.shiftKey
         if (isTopCorner && isTabForward && expandedID) {
           topTable.deselectCell()
-          console.log("focusing first input");
-          
           firstInput.focus()
         }
       },

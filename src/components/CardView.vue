@@ -119,7 +119,7 @@ export default {
     },
     handleSave() {
       if (this.onSave) {
-        this.onSave(this.collection, this.id, this.page)
+        this.onSave(this.collection.type, this.id, this.page)
       }
     },
     // handles keypresses from the input boxes
@@ -163,9 +163,10 @@ export default {
 <style scoped>
 .sld-card-view {
   padding: 10px;
-  margin: 10px;
-  border-radius: 10px;
-  box-shadow: rgba(0, 0, 0, 0.3) 0 1px 3px;
+  /* margin: 10px; */
+  border: 1px #cdcdcd solid;
+  border-radius: 1px;
+  /* box-shadow: rgba(0, 0, 0, 0.3) 0 1px 3px; */
   max-width: 500px;
 }
 

@@ -5,7 +5,6 @@
       :setPage="setPage"
       :selected="page"
     ></NavBar>
-    <div id="nav-bar-spacer"></div>
     <!-- temporary way to see the mobile version -->
     <label><input type="checkbox" v-model="mobile" /> Mobile version</label>
     <CardSearch
@@ -126,6 +125,7 @@ export default {
     },
     // patch the collection to the server
     saveCard(type, id, fromPage) {
+      this.closeCard(type, id, fromPage)
       alert('save not yet implemented')
     },
     setExpandedID(id, page = this.page) {
@@ -172,9 +172,3 @@ export default {
   },
 }
 </script>
-
-<style scoped>
-#nav-bar-spacer {
-  height: 80px;
-}
-</style>
