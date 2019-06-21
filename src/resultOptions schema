@@ -1,0 +1,22 @@
+resultOptions = {
+  collectionName1: {
+    columns: [
+      {
+        name: String,
+        searchOperator(default = 'contains'): String,
+      },
+      {
+        ...
+      }
+    ],
+    previewOrder(default = all columns in the same order): [
+      'FirstCol',
+      'SecondCol',
+      ...
+    ],
+  },
+  collectionName2: {
+    ...
+  },
+  ...
+}

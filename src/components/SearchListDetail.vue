@@ -1,7 +1,7 @@
 <template>
   <div id="sld">
     <NavBar
-      :collectionNames="collectionNames"
+      :collectionNames="Object.keys(this.resultOptions)"
       :setPage="setPage"
       :selected="page"
     ></NavBar>
@@ -39,10 +39,9 @@ import Collection from './Collection'
 export default {
   name: 'SearchListDetail',
   props: {
+    resultOptions: Object,
     // array of string names for all collections
     // need to keep this so that the order is consistent
-    collectionNames: Array,
-    // shown when details are expanded
     fullColumnNames: Object,
     // shown in a card when not expanded
     previewColumnNames: Object,
@@ -89,7 +88,8 @@ export default {
     // if it's the "all" page, return all collections, otherwise just return one
     selectedCollections() {
       if (this.page == config.ALL_PAGE_NAME) {
-        return this.collectionNames
+        // all collection names
+        return Object.keys(this.resultOptions)
       } else {
         return [this.page]
       }
@@ -142,7 +142,8 @@ export default {
           type: null,
         },
       }
-      this.collectionNames.forEach((name) => {
+      const collectionNames = Object.keys(this.resultOptions)
+      collectionNames.forEach((name) => {
         expandedIDs[name] = {
           id: null,
           type: null,
@@ -153,8 +154,9 @@ export default {
   },
   // on creation, fetch the collections from the server
   created() {
+    const collectionNames = Object.keys(this.resultOptions)
     // for each collection
-    this.collectionNames.forEach((collectionName) => {
+    collectionNames.forEach((collectionName) => {
       // get collection from server
       // sparse fields not working?
       const url = `${collectionName}`

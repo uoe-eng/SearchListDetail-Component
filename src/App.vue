@@ -1,7 +1,34 @@
 <template>
   <div id="app">
     <SearchListDetail
-      :collectionNames="['person', 'widget']"
+      :resultOptions="{
+        person: {
+          columns: [
+            {
+              name: 'name',
+            },
+            {
+              name: 'title',
+              searchOperator: 'matches',
+            },
+            {
+              name: 'job',
+            },
+          ],
+          previewOrder: ['name', 'title'],
+        },
+        widget: {
+          columns: [
+            {
+              name: 'name',
+            },
+            {
+              name: 'color',
+            },
+          ],
+          previewOrder: ['name'],
+        },
+      }"
       :fullColumnNames="{
         person: ['name', 'title', 'job'],
         widget: ['name', 'color'],
