@@ -4,11 +4,15 @@ export default class Collection {
     this.entries = entries
     this.fullCols = fullCols
     this.previewCols = previewCols
+    this.columnSorting = {}
   }
 
   // returns (consistently) the ids of the collection in an array
+  // example for sorting by name
   ids() {
-    return Object.keys(this.entries).sort()
+    return Object.keys(this.entries).sort((a, b) => {
+      return this.entries[a].name > this.entries[b].name ? 1 : -1
+    })
   }
 
   // given a coordinate from the table, get the id and col names for it

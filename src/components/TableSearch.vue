@@ -17,19 +17,18 @@
     </div>
     <hot-table ref="bottomTable" :settings="tableSettings"></hot-table>
   </div>
-  <div v-else>
-    <CardSearch
-      :collections="{
-        [collection.type]: collection,
-      }"
-      :page="collection.type"
-      :expandedID="expandedID"
-      :onClick="expandCard"
-      :onClose="onCardClose"
-      :onSave="onCardSave"
-      :componentOptions="componentOptions"
-    ></CardSearch>
-  </div>
+  <CardSearch
+    v-else
+    :collections="{
+      [collection.type]: collection,
+    }"
+    :page="collection.type"
+    :expandedID="expandedID"
+    :onClick="expandCard"
+    :onClose="onCardClose"
+    :onSave="onCardSave"
+    :componentOptions="componentOptions"
+  ></CardSearch>
 </template>
 
 <script>
@@ -54,9 +53,10 @@ export default {
         colHeaders: [this.componentOptions.detailsTitle].concat(
           this.collection.fullCols
         ),
-        multiColumnSorting: true,
-        manualColumnResize: true,
+        columnSorting: true,
+        // manualColumnResize: true,
         selectionMode: 'single',
+        // stretchH: 'all',
         licenseKey: 'non-commercial-and-evaluation',
       },
       // data for the tables calculated from the collection and expanded id

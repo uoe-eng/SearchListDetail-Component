@@ -54,6 +54,60 @@
           "name": "Adam Smith",
           "job": "Admin"
         }
+      },
+      {
+        "type": "person",
+        "id": 7,
+        "attributes": {
+          "title": "Mr",
+          "name": "John Smith 7",
+          "job": "Admin"
+        }
+      },
+      {
+        "type": "person",
+        "id": 8,
+        "attributes": {
+          "title": "Ms",
+          "name": "Johanna Smith 8",
+          "job":"Admin"
+        }
+      },
+      {
+        "type": "person",
+        "id": 9,
+        "attributes": {
+          "title": "Mr",
+          "name": "John Smith 9",
+          "job": "Technician"
+        }
+      },
+      {
+        "type": "person",
+        "id": 10,
+        "attributes": {
+          "title": "Ms",
+          "name": "Johanna Smith 10",
+          "job":"Technician"
+        }
+      },
+      {
+        "type": "person",
+        "id": 11,
+        "attributes": {
+          "title": "Mr",
+          "name": "Adam Smith 11",
+          "job": "Technician"
+        }
+      },
+      {
+        "type": "person",
+        "id": 12,
+        "attributes": {
+          "title": "Mr",
+          "name": "Adam Smith 12",
+          "job": "Admin"
+        }
       }
     ]
   },
