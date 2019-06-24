@@ -6,10 +6,19 @@
 * The other tabs display results with row-expandable handsontable components
 * 'All' tab cards link to their corresponding type tab and expands its row automatically
 * Mobile layout where cards are used instead of tables
+* Navigation bar scrolls horizontally if too long
+* Expanded cards stay expanded when switching tabs
+* Data is editable from both the cards and table cells
+* Navigation by keyboard and tab is possible in the table views
+* All data structures regarding state are stored in the root component, potential for URL routing
+* Columns can be sorted by handsontable, the order will be saved in vue and is reactive
+* Sorted columns stay sorted when switching tabs
 
 ## Next steps
-* Make the data editable from the cards and from the tables directly.
-* Make navigation by keyboard possible
+* Patch collections to the server (will require real server)
+* Add search box
+* Add advanced search settings with column filters
+* Keyboard navigation for switching tabs
 
 ## Project setup
 ```
