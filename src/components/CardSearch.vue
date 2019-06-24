@@ -49,8 +49,7 @@ export default {
 
 <style scoped>
 #card-search {
-  max-height: 80vh;
-  overflow-y: scroll;
+  max-width: var(--card-width);
+  overflow-y: auto;
 }
 </style>
-

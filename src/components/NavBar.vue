@@ -42,10 +42,11 @@ export default {
   padding-top: 20px;
   padding-bottom: 20px;
   margin-bottom: 10px;
+  height: 20px;
   border-radius: 5px;
   background-color: #fff;
   box-shadow: rgba(0, 0, 0, 0.3) 0 1px 3px;
-  overflow-x: scroll;
+  overflow-x: auto;
   white-space: nowrap;
   width: fit-content;
   max-width: 100%;

@@ -163,11 +163,9 @@ export default {
 <style scoped>
 .sld-card-view {
   padding: 10px;
-  /* margin: 10px; */
   border: 1px #cdcdcd solid;
   border-radius: 1px;
-  /* box-shadow: rgba(0, 0, 0, 0.3) 0 1px 3px; */
-  max-width: 500px;
+  /* max-width: var(--card-width); */
 }
 
 .sld-card-view.pointer {
@@ -175,11 +173,11 @@ export default {
 }
 
 .sld-card-view.pointer:hover {
-  background-color: rgba(0, 0, 0, 0.03);
+  background-color: var(--highlight-color);
 }
 
 .sld-card-view .column {
-  color: grey;
+  color: var(--alt-text-color);
 }
 
 .sld-card-view .title {
@@ -189,20 +187,21 @@ export default {
 }
 
 .sld-card-view .subtitle {
-  color: grey;
+  color: var(--alt-text-color);
 }
 
 .sld-card-view input {
   border: none;
   font-size: inherit;
   background-color: transparent;
+  width: 100%;
 }
 
 .sld-card-view .controls {
   width: 100%;
   padding-top: 20px;
   font-weight: bold;
-  color: grey;
+  color: var(--alt-text-color);
 }
 
 .sld-card-view .controls .close {

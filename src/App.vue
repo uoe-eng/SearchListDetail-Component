@@ -49,8 +49,12 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 * {
   font-family: 'Montserrat', sans-serif;
+}
+
+body {
+  margin: 0;
 }
 </style>

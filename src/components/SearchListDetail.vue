@@ -202,3 +202,24 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+#sld {
+  --card-width: 500px;
+  --highlight-color: rgba(0, 0, 0, 0.03);
+  --text-color: black;
+  --alt-text-color: grey;
+  color: var(--text-color);
+  background-color: #fff;
+  display: grid;
+  grid-template-areas: 'nav' 'settings' 'results';
+  /* collapses first two as much as possible */
+  grid-template-rows: auto auto 1fr;
+  /* change this depending on application */
+  height: 100vh;
+}
+
+.hidden {
+  display: none;
+}
+</style>
