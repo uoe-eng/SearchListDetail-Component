@@ -1,6 +1,35 @@
 import Handsontable from 'handsontable'
 
 export default {
+  // every time a column is sorted by the user, the sorting information for
+  // the collection is updated in the collection object
+  afterColumnSort: (context) => {
+    const hook = (currentSortConfig, destinationSortConfigs) => {
+      // set the collection's sorting
+      const sorting = destinationSortConfigs[0]
+      context.collection.columnSorting = sorting
+      // handsontable will not be able to sort the whole table when it is split
+      // into two tables, so update the view to redraw the two tables
+      if (context.expandedID.id != null) {
+        // same as refresh view
+        context.expandCard(
+          context.expandedID.type,
+          context.expandedID.id,
+          context.expandedID.type
+        )
+      }     
+    }
+    Handsontable.hooks.add(
+      'afterColumnSort',
+      hook,
+      context.$refs.topTable.hotInstance
+    )
+    Handsontable.hooks.add(
+      'afterColumnSort',
+      hook,
+      context.$refs.bottomTable.hotInstance
+    )
+  },
   // when a cell is edited, the value is updated in the reactive object
   addAfterChange: (context) => {
     Handsontable.hooks.add(

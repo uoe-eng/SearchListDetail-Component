@@ -156,12 +156,6 @@ export default {
       this.closeCard(type, id, fromPage)
       alert('save not yet implemented')
     },
-    setExpandedID(id, page = this.page) {
-      if (id != undefined) {
-        this.expandedIDs[page] = id
-        this.setPage(page)
-      }
-    },
     // initialise the structure for the expandedIDs object
     initExpandedIDs() {
       let expandedIDs = {

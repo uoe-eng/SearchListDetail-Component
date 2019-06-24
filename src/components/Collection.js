@@ -4,14 +4,27 @@ export default class Collection {
     this.entries = entries
     this.fullCols = fullCols
     this.previewCols = previewCols
-    this.columnSorting = {}
+    // the sorting for each column is stored in the collection object
+    this.columnSorting = undefined
   }
 
   // returns (consistently) the ids of the collection in an array
   // example for sorting by name
   ids() {
     return Object.keys(this.entries).sort((a, b) => {
-      return this.entries[a].name > this.entries[b].name ? 1 : -1
+      if (this.columnSorting == undefined) {
+        // normal numerical sort by id
+        return a - b
+      }
+      // otherwise sort by column
+      const colNumber = this.columnSorting.column - 1
+      const colName = this.fullCols[colNumber]
+      // the comparator function in sort() expects a number
+      if (this.columnSorting.sortOrder == 'asc') {
+        return this.entries[a][colName] >= this.entries[b][colName] ? 1 : -1
+      } else {
+        return this.entries[a][colName] >= this.entries[b][colName] ? -1 : 1
+      }
     })
   }
 

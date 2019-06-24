@@ -108,11 +108,20 @@ export default {
           bottomTableInstance.setCellMeta(index, 0, 'id', id)
         })
 
+        // sort the tables by the current sorting order
+        topTableInstance.getPlugin('columnSorting').sort(
+          this.collection.columnSorting
+        )
+        bottomTableInstance.getPlugin('columnSorting').sort(
+          this.collection.columnSorting
+        )
+
         // add the hooks to the tables
         TableHooks.addAfterChange(this)
         TableHooks.addAfterBeginEditing(this)
         TableHooks.addTableToCard(this)
         TableHooks.addTableWraparound(this)
+        TableHooks.afterColumnSort(this)
       })
     },
     handleEdit(row, column, tableInstance) {
