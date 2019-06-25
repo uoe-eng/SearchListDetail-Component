@@ -5,6 +5,6 @@ export default {
   DEFAULT_DETAILS_TEXT: '+',
   SAVE_BUTTON_REF: 'save',
   SAVE_BUTTON_TEXT: 'Save',
-  CLOSE_BUTTON_REF: 'close',
-  CLOSE_BUTTON_TEXT: 'Close',
+  CLOSE_BUTTON_REF: 'cancel',
+  CLOSE_BUTTON_TEXT: 'Cancel',
 }

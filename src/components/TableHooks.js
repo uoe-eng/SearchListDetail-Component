@@ -42,6 +42,7 @@ export default {
           const id = context.collection.fromCoordinates(row, col).id
           const colName = context.collection.fromCoordinates(row, col).col
           context.$set(context.collection.entries[id], colName, newValue)
+          context.onCardSave(context.collection.type, id, context.collection.type, false)
         }
       },
       context.$refs.topTable.hotInstance
@@ -62,6 +63,7 @@ export default {
           const id = context.collection.fromCoordinates(row, col).id
           const colName = context.collection.fromCoordinates(row, col).col
           context.$set(context.collection.entries[id], colName, newValue)
+          context.onCardSave(context.collection.type, id, context.collection.type, false)
         }
       },
       context.$refs.bottomTable.hotInstance

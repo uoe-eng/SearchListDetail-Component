@@ -152,9 +152,11 @@ export default {
       }, 0)
     },
     // patch the collection to the server
-    saveCard(type, id, fromPage) {
-      this.closeCard(type, id, fromPage)
-      alert('save not yet implemented')
+    saveCard(type, id, fromPage, closeCard = true) {
+      if (closeCard) {
+        this.closeCard(type, id, fromPage)
+      }
+      this.patchRecord(type, id)
     },
     // initialise the structure for the expandedIDs object
     initExpandedIDs() {
@@ -172,6 +174,11 @@ export default {
         }
       })
       return expandedIDs
+    },
+    patchRecord(type, id) {
+      const record = this.collections[type].entries[id]
+      console.log(record)
+      this.$store.dispatch('jv/patch', record)
     },
   },
   // on creation, fetch the collections from the server

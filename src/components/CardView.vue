@@ -76,6 +76,8 @@ export default {
     return {
       config: config,
       entry: this.collection.entries[this.id],
+      // stringify to create deep copy
+      oldDetails: JSON.stringify(this.collection.entries[this.id]),
     }
   },
   computed: {
@@ -114,6 +116,9 @@ export default {
     },
     handleClose() {
       if (this.onClose) {
+        // restore the old deatils from when the card was rendered
+        const oldDetails = JSON.parse(this.oldDetails)
+        this.collection.entries[this.id] = oldDetails
         this.onClose(this.collection.type, this.id, this.page)
       }
     },
