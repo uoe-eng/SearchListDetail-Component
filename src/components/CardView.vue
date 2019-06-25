@@ -11,7 +11,25 @@
         <tr v-for="(column, index) of columnsToShow" v-bind:key="column">
           <td class="column">{{ column }}:</td>
           <td class="value">
-            <span v-if="isReadOnly">{{ entry[column] }}</span>
+            <span v-if="column.includes('.')">
+              <span
+                v-for="(related, key) of collection.entries[id][
+                  column.split('.')[0]
+                ]"
+                v-bind:key="key"
+              >
+                <span v-if="key == '_jv'"></span>
+                <button v-else-if="typeof related == 'object'">
+                  {{ related[column.split('.')[1]] }}
+                </button>
+                <button v-else-if="key == column.split('.')[1]">
+                  {{ related }}
+                </button>
+              </span>
+            </span>
+            <span v-else-if="isReadOnly">{{
+              collection.entries[id][column]
+            }}</span>
             <input
               v-else
               @keydown="
@@ -21,7 +39,7 @@
               "
               ref="input"
               type="text"
-              v-model="entry[column]"
+              v-model="collection.entries[id][column]"
             />
           </td>
         </tr>
@@ -74,8 +92,8 @@ export default {
   },
   data() {
     return {
+      // defined here so the template can use it
       config: config,
-      entry: this.collection.entries[this.id],
       // stringify to create deep copy
       oldDetails: JSON.stringify(this.collection.entries[this.id]),
     }
@@ -85,7 +103,8 @@ export default {
     title() {
       // don't set the title unless specified
       if (this.componentOptions.firstAttrAsCardTitle) {
-        return this.entry[this.collection.fullCols[0]]
+        const entry = this.collection.entries[this.id]
+        return entry[this.collection.fullCols[0]]
       } else {
         return null
       }

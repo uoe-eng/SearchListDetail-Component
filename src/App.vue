@@ -25,6 +25,9 @@
             {
               name: 'color',
             },
+            {
+              name: 'widgets.name',
+            },
           ],
           previewOrder: ['name'],
         },

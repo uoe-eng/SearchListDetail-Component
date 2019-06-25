@@ -8,8 +8,12 @@ export default class Collection {
     this.columnSorting = undefined
   }
 
-  // returns (consistently) the ids of the collection in an array
-  // example for sorting by name
+  // gets the entry of id
+  get(id) {
+    return this.entries[id]
+  }
+
+  // returns (in order) the ids of the collection in an array
   ids() {
     return Object.keys(this.entries).sort((a, b) => {
       if (this.columnSorting == undefined) {
@@ -39,15 +43,7 @@ export default class Collection {
   // create the table data for the two tables depending on the expanded row
   splitIntoTables(expandedID, detailsText) {
     // for each id in the collection we need to compute the data for the row
-    let data = this.ids().map((id) => {
-      // the row items will be determined by this.fullCols
-      const row = this.fullCols.map((column) => {
-        return this.entries[id][column]
-      })
-
-      // add the expand details cell to the left of each row
-      return [detailsText].concat(row)
-    })
+    let data = this.getAllData(detailsText)
 
     // using the list of ids find the index of the expanded id
     const expandedRow = this.ids().indexOf(expandedID.id)
@@ -68,5 +64,34 @@ export default class Collection {
         bottomIDs: this.ids().slice(expandedRow + 1, data.length),
       }
     }
+  }
+
+  getAllData(detailsText) {
+    return this.ids().map((id) => {
+      // the row items will be determined by this.fullCols
+      const row = this.fullCols.map((column) => {
+        // special case for relationship column
+        if (column.includes('.')) {
+          const relCollection = column.split('.')[0]
+          const relatedItems = this.entries[id][relCollection]
+          // 0 items
+          if (!relatedItems) {
+            return '0 items'
+          }
+          // 1 item
+          if (relatedItems._jv) {
+            return relatedItems[column.split('.')[1]]
+          }
+          // many items
+          const itemCount = Object.keys(relatedItems).length
+          return itemCount + ' items...'
+        }
+        // normal attribute column
+        return this.entries[id][column]
+      })
+
+      // add the expand details cell to the left of each row
+      return [detailsText].concat(row)
+    })
   }
 }
