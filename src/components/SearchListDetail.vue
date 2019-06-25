@@ -177,7 +177,6 @@ export default {
     },
     patchRecord(type, id) {
       const record = this.collections[type].entries[id]
-      console.log(record)
       this.$store.dispatch('jv/patch', record)
     },
   },
