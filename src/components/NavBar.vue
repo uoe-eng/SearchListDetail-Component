@@ -26,13 +26,20 @@ export default {
   name: 'NavBar',
   props: {
     collectionNames: Array,
-    setPage: Function,
     selected: String,
   },
   data() {
     return {
       config: config,
     }
+  },
+  methods: {
+    setPage(page) {
+      this.$store.dispatch('setPage', {
+        page: page,
+        nextTick: this.$nextTick,
+      })
+    },
   },
 }
 </script>

@@ -7,7 +7,6 @@
           :collections="collections"
           :type="collection.type"
           :id="id"
-          :page="page"
           :onClick="onClick"
           :onClose="onClose"
           :onSave="onSave"
@@ -34,7 +33,6 @@ export default {
   props: {
     collections: Object,
     showOnly: String,
-    page: String,
     expandedID: Object,
     addOverlay: Function,
     onClick: Function,

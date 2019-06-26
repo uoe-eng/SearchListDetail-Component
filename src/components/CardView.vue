@@ -4,7 +4,7 @@
       class="sld-card-view"
       v-bind:class="{
         pointer: onClick && !isExpanded,
-        selected: expandedID.id == id
+        selected: expandedID.id == id,
       }"
       @click="handleClick"
     >
@@ -78,7 +78,6 @@
       :collections="collections"
       :type="expandedID.overlay.type"
       :id="expandedID.overlay.id"
-      :page="page"
       :onClick="onClick"
       :onClose="onClose"
       :onSave="onSave"
@@ -100,7 +99,6 @@ export default {
     collections: Object,
     type: String,
     id: String, // id of row in collection
-    page: String, // page on which this card is showing
     isReadOnly: Boolean,
     isExpanded: Boolean,
     onClick: Function,
@@ -129,6 +127,9 @@ export default {
     }
   },
   computed: {
+    page() {
+      return this.$store.state.sld.page
+    },
     // the string for the title of the card (null if titles are disabled)
     title() {
       // don't set the title unless specified
@@ -148,7 +149,10 @@ export default {
           : this.collection.previewCols
       // the first attribute is reserved for the title if specified, so remove it from body of card
       // card must also be read-only, since when editing it will be needed in the body
-      if (this.componentOptions.firstAttrAsCardTitle && this.isReadOnly || this.expandedID.overlay) {
+      if (
+        (this.componentOptions.firstAttrAsCardTitle && this.isReadOnly) ||
+        this.expandedID.overlay
+      ) {
         return columnsToShow.slice(1)
       } else {
         return columnsToShow

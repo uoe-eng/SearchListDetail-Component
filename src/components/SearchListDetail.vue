@@ -2,7 +2,6 @@
   <div id="sld">
     <NavBar
       :collectionNames="Object.keys(this.resultOptions)"
-      :setPage="setPage"
       :selected="page"
     ></NavBar>
     <!-- temporary way to see the mobile version -->
@@ -38,6 +37,7 @@ import CardSearch from './CardSearch'
 import NavBar from './NavBar'
 import config from './config'
 import Collection from './Collection'
+import SldStore from './SldStore'
 
 export default {
   name: 'SearchListDetail',
@@ -65,7 +65,6 @@ export default {
   data() {
     return {
       config: config,
-      page: config.ALL_PAGE_NAME,
       expandedIDs: this.initExpandedIDs(),
       mobile: false,
       // use prop information to create the collections
@@ -74,6 +73,9 @@ export default {
     }
   },
   computed: {
+    page() {
+      return this.$store.state.sld.page
+    },
     // group together all options to pass around in other components as a single prop
     componentOptions() {
       return {
@@ -128,10 +130,9 @@ export default {
   },
   methods: {
     setPage(page) {
-      // strange bug ?? need to set to null first, can't go straight to the other page
-      this.page = null
-      this.$nextTick().then(() => {
-        this.page = page
+      this.$store.dispatch('setPage', {
+        page: page,
+        nextTick: this.$nextTick,
       })
     },
     expandCard(type, id, fromPage) {
@@ -145,16 +146,14 @@ export default {
       this.$delete(this.expandedIDs[pageToNavTo], 'overlay')
 
       // then switch to that page
-      this.setPage(pageToNavTo)
+      this.$store.dispatch('setPage', {
+        page: pageToNavTo,
+        nextTick: this.$nextTick,
+      })
     },
     closeCard(type, id, fromPage) {
-      // since the user's click will also trigger expandCard()
-      // force this event to happen after (hacky?)
-      setTimeout(() => {
-        this.removeOneOverlay(this.expandedIDs[fromPage])
-        this.setPage(this.page)
-        // this.expandCard(type, null, fromPage)
-      }, 0)
+      this.removeOneOverlay(this.expandedIDs[fromPage])
+      this.$store.dispatch('refreshPage', this.$nextTick)
     },
     // patch the collection to the server
     saveCard(type, id, fromPage, closeCard = true) {
@@ -202,6 +201,7 @@ export default {
   },
   // on creation, fetch the collections from the server
   created() {
+    this.$store.registerModule('sld', SldStore)
     const collectionNames = Object.keys(this.resultOptions)
     // for each collection
     collectionNames.forEach((collectionName) => {
@@ -216,6 +216,7 @@ export default {
           this.fullColumnNames[collectionName],
           this.previewColumnNames[collectionName]
         )
+        // this.$store.dispatch('addCollection', collection)
         this.$set(this.collections, collectionName, collection)
       })
     })

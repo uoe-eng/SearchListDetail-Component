@@ -6,7 +6,6 @@
         :collections="collections"
         :type="type"
         :id="expandedID.id"
-        :page="type"
         :onClose="onCardClose"
         :onSave="onCardSave"
         :isReadOnly="false"
@@ -25,7 +24,6 @@
     v-else
     :collections="collections"
     :showOnly="collection.type"
-    :page="collection.type"
     :expandedID="expandedID"
     :addOverlay="addOverlay"
     :onClick="expandCard"
