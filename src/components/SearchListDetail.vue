@@ -12,6 +12,7 @@
       :collections="collections"
       :page="config.ALL_PAGE_NAME"
       :expandedID="expandedIDs[config.ALL_PAGE_NAME]"
+      :addOverlay="addOverlay"
       :onClick="expandCard"
       :onClose="closeCard"
       :onSave="saveCard"
@@ -19,8 +20,10 @@
     ></CardSearch>
     <TableSearch
       v-else-if="page"
-      :collection="collections[page]"
+      :collections="collections"
+      :type="page"
       :expandedID="expandedIDs[page]"
+      :addOverlay="addOverlay"
       :expandCard="expandCard"
       :onCardClose="closeCard"
       :onCardSave="saveCard"
@@ -137,10 +140,10 @@ export default {
       const pageToNavTo = this.mobile ? fromPage : type
 
       // set the expanded ID for the collection type
-      this.$set(this.expandedIDs, pageToNavTo, {
-        id: id,
-        type: type,
-      })
+      this.$set(this.expandedIDs[pageToNavTo], 'id', id)
+      this.$set(this.expandedIDs[pageToNavTo], 'type', type)
+      this.$delete(this.expandedIDs[pageToNavTo], 'overlay')
+
       // then switch to that page
       this.setPage(pageToNavTo)
     },
@@ -148,7 +151,9 @@ export default {
       // since the user's click will also trigger expandCard()
       // force this event to happen after (hacky?)
       setTimeout(() => {
-        this.expandCard(type, null, fromPage)
+        this.removeOneOverlay(this.expandedIDs[fromPage])
+        this.setPage(this.page)
+        // this.expandCard(type, null, fromPage)
       }, 0)
     },
     // patch the collection to the server
@@ -158,20 +163,35 @@ export default {
       }
       this.patchRecord(type, id)
     },
+    addOverlay(expandedID, type, id) {
+      if (expandedID.overlay) {
+        this.addOverlay(expandedID.overlay, type, id)
+      } else {
+        this.$set(expandedID, 'overlay', {})
+        this.$set(expandedID.overlay, 'type', type)
+        this.$set(expandedID.overlay, 'id', id)
+      }
+    },
+    removeOneOverlay(expandedID) {
+      if (!expandedID.overlay) {
+        this.$set(expandedID, 'type', null)
+        this.$set(expandedID, 'id', null)
+        return
+      }
+      if (expandedID.overlay.overlay) {
+        this.removeOneOverlay(expandedID.overlay)
+      } else {
+        this.$delete(expandedID, 'overlay')
+      }
+    },
     // initialise the structure for the expandedIDs object
     initExpandedIDs() {
       let expandedIDs = {
-        [config.ALL_PAGE_NAME]: {
-          id: null,
-          type: null,
-        },
+        [config.ALL_PAGE_NAME]: {},
       }
       const collectionNames = Object.keys(this.resultOptions)
       collectionNames.forEach((name) => {
-        expandedIDs[name] = {
-          id: null,
-          type: null,
-        }
+        expandedIDs[name] = {}
       })
       return expandedIDs
     },
@@ -210,7 +230,7 @@ export default {
   --text-color: black;
   --alt-text-color: grey;
   color: var(--text-color);
-  background-color: #fff;
+  background-color: white;
   display: grid;
   grid-template-areas: 'nav' 'settings' 'results';
   /* collapses first two as much as possible */

@@ -1,9 +1,11 @@
 <template>
   <div id="card-search">
-    <div v-for="(collection, name) of collections" v-bind:key="name">
+    <div v-for="(collection, name) of collectionsToShow" v-bind:key="name">
+      <div></div>
       <div v-for="(entry, id) of collection.entries" v-bind:key="id">
         <CardView
-          :collection="collection"
+          :collections="collections"
+          :type="collection.type"
           :id="id"
           :page="page"
           :onClick="onClick"
@@ -15,6 +17,8 @@
           :isExpanded="
             id == expandedID.id && collection.type == expandedID.type
           "
+          :expandedID="expandedID"
+          :addOverlay="addOverlay"
           :componentOptions="componentOptions"
         ></CardView>
       </div>
@@ -29,20 +33,29 @@ export default {
   name: 'CardSearch',
   props: {
     collections: Object,
+    showOnly: String,
     page: String,
     expandedID: Object,
+    addOverlay: Function,
     onClick: Function,
     onClose: Function,
     onSave: Function,
     componentOptions: Object,
   },
-  data() {
-    return {
-      collectionNames: Object.keys(this.collections),
-    }
-  },
   components: {
     CardView,
+  },
+  computed: {
+    // if specified, only show one collection
+    collectionsToShow() {
+      if (this.showOnly) {
+        return {
+          [this.showOnly]: this.collections[this.showOnly],
+        }
+      } else {
+        return this.collections
+      }
+    },
   },
 }
 </script>

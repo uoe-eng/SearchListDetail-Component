@@ -3,15 +3,19 @@
     <hot-table ref="topTable" :settings="tableSettings"></hot-table>
     <div v-if="expandedID.id != null">
       <CardView
-        :collection="collection"
+        :collections="collections"
+        :type="type"
         :id="expandedID.id"
-        :componentOptions="componentOptions"
+        :page="type"
         :onClose="onCardClose"
         :onSave="onCardSave"
         :isReadOnly="false"
         :isExpanded="true"
         :onTabOutUp="onTabOutUp"
         :onTabOutDown="onTabOutDown"
+        :expandedID="expandedID"
+        :addOverlay="addOverlay"
+        :componentOptions="componentOptions"
         ref="cardview"
       ></CardView>
     </div>
@@ -19,11 +23,11 @@
   </div>
   <CardSearch
     v-else
-    :collections="{
-      [collection.type]: collection,
-    }"
+    :collections="collections"
+    :showOnly="collection.type"
     :page="collection.type"
     :expandedID="expandedID"
+    :addOverlay="addOverlay"
     :onClick="expandCard"
     :onClose="onCardClose"
     :onSave="onCardSave"
@@ -39,8 +43,10 @@ import TableHooks from './TableHooks'
 
 export default {
   props: {
-    collection: Object,
+    collections: Object,
+    type: String,
     expandedID: Object,
+    addOverlay: Function,
     expandCard: Function,
     onCardClose: Function,
     onCardSave: Function,
@@ -48,10 +54,11 @@ export default {
   },
   data() {
     return {
+      collection: this.collections[this.type],
       // common settings for both the top and bottom table (no data)
       tableSettings: {
         colHeaders: [this.componentOptions.detailsTitle].concat(
-          this.collection.fullCols
+          this.collections[this.type].fullCols
         ),
         columnSorting: true,
         // manualColumnResize: true,
@@ -60,7 +67,7 @@ export default {
         licenseKey: 'non-commercial-and-evaluation',
       },
       // data for the tables calculated from the collection and expanded id
-      tableData: this.collection.splitIntoTables(
+      tableData: this.collections[this.type].splitIntoTables(
         this.expandedID,
         this.componentOptions.detailsText
       ),
@@ -109,12 +116,12 @@ export default {
         })
 
         // sort the tables by the current sorting order
-        topTableInstance.getPlugin('columnSorting').sort(
-          this.collection.columnSorting
-        )
-        bottomTableInstance.getPlugin('columnSorting').sort(
-          this.collection.columnSorting
-        )
+        topTableInstance
+          .getPlugin('columnSorting')
+          .sort(this.collection.columnSorting)
+        bottomTableInstance
+          .getPlugin('columnSorting')
+          .sort(this.collection.columnSorting)
 
         // add the hooks to the tables
         TableHooks.addAfterChange(this)

@@ -1,68 +1,93 @@
 <template>
-  <div
-    class="sld-card-view"
-    v-bind:class="{ pointer: onClick && !isExpanded }"
-    @click="handleClick"
-  >
-    <span v-if="title != null" class="title">{{ title }}</span>
-    <span class="subtitle">{{ collection.type }} / {{ id }}</span>
-    <form v-on:submit.prevent="save">
-      <table class="sld-card-view-details">
-        <tr v-for="(column, index) of columnsToShow" v-bind:key="column">
-          <td class="column">{{ column }}:</td>
-          <td class="value">
-            <span v-if="column.includes('.')">
-              <span
-                v-for="(related, key) of collection.entries[id][
-                  column.split('.')[0]
-                ]"
-                v-bind:key="key"
-              >
-                <span v-if="key == '_jv'"></span>
-                <button v-else-if="typeof related == 'object'">
-                  {{ related[column.split('.')[1]] }}
-                </button>
-                <button v-else-if="key == column.split('.')[1]">
-                  {{ related }}
-                </button>
+  <div>
+    <div
+      class="sld-card-view"
+      v-bind:class="{
+        pointer: onClick && !isExpanded,
+        selected: expandedID.id == id
+      }"
+      @click="handleClick"
+    >
+      <span v-if="title != null" class="title">{{ title }}</span>
+      <span class="subtitle">{{ type }} / {{ id }}</span>
+      <form v-on:submit.prevent="save">
+        <table class="sld-card-view-details">
+          <tr v-for="(column, index) of columnsToShow" v-bind:key="column">
+            <td class="column">{{ column }}:&nbsp;</td>
+            <td class="value">
+              <!-- if column is a relationship -->
+              <span v-if="column.includes('.')">
+                <span
+                  v-for="(related, index) in getRelationships(column)"
+                  v-bind:key="index"
+                >
+                  <button
+                    @click="addOverlay(expandedID, related.type, related.id)"
+                  >
+                    {{
+                      collections[related.type].entries[related.id][
+                        column.split('.')[1]
+                      ]
+                    }}
+                  </button>
+                </span>
               </span>
-            </span>
-            <span v-else-if="isReadOnly">{{
-              collection.entries[id][column]
-            }}</span>
-            <input
-              v-else
-              @keydown="
-                (e) => {
-                  handleKeyDown(e, index)
-                }
-              "
-              ref="input"
-              type="text"
-              v-model="collection.entries[id][column]"
-            />
-          </td>
-        </tr>
-      </table>
-    </form>
-    <div class="controls" v-if="!isReadOnly">
-      <span
-        class="close"
-        :ref="config.CLOSE_BUTTON_REF"
-        tabIndex="0"
-        @click="handleClose"
-      >
-        {{ config.CLOSE_BUTTON_TEXT }}
-      </span>
-      <span
-        class="save"
-        :ref="config.SAVE_BUTTON_REF"
-        tabindex="0"
-        @click="handleSave"
-      >
-        {{ config.SAVE_BUTTON_TEXT }}
-      </span>
+              <!-- if column is read only - read only is overruled if there is an overlay -->
+              <span v-else-if="isReadOnly || expandedID.overlay">
+                {{ entry[column] }}
+              </span>
+              <!-- otherwise column is editable -->
+              <input
+                v-else
+                @keydown="
+                  (e) => {
+                    handleKeyDown(e, index)
+                  }
+                "
+                ref="input"
+                type="text"
+                v-model="entry[column]"
+              />
+            </td>
+          </tr>
+        </table>
+      </form>
+      <div class="controls" v-if="!isReadOnly && !expandedID.overlay">
+        <span
+          class="close"
+          :ref="config.CLOSE_BUTTON_REF"
+          tabIndex="0"
+          @click="handleClose"
+        >
+          {{ config.CLOSE_BUTTON_TEXT }}
+        </span>
+        <span
+          class="save"
+          :ref="config.SAVE_BUTTON_REF"
+          tabindex="0"
+          @click="handleSave"
+        >
+          {{ config.SAVE_BUTTON_TEXT }}
+        </span>
+      </div>
     </div>
+    <CardView
+      v-if="
+        expandedID.overlay && expandedID.type == type && expandedID.id == id
+      "
+      :collections="collections"
+      :type="expandedID.overlay.type"
+      :id="expandedID.overlay.id"
+      :page="page"
+      :onClick="onClick"
+      :onClose="onClose"
+      :onSave="onSave"
+      :isReadOnly="false"
+      :isExpanded="true"
+      :expandedID="expandedID.overlay"
+      :addOverlay="addOverlay"
+      :componentOptions="componentOptions"
+    ></CardView>
   </div>
 </template>
 
@@ -72,7 +97,8 @@ import config from './config'
 export default {
   name: 'CardView',
   props: {
-    collection: Object,
+    collections: Object,
+    type: String,
     id: String, // id of row in collection
     page: String, // page on which this card is showing
     isReadOnly: Boolean,
@@ -88,14 +114,18 @@ export default {
       type: Function,
       default: () => {},
     },
+    expandedID: Object,
+    addOverlay: Function,
     componentOptions: Object,
   },
   data() {
     return {
       // defined here so the template can use it
       config: config,
+      collection: this.collections[this.type],
+      entry: this.collections[this.type].entries[this.id],
       // stringify to create deep copy
-      oldDetails: JSON.stringify(this.collection.entries[this.id]),
+      oldDetails: JSON.stringify(this.collections[this.type].entries[this.id]),
     }
   },
   computed: {
@@ -112,12 +142,13 @@ export default {
     // the columns that will show in the body of the card
     columnsToShow() {
       // choose the columns to display, expanded means show all columns
-      const columnsToShow = this.isExpanded
-        ? this.collection.fullCols
-        : this.collection.previewCols
+      const columnsToShow =
+        this.isExpanded && !this.expandedID.overlay
+          ? this.collection.fullCols
+          : this.collection.previewCols
       // the first attribute is reserved for the title if specified, so remove it from body of card
       // card must also be read-only, since when editing it will be needed in the body
-      if (this.componentOptions.firstAttrAsCardTitle && this.isReadOnly) {
+      if (this.componentOptions.firstAttrAsCardTitle && this.isReadOnly || this.expandedID.overlay) {
         return columnsToShow.slice(1)
       } else {
         return columnsToShow
@@ -128,8 +159,21 @@ export default {
     this.focusFirstInputBox()
   },
   methods: {
+    // returns an array of {id, type} for the related entries of this card
+    getRelationships(relColumn) {
+      const relName = relColumn.split('.')[0]
+      if (!this.entry._jv.relationships) {
+        return []
+      }
+      const relData = this.entry._jv.relationships[relName].data
+      if (Array.isArray(relData)) {
+        return relData
+      } else {
+        return [relData]
+      }
+    },
     handleClick() {
-      if (this.onClick) {
+      if (this.onClick && !this.isExpanded) {
         this.onClick(this.collection.type, this.id, this.page)
       }
     },
@@ -189,7 +233,7 @@ export default {
   padding: 10px;
   border: 1px #cdcdcd solid;
   border-radius: 1px;
-  /* max-width: var(--card-width); */
+  max-width: var(--card-width);
 }
 
 .sld-card-view.pointer {
@@ -197,6 +241,10 @@ export default {
 }
 
 .sld-card-view.pointer:hover {
+  background-color: var(--highlight-color);
+}
+
+.sld-card-view.selected {
   background-color: var(--highlight-color);
 }
 
