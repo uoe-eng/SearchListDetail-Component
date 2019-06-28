@@ -22,7 +22,10 @@
                   v-for="(related, index) in getRelationships(column)"
                   v-bind:key="index"
                 >
-                  <button @click="addOverlay(related.type, related.id)">
+                  <button
+                    @click="addOverlay(related.type, related.id)"
+                    class="relationship"
+                  >
                     {{
                       collections[related.type].entries[related.id][
                         column.split('.')[1]
@@ -254,9 +257,10 @@ export default {
 
 <style scoped>
 .sld-card-view {
+  background-color: var(--light-card);
   padding: 10px;
   border: 1px #cdcdcd solid;
-  border-radius: 1px;
+  border-radius: 3px;
   max-width: var(--card-width);
 }
 
@@ -284,6 +288,21 @@ export default {
 
 .sld-card-view .subtitle {
   color: var(--alt-text-color);
+}
+
+.sld-card-view button.relationship {
+  padding: 7px;
+  margin: 5px;
+  border: 1px var(--alt-text-color) solid;
+  border-radius: 3px;
+  background-color: var(--light-card);
+  cursor: pointer;
+  font-weight: bold;
+  font-style: italic;
+}
+
+.sld-card-view button.relationship:hover {
+  background-color: var(--highlight-color);
 }
 
 .sld-card-view input {

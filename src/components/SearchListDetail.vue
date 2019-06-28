@@ -145,6 +145,7 @@ export default {
   --highlight-color: rgba(0, 0, 0, 0.03);
   --text-color: black;
   --alt-text-color: grey;
+  --light-card: white;
   color: var(--text-color);
   background-color: white;
   display: grid;

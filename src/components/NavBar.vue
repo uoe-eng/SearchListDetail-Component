@@ -51,7 +51,7 @@ export default {
   padding-bottom: 20px;
   margin-bottom: 10px;
   height: 20px;
-  border-radius: 5px;
+  border-radius: 3px;
   background-color: #fff;
   box-shadow: rgba(0, 0, 0, 0.3) 0 1px 3px;
   overflow-x: auto;
