@@ -8,16 +8,11 @@ export default {
     allExpanded: {},
   },
   mutations: {
+    // called on creation so it can be used in the future
     defineNextTick(state, nextTick) {
       state.nextTick = nextTick
     },
-    setPage(state, page) {
-      console.log('setting page', page)
-      state.page = page
-    },
-    addCollection(state, collection) {
-      state.collections[collection.type] = collection
-    },
+    // called on creation to define the data structure for allExpanded
     initialiseExpanded(state, resultOptions) {
       let allExpanded = {
         [config.ALL_PAGE_NAME]: {},
@@ -28,6 +23,13 @@ export default {
       })
       state.allExpanded = allExpanded
     },
+    setPage(state, page) {
+      console.log('setting page', page)
+      state.page = page
+    },
+    addCollection(state, collection) {
+      state.collections[collection.type] = collection
+    },
     setExpanded(state, args) {
       console.log('expanding', args)
       state.allExpanded[args.page] = {
@@ -35,6 +37,7 @@ export default {
         id: args.id,
       }
     },
+    // add an overlay object to the last object in the overlay chain
     addOverlay(state, args) {
       console.log('adding overlay', args)
       const type = args.type
@@ -51,6 +54,7 @@ export default {
       }
       addOverlay(state.allExpanded[state.page], type, id)
     },
+    // remove the last overlay object in the overlay chain
     removeOneOverlay(state) {
       console.log('removing one overlay')
       const expanded = state.allExpanded[state.page]
@@ -83,15 +87,18 @@ export default {
     },
     setExpanded(context, args) {
       context.commit('setExpanded', args)
+      context.dispatch('refreshPage')
     },
     addCollection(context, collection) {
       context.commit('addCollection', collection)
     },
     addOverlay(context, args) {
       context.commit('addOverlay', args)
+      context.dispatch('refreshPage')
     },
     removeOneOverlay(context) {
       context.commit('removeOneOverlay')
+      context.dispatch('refreshPage')
     },
   },
 }

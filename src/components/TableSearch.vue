@@ -1,19 +1,16 @@
 <template>
   <div v-if="!componentOptions.mobile" id="table-search">
     <hot-table ref="topTable" :settings="tableSettings"></hot-table>
-    <div v-if="expandedID.id != null">
+    <div v-if="expanded && expanded.id != null">
       <CardView
         :collections="collections"
         :type="type"
-        :id="expandedID.id"
-        :onClose="onCardClose"
-        :onSave="onCardSave"
+        :id="expanded.id"
+        :expanded="expanded"
         :isReadOnly="false"
         :isExpanded="true"
         :onTabOutUp="onTabOutUp"
         :onTabOutDown="onTabOutDown"
-        :expanded="expandedID"
-        :addOverlay="addOverlay"
         :componentOptions="componentOptions"
         ref="cardview"
       ></CardView>
@@ -23,12 +20,7 @@
   <CardSearch
     v-else
     :collections="collections"
-    :showOnly="collection.type"
-    :expandedID="expandedID"
-    :addOverlay="addOverlay"
-    :onClick="expandCard"
-    :onClose="onCardClose"
-    :onSave="onCardSave"
+    :showOnly="type"
     :componentOptions="componentOptions"
   ></CardSearch>
 </template>
@@ -43,12 +35,22 @@ export default {
   props: {
     collections: Object,
     type: String,
-    expandedID: Object,
-    addOverlay: Function,
-    expandCard: Function,
-    onCardClose: Function,
-    onCardSave: Function,
     componentOptions: Object,
+  },
+  computed: {
+    expanded() {
+      return this.$store.state.sld.allExpanded[this.page]
+    },
+    page() {
+      return this.$store.state.sld.page
+    },
+    // data for the tables calculated from the collection and expanded id
+    tableData() {
+      return this.collections[this.type].splitIntoTables(
+        this.expanded,
+        this.componentOptions.detailsText
+      )
+    },
   },
   data() {
     return {
@@ -64,11 +66,6 @@ export default {
         // stretchH: 'all',
         licenseKey: 'non-commercial-and-evaluation',
       },
-      // data for the tables calculated from the collection and expanded id
-      tableData: this.collections[this.type].splitIntoTables(
-        this.expandedID,
-        this.componentOptions.detailsText
-      ),
     }
   },
   created() {
@@ -129,15 +126,18 @@ export default {
         TableHooks.afterColumnSort(this)
       })
     },
+    // handles when the details cell is edited, expands the card
     handleEdit(row, column, tableInstance) {
       // ignore normal cell selections
-      if (column != 0) {
-        return
-      }
-      tableInstance.deselectCell()
+      if (column != 0) return
       // read the cell meta value for id
       const id = tableInstance.getCellMeta(row, column).id
-      this.expandCard(this.collection.type, id, this.collection.type)
+      // this.expandCard(this.collection.type, id, this.collection.type)
+      this.$store.dispatch('setExpanded', {
+        page: this.type,
+        type: this.type,
+        id: id,
+      })
     },
   },
   components: {

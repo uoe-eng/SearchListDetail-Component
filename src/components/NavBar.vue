@@ -67,10 +67,10 @@ export default {
 }
 
 #nav-bar .nav-bar-item.selected {
-  background-color: rgba(0, 0, 0, 0.03);
+  background-color: var(--highlight-color);
 }
 
 #nav-bar .nav-bar-item:hover {
-  background-color: rgba(0, 0, 0, 0.03);
+  background-color: var(--highlight-color);
 }
 </style>

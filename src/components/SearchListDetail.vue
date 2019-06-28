@@ -12,11 +12,6 @@
       v-else-if="page"
       :collections="collections"
       :type="page"
-      :expandedID="expandedIDs[page]"
-      :addOverlay="addOverlay"
-      :expandCard="expandCard"
-      :onCardClose="closeCard"
-      :onCardSave="saveCard"
       :componentOptions="componentOptions"
     ></TableSearch>
   </div>
@@ -56,7 +51,6 @@ export default {
   data() {
     return {
       config: config,
-      // expandedIDs: this.initExpandedIDs(),
       mobile: false,
       // use prop information to create the collections
       // computed after collections are retrieved from the server
@@ -117,91 +111,6 @@ export default {
         }
       })
       return names
-    },
-  },
-  methods: {
-    // setPage(page) {
-    //   this.$store.dispatch('setPage', {
-    //     page: page,
-    //     nextTick: this.$nextTick,
-    //   })
-    // },
-    // expandCard(type, id, fromPage) {
-    //   // if on mobile, don't navigate to the page for the card type
-    //   // instead stay on the same page
-    //   const pageToNavTo = this.mobile ? fromPage : type
-
-    //   // set the expanded ID for the collection type
-    //   this.$set(this.expandedIDs, pageToNavTo, {
-    //     id: id,
-    //     type: type,
-    //   })
-
-    //   // TODO move to cardview
-    //   this.$store.commit('setExpanded', {
-    //     page: pageToNavTo,
-    //     type: type,
-    //     id: id,
-    //   })
-
-    //   // then switch to that page
-    //   this.$store.dispatch('setPage', {
-    //     page: pageToNavTo,
-    //     nextTick: this.$nextTick,
-    //   })
-    // },
-    // closeCard(type, id, fromPage) {
-    //   this.removeOneOverlay(this.expandedIDs[fromPage])
-    //   this.$store.commit('removeOneOverlay')
-    //   this.$store.dispatch('refreshPage', this.$nextTick)
-    // },
-    // // patch the collection to the server
-    // saveCard(type, id, fromPage, closeCard = true) {
-    //   if (closeCard) {
-    //     this.closeCard(type, id, fromPage)
-    //   }
-    //   this.patchRecord(type, id)
-    // },
-    // addOverlay(expandedID, type, id) {
-    //   if (expandedID.overlay) {
-    //     this.addOverlay(expandedID.overlay, type, id)
-    //   } else {
-    //     this.$set(expandedID, 'overlay', {})
-    //     this.$set(expandedID.overlay, 'type', type)
-    //     this.$set(expandedID.overlay, 'id', id)
-
-    //     this.$store.commit('addOverlay', {
-    //       type: type,
-    //       id: id,
-    //     })
-    //   }
-    // },
-    // removeOneOverlay(expandedID) {
-    //   if (!expandedID.overlay) {
-    //     this.$set(expandedID, 'type', null)
-    //     this.$set(expandedID, 'id', null)
-    //     return
-    //   }
-    //   if (expandedID.overlay.overlay) {
-    //     this.removeOneOverlay(expandedID.overlay)
-    //   } else {
-    //     this.$delete(expandedID, 'overlay')
-    //   }
-    // },
-    // // initialise the structure for the expandedIDs object
-    // initExpandedIDs() {
-    //   let expandedIDs = {
-    //     [config.ALL_PAGE_NAME]: {},
-    //   }
-    //   const collectionNames = Object.keys(this.resultOptions)
-    //   collectionNames.forEach((name) => {
-    //     expandedIDs[name] = {}
-    //   })
-    //   return expandedIDs
-    // },
-    patchRecord(type, id) {
-      const record = this.collections[type].entries[id]
-      this.$store.dispatch('jv/patch', record)
     },
   },
   // on creation, fetch the collections from the server

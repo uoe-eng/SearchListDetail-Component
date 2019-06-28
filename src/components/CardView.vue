@@ -1,4 +1,5 @@
 <template>
+  <!-- empty div to hold parent and childern cards -->
   <div>
     <div
       class="sld-card-view"
@@ -69,6 +70,7 @@
         </span>
       </div>
     </div>
+    <!-- child card for when there are overlays -->
     <CardView
       v-if="shouldShowOverlay"
       :collections="collections"
@@ -89,8 +91,8 @@ export default {
   name: 'CardView',
   props: {
     collections: Object,
-    type: String,
-    id: String, // id of row in collection
+    type: String, // type of entry in collection
+    id: String, // id of entry in collection
     isReadOnly: Boolean,
     isExpanded: Boolean,
     onTabOutUp: {
@@ -101,7 +103,7 @@ export default {
       type: Function,
       default: () => {},
     },
-    // can't be taken from the store since the value is different when calling self
+    // must stay as prop (not in store) since the value is modified in a recursive call
     expanded: Object,
     componentOptions: Object,
   },
@@ -119,6 +121,7 @@ export default {
     page() {
       return this.$store.state.sld.page
     },
+    // boolean to determine if there are overlays to be displayed
     shouldShowOverlay() {
       return (
         this.expanded.overlay != undefined &&
@@ -155,16 +158,17 @@ export default {
       }
     },
   },
+  // focus on the first input box when the card is created
   created() {
     this.focusFirstInputBox()
   },
   methods: {
+    // creates a child card on top of this
     addOverlay(type, id) {
       this.$store.dispatch('addOverlay', {
         type: type,
         id: id,
       })
-      this.$store.dispatch('refreshPage', this.$nextTick)
     },
     // returns an array of {id, type} for the related entries of this card
     getRelationships(relColumn) {
@@ -176,16 +180,16 @@ export default {
       if (Array.isArray(relData)) {
         return relData
       } else {
+        // relData is not put in an array if there is only one
         return [relData]
       }
     },
     handleClick() {
       if (!this.isExpanded) {
-        // this.onClick(this.collection.type, this.id, this.page)
-
+        // determine if the page should be changed somewhere else
         const pageToNavTo = this.componentOptions.mobile
-          ? this.$store.state.sld.page
-          : this.type
+          ? this.$store.state.sld.page // current page
+          : this.type // page for the type of card
         this.$store.dispatch('setExpanded', {
           page: pageToNavTo,
           type: this.type,
@@ -200,13 +204,15 @@ export default {
       // restore the old deatils from when the card was rendered
       const oldDetails = JSON.parse(this.oldDetails)
       this.collection.entries[this.id] = oldDetails
+      // remove the top child card
       this.$store.dispatch('removeOneOverlay')
-      this.$store.dispatch('refreshPage')
     },
     handleSave() {
-      if (this.onSave) {
-        this.onSave(this.collection.type, this.id, this.page)
-      }
+      const record = this.collections[this.type].entries[this.id]
+      // patch the modified record up to the server
+      this.$store.dispatch('jv/patch', record)
+      // remove the top child card
+      this.$store.dispatch('removeOneOverlay')
     },
     // handles keypresses from the input boxes
     handleKeyDown(e, index) {
@@ -282,6 +288,8 @@ export default {
 
 .sld-card-view input {
   border: none;
+  border-bottom: 1px var(--alt-text-color) solid;
+  outline: none;
   font-size: inherit;
   background-color: transparent;
   width: 100%;

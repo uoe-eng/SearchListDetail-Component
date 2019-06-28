@@ -1,7 +1,6 @@
 <template>
   <div id="card-search">
     <div v-for="(collection, name) of collectionsToShow" v-bind:key="name">
-      <div></div>
       <div v-for="(entry, id) of collection.entries" v-bind:key="id">
         <CardView
           :collections="collections"
@@ -25,11 +24,6 @@ export default {
   props: {
     collections: Object,
     showOnly: String,
-    // expandedID: Object,
-    // addOverlay: Function,
-    // onClick: Function,
-    // onClose: Function,
-    // onSave: Function,
     componentOptions: Object,
   },
   components: {
