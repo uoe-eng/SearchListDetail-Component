@@ -10,14 +10,7 @@ export default {
       context.collection.columnSorting = sorting
       // handsontable will not be able to sort the whole table when it is split
       // into two tables, so update the view to redraw the two tables
-      if (context.expandedID.id != null) {
-        // same as refresh view
-        context.expandCard(
-          context.expandedID.type,
-          context.expandedID.id,
-          context.expandedID.type
-        )
-      }
+      context.$store.dispatch('refreshPage')
     }
     Handsontable.hooks.add(
       'afterColumnSort',
