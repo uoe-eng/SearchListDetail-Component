@@ -6,13 +6,11 @@
     <CardSearch
       v-if="page == config.ALL_PAGE_NAME"
       :collections="collections"
-      :componentOptions="componentOptions"
     ></CardSearch>
     <TableSearch
       v-else-if="page"
       :collections="collections"
       :type="page"
-      :componentOptions="componentOptions"
     ></TableSearch>
   </div>
 </template>
@@ -118,6 +116,7 @@ export default {
     this.$store.registerModule('sld', SldStore)
     this.$store.commit('initialiseExpanded', this.resultOptions)
     this.$store.commit('defineNextTick', this.$nextTick)
+    this.$store.commit('setComponentOptions', this.componentOptions)
     const collectionNames = Object.keys(this.resultOptions)
     // for each collection
     collectionNames.forEach((collectionName) => {

@@ -79,7 +79,6 @@
       :isReadOnly="false"
       :isExpanded="true"
       :expanded="expanded.overlay"
-      :componentOptions="componentOptions"
     ></CardView>
   </div>
 </template>
@@ -105,7 +104,6 @@ export default {
     },
     // must stay as prop (not in store) since the value is modified in a recursive call
     expanded: Object,
-    componentOptions: Object,
   },
   data() {
     return {
@@ -132,7 +130,7 @@ export default {
     // the string for the title of the card (null if titles are disabled)
     title() {
       // don't set the title unless specified
-      if (this.componentOptions.firstAttrAsCardTitle) {
+      if (this.$store.state.sld.componentOptions.firstAttrAsCardTitle) {
         const entry = this.collection.entries[this.id]
         return entry[this.collection.fullCols[0]]
       } else {
@@ -149,9 +147,11 @@ export default {
       // the first attribute is reserved for the title if specified, so remove it from body of card
       // card must also be read-only, since when editing it will be needed in the body
       if (
-        (this.componentOptions.firstAttrAsCardTitle && this.isReadOnly) ||
-        this.expanded.overlay
+        this.expanded.overlay ||
+        (this.$store.state.sld.componentOptions.firstAttrAsCardTitle &&
+          this.isReadOnly)
       ) {
+        // take all columns except the first
         return columnsToShow.slice(1)
       } else {
         return columnsToShow
@@ -187,7 +187,7 @@ export default {
     handleClick() {
       if (!this.isExpanded) {
         // determine if the page should be changed somewhere else
-        const pageToNavTo = this.componentOptions.mobile
+        const pageToNavTo = this.$store.state.sld.componentOptions.mobile
           ? this.$store.state.sld.page // current page
           : this.type // page for the type of card
         this.$store.dispatch('setExpanded', {

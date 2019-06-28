@@ -9,7 +9,6 @@
           :isReadOnly="!isExpanded(id, collection)"
           :isExpanded="isExpanded(id, collection)"
           :expanded="expanded"
-          :componentOptions="componentOptions"
         ></CardView>
       </div>
     </div>
@@ -24,7 +23,6 @@ export default {
   props: {
     collections: Object,
     showOnly: String,
-    componentOptions: Object,
   },
   components: {
     CardView,

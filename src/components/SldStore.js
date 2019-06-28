@@ -6,6 +6,7 @@ export default {
     page: config.ALL_PAGE_NAME,
     collections: {},
     allExpanded: {},
+    componentOptions: {},
   },
   mutations: {
     // called on creation so it can be used in the future
@@ -22,6 +23,9 @@ export default {
         allExpanded[name] = {}
       })
       state.allExpanded = allExpanded
+    },
+    setComponentOptions(state, options) {
+      state.componentOptions = options
     },
     setPage(state, page) {
       console.log('setting page', page)

@@ -25,23 +25,23 @@ export default {
   },
   // when a cell is edited, the value is updated in the reactive object
   addAfterChange: (context) => {
+    const setAndPatch = (row, col, newValue) => {
+      const collection = context.collections[context.type]
+      const id = collection.fromCoordinates(row, col).id
+      const colName = collection.fromCoordinates(row, col).col
+      context.$set(collection.entries[id], colName, newValue)
+      const record = collection.entries[id]
+      // patch the modified record up to the server
+      context.$store.dispatch('jv/patch', record)
+    }
     Handsontable.hooks.add(
       'afterChange',
       (change) => {
+        // interpret details from the given argument 'change'
         const row = change[0][0]
         const col = change[0][1] - 1 // adjust for the leftmost cell
         const newValue = change[0][3]
-        if (col >= 0) {
-          const id = context.collection.fromCoordinates(row, col).id
-          const colName = context.collection.fromCoordinates(row, col).col
-          context.$set(context.collection.entries[id], colName, newValue)
-          context.onCardSave(
-            context.collection.type,
-            id,
-            context.collection.type,
-            false
-          )
-        }
+        if (col >= 0) setAndPatch(row, col, newValue)
       },
       context.$refs.topTable.hotInstance
     )
@@ -49,25 +49,17 @@ export default {
     Handsontable.hooks.add(
       'afterChange',
       (change) => {
-        // will always be found since the bottom table only shows when a row is expanded
-        const expandedRow = context.collection
-          .ids()
-          .indexOf(context.expandedID.id)
-        // row 0 would just be the row just under the card which is not what we want
+        // find the expanded row
+        const allExpanded = context.$store.state.sld.allExpanded
+        const expanded = allExpanded[context.$store.state.sld.page]
+        const expandedRow = context.collection.ids().indexOf(expanded)
+        // interpret details from the given argument 'change'
+        // expanded row will always be found since the bottom table only shows when a row is expanded
+        // + 1 so that the first row after the card is 0
         const row = change[0][0] + expandedRow + 1
         const col = change[0][1] - 1 // adjust for the leftmost cell
         const newValue = change[0][3]
-        if (col >= 0) {
-          const id = context.collection.fromCoordinates(row, col).id
-          const colName = context.collection.fromCoordinates(row, col).col
-          context.$set(context.collection.entries[id], colName, newValue)
-          context.onCardSave(
-            context.collection.type,
-            id,
-            context.collection.type,
-            false
-          )
-        }
+        if (col >= 0) setAndPatch(row, col, newValue)
       },
       context.$refs.bottomTable.hotInstance
     )

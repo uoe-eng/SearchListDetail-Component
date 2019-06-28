@@ -11,18 +11,12 @@
         :isExpanded="true"
         :onTabOutUp="onTabOutUp"
         :onTabOutDown="onTabOutDown"
-        :componentOptions="componentOptions"
         ref="cardview"
       ></CardView>
     </div>
     <hot-table ref="bottomTable" :settings="tableSettings"></hot-table>
   </div>
-  <CardSearch
-    v-else
-    :collections="collections"
-    :showOnly="type"
-    :componentOptions="componentOptions"
-  ></CardSearch>
+  <CardSearch v-else :collections="collections" :showOnly="type"></CardSearch>
 </template>
 
 <script>
@@ -35,7 +29,6 @@ export default {
   props: {
     collections: Object,
     type: String,
-    componentOptions: Object,
   },
   computed: {
     expanded() {
@@ -51,12 +44,12 @@ export default {
         this.componentOptions.detailsText
       )
     },
-  },
-  data() {
-    return {
-      collection: this.collections[this.type],
-      // common settings for both the top and bottom table (no data)
-      tableSettings: {
+    componentOptions() {
+      return this.$store.state.sld.componentOptions
+    },
+    // common settings for both the top and bottom table (no data)
+    tableSettings() {
+      return {
         colHeaders: [this.componentOptions.detailsTitle].concat(
           this.collections[this.type].fullCols
         ),
@@ -65,7 +58,12 @@ export default {
         selectionMode: 'single',
         // stretchH: 'all',
         licenseKey: 'non-commercial-and-evaluation',
-      },
+      }
+    },
+  },
+  data() {
+    return {
+      collection: this.collections[this.type],
     }
   },
   created() {
