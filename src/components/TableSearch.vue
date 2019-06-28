@@ -12,7 +12,7 @@
         :isExpanded="true"
         :onTabOutUp="onTabOutUp"
         :onTabOutDown="onTabOutDown"
-        :expandedID="expandedID"
+        :expanded="expandedID"
         :addOverlay="addOverlay"
         :componentOptions="componentOptions"
         ref="cardview"

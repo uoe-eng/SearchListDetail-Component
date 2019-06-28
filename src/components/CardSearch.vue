@@ -7,17 +7,9 @@
           :collections="collections"
           :type="collection.type"
           :id="id"
-          :onClick="onClick"
-          :onClose="onClose"
-          :onSave="onSave"
-          :isReadOnly="
-            !(id == expandedID.id && collection.type == expandedID.type)
-          "
-          :isExpanded="
-            id == expandedID.id && collection.type == expandedID.type
-          "
-          :expandedID="expandedID"
-          :addOverlay="addOverlay"
+          :isReadOnly="!isExpanded(id, collection)"
+          :isExpanded="isExpanded(id, collection)"
+          :expanded="expanded"
           :componentOptions="componentOptions"
         ></CardView>
       </div>
@@ -33,11 +25,11 @@ export default {
   props: {
     collections: Object,
     showOnly: String,
-    expandedID: Object,
-    addOverlay: Function,
-    onClick: Function,
-    onClose: Function,
-    onSave: Function,
+    // expandedID: Object,
+    // addOverlay: Function,
+    // onClick: Function,
+    // onClose: Function,
+    // onSave: Function,
     componentOptions: Object,
   },
   components: {
@@ -53,6 +45,17 @@ export default {
       } else {
         return this.collections
       }
+    },
+    expanded() {
+      return this.$store.state.sld.allExpanded[this.page]
+    },
+    page() {
+      return this.$store.state.sld.page
+    },
+  },
+  methods: {
+    isExpanded(id, collection) {
+      return id == this.expanded.id && collection.type == this.expanded.type
     },
   },
 }

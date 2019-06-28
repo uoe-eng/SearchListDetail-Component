@@ -3,14 +3,14 @@
     <div
       class="sld-card-view"
       v-bind:class="{
-        pointer: onClick && !isExpanded,
-        selected: expandedID.id == id,
+        pointer: !isExpanded,
+        selected: expanded.id == id,
       }"
       @click="handleClick"
     >
       <span v-if="title != null" class="title">{{ title }}</span>
       <span class="subtitle">{{ type }} / {{ id }}</span>
-      <form v-on:submit.prevent="save">
+      <form v-on:submit.prevent="handleSave">
         <table class="sld-card-view-details">
           <tr v-for="(column, index) of columnsToShow" v-bind:key="column">
             <td class="column">{{ column }}:&nbsp;</td>
@@ -21,9 +21,7 @@
                   v-for="(related, index) in getRelationships(column)"
                   v-bind:key="index"
                 >
-                  <button
-                    @click="addOverlay(expandedID, related.type, related.id)"
-                  >
+                  <button @click="addOverlay(related.type, related.id)">
                     {{
                       collections[related.type].entries[related.id][
                         column.split('.')[1]
@@ -33,7 +31,7 @@
                 </span>
               </span>
               <!-- if column is read only - read only is overruled if there is an overlay -->
-              <span v-else-if="isReadOnly || expandedID.overlay">
+              <span v-else-if="isReadOnly || expanded.overlay">
                 {{ entry[column] }}
               </span>
               <!-- otherwise column is editable -->
@@ -52,7 +50,7 @@
           </tr>
         </table>
       </form>
-      <div class="controls" v-if="!isReadOnly && !expandedID.overlay">
+      <div class="controls" v-if="!isReadOnly && !expanded.overlay">
         <span
           class="close"
           :ref="config.CLOSE_BUTTON_REF"
@@ -72,19 +70,13 @@
       </div>
     </div>
     <CardView
-      v-if="
-        expandedID.overlay && expandedID.type == type && expandedID.id == id
-      "
+      v-if="shouldShowOverlay"
       :collections="collections"
-      :type="expandedID.overlay.type"
-      :id="expandedID.overlay.id"
-      :onClick="onClick"
-      :onClose="onClose"
-      :onSave="onSave"
+      :type="expanded.overlay.type"
+      :id="expanded.overlay.id"
       :isReadOnly="false"
       :isExpanded="true"
-      :expandedID="expandedID.overlay"
-      :addOverlay="addOverlay"
+      :expanded="expanded.overlay"
       :componentOptions="componentOptions"
     ></CardView>
   </div>
@@ -101,9 +93,6 @@ export default {
     id: String, // id of row in collection
     isReadOnly: Boolean,
     isExpanded: Boolean,
-    onClick: Function,
-    onClose: Function,
-    onSave: Function,
     onTabOutUp: {
       type: Function,
       default: () => {},
@@ -112,8 +101,8 @@ export default {
       type: Function,
       default: () => {},
     },
-    expandedID: Object,
-    addOverlay: Function,
+    // can't be taken from the store since the value is different when calling self
+    expanded: Object,
     componentOptions: Object,
   },
   data() {
@@ -130,6 +119,13 @@ export default {
     page() {
       return this.$store.state.sld.page
     },
+    shouldShowOverlay() {
+      return (
+        this.expanded.overlay != undefined &&
+        this.expanded.type == this.type &&
+        this.expanded.id == this.id
+      )
+    },
     // the string for the title of the card (null if titles are disabled)
     title() {
       // don't set the title unless specified
@@ -144,14 +140,14 @@ export default {
     columnsToShow() {
       // choose the columns to display, expanded means show all columns
       const columnsToShow =
-        this.isExpanded && !this.expandedID.overlay
+        this.isExpanded && !this.expanded.overlay
           ? this.collection.fullCols
           : this.collection.previewCols
       // the first attribute is reserved for the title if specified, so remove it from body of card
       // card must also be read-only, since when editing it will be needed in the body
       if (
         (this.componentOptions.firstAttrAsCardTitle && this.isReadOnly) ||
-        this.expandedID.overlay
+        this.expanded.overlay
       ) {
         return columnsToShow.slice(1)
       } else {
@@ -163,6 +159,13 @@ export default {
     this.focusFirstInputBox()
   },
   methods: {
+    addOverlay(type, id) {
+      this.$store.dispatch('addOverlay', {
+        type: type,
+        id: id,
+      })
+      this.$store.dispatch('refreshPage', this.$nextTick)
+    },
     // returns an array of {id, type} for the related entries of this card
     getRelationships(relColumn) {
       const relName = relColumn.split('.')[0]
@@ -177,17 +180,28 @@ export default {
       }
     },
     handleClick() {
-      if (this.onClick && !this.isExpanded) {
-        this.onClick(this.collection.type, this.id, this.page)
+      if (!this.isExpanded) {
+        // this.onClick(this.collection.type, this.id, this.page)
+
+        const pageToNavTo = this.componentOptions.mobile
+          ? this.$store.state.sld.page
+          : this.type
+        this.$store.dispatch('setExpanded', {
+          page: pageToNavTo,
+          type: this.type,
+          id: this.id,
+        })
+
+        // then switch to that page
+        this.$store.dispatch('setPage', pageToNavTo)
       }
     },
     handleClose() {
-      if (this.onClose) {
-        // restore the old deatils from when the card was rendered
-        const oldDetails = JSON.parse(this.oldDetails)
-        this.collection.entries[this.id] = oldDetails
-        this.onClose(this.collection.type, this.id, this.page)
-      }
+      // restore the old deatils from when the card was rendered
+      const oldDetails = JSON.parse(this.oldDetails)
+      this.collection.entries[this.id] = oldDetails
+      this.$store.dispatch('removeOneOverlay')
+      this.$store.dispatch('refreshPage')
     },
     handleSave() {
       if (this.onSave) {

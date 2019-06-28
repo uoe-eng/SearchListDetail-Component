@@ -8,13 +8,13 @@
       All
     </span>
     <span
-      v-for="collection of collectionNames"
-      v-bind:key="collection"
+      v-for="collectionName of collectionNames"
+      v-bind:key="collectionName"
       class="nav-bar-item"
-      v-bind:class="{ selected: selected == collection }"
-      @click="setPage(collection)"
+      v-bind:class="{ selected: selected == collectionName }"
+      @click="setPage(collectionName)"
     >
-      {{ collection }}
+      {{ collectionName }}
     </span>
   </div>
 </template>
@@ -26,7 +26,6 @@ export default {
   name: 'NavBar',
   props: {
     collectionNames: Array,
-    selected: String,
   },
   data() {
     return {
@@ -35,10 +34,12 @@ export default {
   },
   methods: {
     setPage(page) {
-      this.$store.dispatch('setPage', {
-        page: page,
-        nextTick: this.$nextTick,
-      })
+      this.$store.dispatch('setPage', page)
+    },
+  },
+  computed: {
+    selected() {
+      return this.$store.state.sld.page
     },
   },
 }
