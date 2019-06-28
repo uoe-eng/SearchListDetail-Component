@@ -3,7 +3,6 @@
     <div v-for="(collection, name) of collectionsToShow" v-bind:key="name">
       <div v-for="(entry, id) of collection.entries" v-bind:key="id">
         <CardView
-          :collections="collections"
           :type="collection.type"
           :id="id"
           :isReadOnly="!isExpanded(id, collection)"
@@ -21,13 +20,15 @@ import CardView from './CardView'
 export default {
   name: 'CardSearch',
   props: {
-    collections: Object,
     showOnly: String,
   },
   components: {
     CardView,
   },
   computed: {
+    collections() {
+      return this.$store.state.sld.collections
+    },
     // if specified, only show one collection
     collectionsToShow() {
       if (this.showOnly) {

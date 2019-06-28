@@ -3,7 +3,6 @@
     <hot-table ref="topTable" :settings="tableSettings"></hot-table>
     <div v-if="expanded && expanded.id != null">
       <CardView
-        :collections="collections"
         :type="type"
         :id="expanded.id"
         :expanded="expanded"
@@ -27,10 +26,15 @@ import TableHooks from './TableHooks'
 
 export default {
   props: {
-    collections: Object,
     type: String,
   },
   computed: {
+    collections() {
+      return this.$store.state.sld.collections
+    },
+    collection() {
+      return this.collections[this.type]
+    },
     expanded() {
       return this.$store.state.sld.allExpanded[this.page]
     },
@@ -39,7 +43,7 @@ export default {
     },
     // data for the tables calculated from the collection and expanded id
     tableData() {
-      return this.collections[this.type].splitIntoTables(
+      return this.collection.splitIntoTables(
         this.expanded,
         this.componentOptions.detailsText
       )
@@ -60,11 +64,6 @@ export default {
         licenseKey: 'non-commercial-and-evaluation',
       }
     },
-  },
-  data() {
-    return {
-      collection: this.collections[this.type],
-    }
   },
   created() {
     this.populateTables()

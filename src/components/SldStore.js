@@ -28,11 +28,25 @@ export default {
       state.componentOptions = options
     },
     setPage(state, page) {
-      console.log('setting page', page)
       state.page = page
     },
-    addCollection(state, collection) {
+    setCollection(state, collection) {
       state.collections[collection.type] = collection
+    },
+    // useful to use instead of setCollection since the class methods might
+    // get overwritten if a deep copy is modified
+    updateEntry(state, args) {
+      const newEntry = args.newEntry
+      const type = args.type
+      const id = args.id
+      state.collections[type].entries[id] = newEntry
+    },
+    updateCell(state, args) {
+      const newValue = args.newValue
+      const type = args.type
+      const id = args.id
+      const column = args.column
+      state.collections[type].entries[id][column] = newValue
     },
     setExpanded(state, args) {
       console.log('expanding', args)
@@ -78,23 +92,35 @@ export default {
       }
       removeOneOverlay(expanded)
     },
+    toggleMobile(state) {
+      state.componentOptions.mobile = !state.componentOptions.mobile
+    },
   },
   actions: {
     setPage(context, page) {
+      console.log('setting page', page)
       context.commit('setPage', null)
       context.state.nextTick(() => {
         context.commit('setPage', page)
       })
     },
     refreshPage(context) {
+      console.log('refreshing page')
       context.dispatch('setPage', context.state.page)
     },
     setExpanded(context, args) {
       context.commit('setExpanded', args)
       context.dispatch('refreshPage')
     },
-    addCollection(context, collection) {
-      context.commit('addCollection', collection)
+    setCollection(context, collection) {
+      context.commit('setCollection', collection)
+      context.dispatch('refreshPage')
+    },
+    updateEntry(context, args) {
+      context.commit('updateEntry', args)
+    },
+    updateCell(context, args) {
+      context.commit('updateCell', args)
     },
     addOverlay(context, args) {
       context.commit('addOverlay', args)
@@ -103,6 +129,9 @@ export default {
     removeOneOverlay(context) {
       context.commit('removeOneOverlay')
       context.dispatch('refreshPage')
+    },
+    toggleMobile(context) {
+      context.commit('toggleMobile')
     },
   },
 }

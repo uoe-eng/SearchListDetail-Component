@@ -2,16 +2,9 @@
   <div id="sld">
     <NavBar :collectionNames="Object.keys(this.resultOptions)"></NavBar>
     <!-- temporary way to see the mobile version -->
-    <label><input type="checkbox" v-model="mobile" /> Mobile version</label>
-    <CardSearch
-      v-if="page == config.ALL_PAGE_NAME"
-      :collections="collections"
-    ></CardSearch>
-    <TableSearch
-      v-else-if="page"
-      :collections="collections"
-      :type="page"
-    ></TableSearch>
+    <label><input type="checkbox" @click="toggleMobile" /> Mobile version</label>
+    <CardSearch v-if="page == config.ALL_PAGE_NAME"></CardSearch>
+    <TableSearch v-else-if="page" :type="page"></TableSearch>
   </div>
 </template>
 
@@ -50,9 +43,6 @@ export default {
     return {
       config: config,
       mobile: false,
-      // use prop information to create the collections
-      // computed after collections are retrieved from the server
-      collections: {},
     }
   },
   computed: {
@@ -65,7 +55,7 @@ export default {
         firstAttrAsCardTitle: this.firstAttrAsCardTitle,
         detailsTitle: this.detailsTitle,
         detailsText: this.detailsText,
-        mobile: this.mobile,
+        mobile: false,
       }
     },
     // the collections that will be shown
@@ -131,10 +121,14 @@ export default {
           this.fullColumnNames[collectionName],
           this.previewColumnNames[collectionName]
         )
-        // this.$store.dispatch('addCollection', collection)
-        this.$set(this.collections, collectionName, collection)
+        this.$store.dispatch('setCollection', collection)
       })
     })
+  },
+  methods: {
+    toggleMobile() {
+      this.$store.dispatch('toggleMobile')
+    },
   },
 }
 </script>

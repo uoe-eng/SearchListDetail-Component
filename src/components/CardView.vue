@@ -76,7 +76,6 @@
     <!-- child card for when there are overlays -->
     <CardView
       v-if="shouldShowOverlay"
-      :collections="collections"
       :type="expanded.overlay.type"
       :id="expanded.overlay.id"
       :isReadOnly="false"
@@ -92,7 +91,6 @@ import config from './config'
 export default {
   name: 'CardView',
   props: {
-    collections: Object,
     type: String, // type of entry in collection
     id: String, // id of entry in collection
     isReadOnly: Boolean,
@@ -112,15 +110,21 @@ export default {
     return {
       // defined here so the template can use it
       config: config,
-      collection: this.collections[this.type],
-      entry: this.collections[this.type].entries[this.id],
-      // stringify to create deep copy
-      oldDetails: JSON.stringify(this.collections[this.type].entries[this.id]),
+      // create a deep copy since the user will want to explicitly save
+      collections: JSON.parse(
+        JSON.stringify(this.$store.state.sld.collections)
+      ),
     }
   },
   computed: {
     page() {
       return this.$store.state.sld.page
+    },
+    collection() {
+      return this.collections[this.type]
+    },
+    entry() {
+      return this.collection.entries[this.id]
     },
     // boolean to determine if there are overlays to be displayed
     shouldShowOverlay() {
@@ -204,9 +208,6 @@ export default {
       }
     },
     handleClose() {
-      // restore the old deatils from when the card was rendered
-      const oldDetails = JSON.parse(this.oldDetails)
-      this.collection.entries[this.id] = oldDetails
       // remove the top child card
       this.$store.dispatch('removeOneOverlay')
     },
@@ -214,6 +215,12 @@ export default {
       const record = this.collections[this.type].entries[this.id]
       // patch the modified record up to the server
       this.$store.dispatch('jv/patch', record)
+      // this.$store.dispatch('setCollection', this.collections[this.type])
+      this.$store.dispatch('updateEntry', {
+        newEntry: this.entry,
+        type: this.type,
+        id: this.id,
+      })
       // remove the top child card
       this.$store.dispatch('removeOneOverlay')
     },
