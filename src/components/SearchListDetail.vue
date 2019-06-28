@@ -2,7 +2,9 @@
   <div id="sld">
     <NavBar :collectionNames="Object.keys(this.resultOptions)"></NavBar>
     <!-- temporary way to see the mobile version -->
-    <label><input type="checkbox" @click="toggleMobile" /> Mobile version</label>
+    <label>
+      <input type="checkbox" @click="toggleMobile" /> Mobile version
+    </label>
     <CardSearch v-if="page == config.ALL_PAGE_NAME"></CardSearch>
     <TableSearch v-else-if="page" :type="page"></TableSearch>
   </div>
