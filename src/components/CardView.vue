@@ -211,7 +211,7 @@ export default {
       this.$store.dispatch('removeOneOverlay')
     },
     handleSave() {
-      const record = this.collections[this.type].entries[this.id]
+      const record = this.collections[this.type].unfilteredEntries[this.id]
       // patch the modified record up to the server
       this.$store.dispatch('jv/patch', record)
       this.$store.dispatch('updateEntry', {

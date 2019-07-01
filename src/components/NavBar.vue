@@ -45,8 +45,7 @@ export default {
     countResults(collectionName) {
       if (collectionName == config.ALL_PAGE_NAME) {
         return this.collectionNames.reduce((count, collectionName) => {
-          const entries = this.collections[collectionName].entries
-          return count + Object.keys(entries).length
+          return count + this.countResults(collectionName)
         }, 0)
       } else {
         const entries = this.collections[collectionName].entries
