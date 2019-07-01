@@ -34,25 +34,28 @@ export default {
     setCollection(state, collection) {
       state.collections[collection.type] = collection
     },
-    // following update functions are useful to use instead of setCollection
-    // since the class methods might get overwritten if a deep copy is modified
+    // used to set the search results
     updateEntries(state, args) {
       const entries = args.entries
       const type = args.type
       state.collections[type].entries = entries
     },
+    // following update functions are useful to use instead of setCollection
+    // since the class methods might get overwritten if a deep copy is modified
+    // updates the unfiltered entries
     updateEntry(state, args) {
       const newEntry = args.newEntry
       const type = args.type
       const id = args.id
-      state.collections[type].entries[id] = newEntry
+      state.collections[type].unfilteredEntries[id] = newEntry
     },
+    // updates the unfiltered entries
     updateCell(state, args) {
       const newValue = args.newValue
       const type = args.type
       const id = args.id
       const column = args.column
-      state.collections[type].entries[id][column] = newValue
+      state.collections[type].unfilteredEntries[id][column] = newValue
     },
     setExpanded(state, args) {
       console.log('expanding', args)

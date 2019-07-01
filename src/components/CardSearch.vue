@@ -1,7 +1,7 @@
 <template>
   <div id="card-search">
-    <div v-for="(collection, name) of collectionsToShow" v-bind:key="name">
-      <div v-for="(entry, id) of collection.entries" v-bind:key="id">
+    <div v-for="(collection, name) of collectionsToShow" :key="name">
+      <div v-for="(entry, id) of collection.entries" :key="id">
         <CardView
           :type="collection.type"
           :id="id"

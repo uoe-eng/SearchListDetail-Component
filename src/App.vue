@@ -34,7 +34,7 @@
               name: 'widgets.name',
             },
           ],
-          previewOrder: ['name'],
+          previewOrder: ['name', 'widgets.name'],
         },
       }"
       :firstAttrAsCardTitle="true"

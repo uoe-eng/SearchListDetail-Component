@@ -3,7 +3,7 @@
   <div>
     <div
       class="sld-card-view"
-      v-bind:class="{
+      :class="{
         pointer: !isExpanded,
         selected: expanded.id == id,
       }"
@@ -13,18 +13,21 @@
       <span class="subtitle">{{ type }} / {{ id }}</span>
       <form v-on:submit.prevent="handleSave">
         <table class="sld-card-view-details">
-          <tr v-for="(column, index) of columnsToShow" v-bind:key="column">
+          <tr v-for="(column, index) of columnsToShow" :key="column">
             <td class="column">{{ column }}:&nbsp;</td>
             <td class="value">
               <!-- if column is a relationship -->
               <span v-if="column.includes('.')">
                 <span
                   v-for="(related, index) in getRelationships(column)"
-                  v-bind:key="index"
+                  :key="index"
                 >
                   <button
                     @click="addOverlay(related.type, related.id)"
-                    class="relationship"
+                    :class="{
+                      relationship: isExpanded && !shouldShowOverlay,
+                      relationshipNoClick: !(isExpanded && !shouldShowOverlay),
+                    }"
                   >
                     {{
                       collections[related.type].unfilteredEntries[related.id][
@@ -171,6 +174,8 @@ export default {
   methods: {
     // creates a child card on top of this
     addOverlay(type, id) {
+      // don't allow adding overlays if an overlay is already showing
+      if (this.shouldShowOverlay) return
       this.$store.dispatch('addOverlay', {
         type: type,
         id: id,
@@ -179,9 +184,7 @@ export default {
     // returns an array of {id, type} for the related entries of this card
     getRelationships(relColumn) {
       const relName = relColumn.split('.')[0]
-      if (!this.entry._jv.relationships) {
-        return []
-      }
+      if (!this.entry._jv.relationships) return []
       const relData = this.entry._jv.relationships[relName].data
       if (Array.isArray(relData)) {
         return relData
@@ -191,26 +194,29 @@ export default {
       }
     },
     handleClick() {
-      if (!this.isExpanded) {
-        // determine if the page should be changed somewhere else
-        const pageToNavTo = this.$store.state.sld.componentOptions.mobile
-          ? this.$store.state.sld.page // current page
-          : this.type // page for the type of card
-        this.$store.dispatch('setExpanded', {
-          page: pageToNavTo,
-          type: this.type,
-          id: this.id,
-        })
+      if (this.isExpanded) return
+      // determine if the page should be changed somewhere else
+      const pageToNavTo = this.$store.state.sld.componentOptions.mobile
+        ? this.$store.state.sld.page // current page
+        : this.type // page for the type of card
+      this.$store.dispatch('setExpanded', {
+        page: pageToNavTo,
+        type: this.type,
+        id: this.id,
+      })
 
-        // then switch to that page
-        this.$store.dispatch('setPage', pageToNavTo)
-      }
+      // then switch to that page
+      this.$store.dispatch('setPage', pageToNavTo)
     },
     handleClose() {
+      // don't allow closing when showing overlay
+      if (this.shouldShowOverlay) return
       // remove the top child card
       this.$store.dispatch('removeOneOverlay')
     },
     handleSave() {
+      // don't allow saves when showing an overlay
+      if (this.shouldShowOverlay) return
       const record = this.collections[this.type].unfilteredEntries[this.id]
       // patch the modified record up to the server
       this.$store.dispatch('jv/patch', record)
@@ -295,6 +301,10 @@ export default {
   color: var(--alt-text-color);
 }
 
+.sld-card-view button {
+  font-size: inherit;
+}
+
 .sld-card-view button.relationship {
   padding: 7px;
   margin: 5px;
@@ -302,12 +312,16 @@ export default {
   border-radius: 3px;
   background-color: var(--light-card);
   cursor: pointer;
-  font-weight: bold;
-  font-style: italic;
 }
 
 .sld-card-view button.relationship:hover {
   background-color: var(--highlight-color);
+}
+
+.sld-card-view button.relationshipNoClick {
+  background-color: transparent;
+  border: none;
+  outline: none;
 }
 
 .sld-card-view input {

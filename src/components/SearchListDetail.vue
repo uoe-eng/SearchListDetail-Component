@@ -89,9 +89,7 @@ export default {
       collectionNames.forEach((collectionName) => {
         // array of column names, each column in a collection has a name
         names[collectionName] = this.resultOptions[collectionName].columns.map(
-          (column) => {
-            return column.name
-          }
+          (column) => column.name
         )
       })
       return names
@@ -107,9 +105,7 @@ export default {
         } else {
           names[collectionName] = this.resultOptions[
             collectionName
-          ].columns.map((column) => {
-            return column.name
-          })
+          ].columns.map((column) => column.name)
         }
       })
       return names

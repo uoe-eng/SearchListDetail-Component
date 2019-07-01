@@ -2,7 +2,7 @@
   <div id="nav-bar">
     <span
       class="nav-bar-item"
-      v-bind:class="{ selected: selected == config.ALL_PAGE_NAME }"
+      :class="{ selected: selected == config.ALL_PAGE_NAME }"
       @click="setPage(config.ALL_PAGE_NAME)"
     >
       All
@@ -12,9 +12,9 @@
     </span>
     <span
       v-for="collectionName of collectionNames"
-      v-bind:key="collectionName"
+      :key="collectionName"
       class="nav-bar-item"
-      v-bind:class="{ selected: selected == collectionName }"
+      :class="{ selected: selected == collectionName }"
       @click="setPage(collectionName)"
     >
       {{ collectionName }}

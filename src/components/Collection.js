@@ -68,10 +68,8 @@ export default class Collection {
   // returns (in order) the ids of the collection in an array
   ids() {
     return Object.keys(this.entries).sort((a, b) => {
-      if (this.columnSorting == undefined) {
-        // normal numerical sort by id
-        return a - b
-      }
+      // normal numerical sort by id
+      if (this.columnSorting == undefined) return a - b
       // otherwise sort by column
       const colNumber = this.columnSorting.column - 1
       const colName = this.fullCols[colNumber]
@@ -127,13 +125,9 @@ export default class Collection {
           const relCollection = column.split('.')[0]
           const relatedItems = this.entries[id][relCollection]
           // 0 items
-          if (!relatedItems) {
-            return '0 items'
-          }
+          if (!relatedItems) return '0 items'
           // 1 item
-          if (relatedItems._jv) {
-            return relatedItems[column.split('.')[1]]
-          }
+          if (relatedItems._jv) return relatedItems[column.split('.')[1]]
           // many items
           const itemCount = Object.keys(relatedItems).length
           return itemCount + ' items...'
