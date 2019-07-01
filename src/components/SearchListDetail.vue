@@ -1,10 +1,7 @@
 <template>
   <div id="sld">
     <SearchBox></SearchBox>
-    <NavBar
-      v-if="search != ''"
-      :collectionNames="Object.keys(this.resultOptions)"
-    ></NavBar>
+    <NavBar v-if="search != ''" :displayResultCount="countResults"></NavBar>
     <!-- temporary way to see the mobile version -->
     <label v-if="search">
       <input type="checkbox" @click="$store.dispatch('toggleMobile')" />
@@ -41,6 +38,10 @@ export default {
       type: String,
       default: config.DEFAULT_DETAILS_TEXT,
     },
+    countResults: {
+      type: Boolean,
+      default: true,
+    },
   },
   components: {
     NavBar,
@@ -67,6 +68,7 @@ export default {
         firstAttrAsCardTitle: this.firstAttrAsCardTitle,
         detailsTitle: this.detailsTitle,
         detailsText: this.detailsText,
+        countResults: this.countResults,
         mobile: false,
       }
     },

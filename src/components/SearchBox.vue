@@ -5,6 +5,7 @@
     type="text"
     placeholder="Type to search..."
     autocomplete="off"
+    autofocus
     @input="quickSearch()"
   />
 </template>

@@ -40,6 +40,7 @@
       :firstAttrAsCardTitle="true"
       detailsTitle="details"
       detailsText="+"
+      :countResults="true"
     ></SearchListDetail>
   </div>
 </template>

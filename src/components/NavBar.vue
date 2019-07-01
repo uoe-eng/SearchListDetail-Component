@@ -6,6 +6,9 @@
       @click="setPage(config.ALL_PAGE_NAME)"
     >
       All
+      <span v-if="displayResultCount">
+        ({{ countResults(config.ALL_PAGE_NAME) }})
+      </span>
     </span>
     <span
       v-for="collectionName of collectionNames"
@@ -15,6 +18,9 @@
       @click="setPage(collectionName)"
     >
       {{ collectionName }}
+      <span v-if="displayResultCount">
+        ({{ countResults(collectionName) }})
+      </span>
     </span>
   </div>
 </template>
@@ -25,7 +31,7 @@ import config from './config'
 export default {
   name: 'NavBar',
   props: {
-    collectionNames: Array,
+    displayResultCount: Boolean,
   },
   data() {
     return {
@@ -36,10 +42,27 @@ export default {
     setPage(page) {
       this.$store.dispatch('setPage', page)
     },
+    countResults(collectionName) {
+      if (collectionName == config.ALL_PAGE_NAME) {
+        return this.collectionNames.reduce((count, collectionName) => {
+          const entries = this.collections[collectionName].entries
+          return count + Object.keys(entries).length
+        }, 0)
+      } else {
+        const entries = this.collections[collectionName].entries
+        return Object.keys(entries).length
+      }
+    },
   },
   computed: {
     selected() {
       return this.$store.state.sld.page
+    },
+    collections() {
+      return this.$store.state.sld.collections
+    },
+    collectionNames() {
+      return Object.keys(this.collections)
     },
   },
 }
