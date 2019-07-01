@@ -5,8 +5,7 @@
     type="text"
     placeholder="Type to search..."
     autocomplete="off"
-    @input="searchPeople()"
-    @change="searchPeopleLong()"
+    @input="quickSearch()"
   />
 </template>
 
@@ -24,19 +23,18 @@ export default {
     },
   },
   methods: {
-    searchPeople: function() {
+    quickSearch: function() {
       Object.keys(this.collections).forEach((collectionName) => {
         const collection = this.collections[collectionName]
         collection.filter(this.search, this.$store)
       })
+      this.$store.dispatch('setSearch', this.search)
       this.$store.dispatch('setExpanded', {
         page: this.$store.state.sld.page,
         type: null,
         id: null,
       })
     },
-
-    searchPeopleLong: function() {},
   },
 }
 </script>

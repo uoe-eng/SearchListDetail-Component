@@ -1,14 +1,17 @@
 <template>
   <div id="sld">
     <SearchBox></SearchBox>
-    <NavBar :collectionNames="Object.keys(this.resultOptions)"></NavBar>
+    <NavBar
+      v-if="search != ''"
+      :collectionNames="Object.keys(this.resultOptions)"
+    ></NavBar>
     <!-- temporary way to see the mobile version -->
-    <label>
+    <label v-if="search">
       <input type="checkbox" @click="$store.dispatch('toggleMobile')" />
       Mobile version
     </label>
-    <CardSearch v-if="page == config.ALL_PAGE_NAME"></CardSearch>
-    <TableSearch v-else-if="page" :type="page"></TableSearch>
+    <CardSearch v-if="page == config.ALL_PAGE_NAME && search"></CardSearch>
+    <TableSearch v-else-if="page && search" :type="page"></TableSearch>
   </div>
 </template>
 
@@ -54,6 +57,9 @@ export default {
   computed: {
     page() {
       return this.$store.state.sld.page
+    },
+    search() {
+      return this.$store.state.sld.search
     },
     // group together all options to pass around in other components as a single prop
     componentOptions() {

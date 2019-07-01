@@ -101,6 +101,9 @@ export default {
     toggleMobile(state) {
       state.componentOptions.mobile = !state.componentOptions.mobile
     },
+    setSearch(state, search) {
+      state.search = search
+    },
   },
   actions: {
     setPage(context, page) {
@@ -141,6 +144,9 @@ export default {
     },
     toggleMobile(context) {
       context.commit('toggleMobile')
+    },
+    setSearch(context, search) {
+      context.commit('setSearch', search)
     },
   },
 }
