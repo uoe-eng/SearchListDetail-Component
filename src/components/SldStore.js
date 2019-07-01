@@ -120,7 +120,7 @@ export default {
     },
     setCollection(context, collection) {
       context.commit('setCollection', collection)
-      context.dispatch('refreshPage')
+      // context.dispatch('refreshPage')
     },
     updateEntries(context, args) {
       context.commit('updateEntries', args)

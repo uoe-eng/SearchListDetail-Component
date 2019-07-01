@@ -4,6 +4,7 @@ resultOptions = {
       {
         name: String,
         searchOperator(default = 'contains'): String,
+        caseSensitive(default = false): Boolean,
       },
       {
         ...

@@ -6,6 +6,9 @@
           columns: [
             {
               name: 'name',
+              // caseSensitive defaults to false
+              // searchOperator defaults to 'contains'
+              searchOperator: 'startsWith',
             },
             {
               name: 'title',
@@ -13,6 +16,7 @@
             },
             {
               name: 'job',
+              caseSensitive: true,
             },
           ],
           previewOrder: ['name', 'title'],
@@ -24,6 +28,7 @@
             },
             {
               name: 'color',
+              searchOperator: 'endsWith',
             },
             {
               name: 'widgets.name',

@@ -125,11 +125,25 @@ export default {
           collectionName,
           this.$store.getters['jv/get'](collectionName),
           this.fullColumnNames[collectionName],
-          this.previewColumnNames[collectionName]
+          this.previewColumnNames[collectionName],
+          this.columnOptions(collectionName)
         )
         this.$store.dispatch('setCollection', collection)
       })
     })
+  },
+  methods: {
+    columnOptions(collectionName) {
+      const columnOptions = {}
+      this.resultOptions[collectionName].columns.forEach((column) => {
+        columnOptions[column.name] = {
+          caseSensitive: column.caseSensitive || config.DEFAULT_CASE_SENSITIVE,
+          searchOperator:
+            column.searchOperator || config.DEFAULT_SEARCH_OPERATOR,
+        }
+      })
+      return columnOptions
+    },
   },
 }
 </script>

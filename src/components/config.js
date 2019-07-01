@@ -7,4 +7,20 @@ export default {
   SAVE_BUTTON_TEXT: 'Save',
   CLOSE_BUTTON_REF: 'cancel',
   CLOSE_BUTTON_TEXT: 'Cancel',
+  DEFAULT_CASE_SENSITIVE: false,
+  DEFAULT_SEARCH_OPERATOR: 'contains',
+  SEARCH_OPERATORS: {
+    contains: (value, search) => {
+      return value.includes(search)
+    },
+    matches: (value, search) => {
+      return value == search
+    },
+    startsWith: (value, search) => {
+      return value.startsWith(search)
+    },
+    endsWith: (value, search) => {
+      return value.endsWith(search)
+    },
+  },
 }

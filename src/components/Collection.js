@@ -1,16 +1,21 @@
+import config from './config'
+
 export default class Collection {
-  constructor(type, entries, fullCols, previewCols) {
+  constructor(type, entries, fullCols, previewCols, columnOptions) {
     this.type = type
+    // represents the search results (empty to begin with)
     this.entries = {}
     this.unfilteredEntries = entries
     this.fullCols = fullCols
     this.previewCols = previewCols
+    this.columnOptions = columnOptions
     // the sorting for each column is stored in the collection object
     this.columnSorting = undefined
   }
 
   // sets this.entries to be the filtered search results
   filter(search, store) {
+    // display no entries and stop if no search term
     if (search == '') {
       store.dispatch('updateEntries', {
         entries: {},
@@ -18,14 +23,24 @@ export default class Collection {
       })
       return
     }
+    // create array of ids that match filter
     const ids = Object.keys(this.unfilteredEntries)
     const filteredIds = ids.filter((id) => {
+      // if this entry should be displayed, return true in here
       const entry = this.unfilteredEntries[id]
       const columns = Object.keys(entry)
-      // array of boolean for if the value in the column matches the search
+
+      // array of booleans for if the value in the column matches the search
       const matchedColumns = columns.map((column) => {
         if (typeof entry[column] != 'string') return false
-        return entry[column].includes(search)
+        const operatorName = this.columnOptions[column].searchOperator
+        const operator = config.SEARCH_OPERATORS[operatorName]
+        if (this.columnOptions[column].caseSensitive) {
+          return operator(entry[column], search)
+        } else {
+          // case insensitive, so convert everything to upper case before searching
+          return operator(entry[column].toUpperCase(), search.toUpperCase())
+        }
       })
       // apply OR operator on all values of the array
       // if one or more column matches, this entry will appear in the search
@@ -34,8 +49,8 @@ export default class Collection {
       })
       return entryMatchesFilter
     })
-    let filteredEntries = {}
     // convert ids to entries
+    let filteredEntries = {}
     filteredIds.forEach((id) => {
       filteredEntries[id] = this.unfilteredEntries[id]
     })
