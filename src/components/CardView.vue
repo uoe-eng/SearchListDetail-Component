@@ -214,7 +214,6 @@ export default {
       const record = this.collections[this.type].entries[this.id]
       // patch the modified record up to the server
       this.$store.dispatch('jv/patch', record)
-      // this.$store.dispatch('setCollection', this.collections[this.type])
       this.$store.dispatch('updateEntry', {
         newEntry: this.entry,
         type: this.type,
