@@ -1,22 +1,26 @@
 # SearchListDeatil Component
 
 ## Current features
-* Separated result type in tabs with a sticky navigation bar
-* The 'All' tab displays results in cards 
+* Results separated by type in tabs with a sticky navigation bar
+* The 'All' tab displays results in cards
 * The other tabs display results with row-expandable handsontable components
 * 'All' tab cards link to their corresponding type tab and expands its row automatically
 * Mobile layout where cards are used instead of tables
 * Navigation bar scrolls horizontally if too long
-* Expanded cards stay expanded when switching tabs
 * Data is editable from both the cards and table cells
 * Navigation by keyboard and tab is possible in the table views
-* All data structures regarding state are stored in the root component, potential for URL routing
-* Columns can be sorted by handsontable, the order will be saved in vue and is reactive
+* All state data is stored in a local store module, potential for URL routing in the future
+* Columns can be sorted by handsontable, the order will be saved in vue and update
 * Sorted columns stay sorted when switching tabs
+* Expanded cards / rows stay expanded when switching tabs
+* Edited fields will patch to the server from both the table and cards
+* Closing a card will revert any change made by the user in that card
+* Escape closes card, enter saves card
+* Simple search box available (client side filtering only)
+* In the props, each column can have search options (operator, case sensitivity)
+* Search operators are configurable in config.js
 
 ## Next steps
-* Patch collections to the server (will require real server)
-* Add search box
 * Add advanced search settings with column filters
 * Keyboard navigation for switching tabs
 
