@@ -1,9 +1,11 @@
 <template>
   <div id="sld">
+    <SearchBox></SearchBox>
     <NavBar :collectionNames="Object.keys(this.resultOptions)"></NavBar>
     <!-- temporary way to see the mobile version -->
     <label>
-      <input type="checkbox" @click="toggleMobile" /> Mobile version
+      <input type="checkbox" @click="$store.dispatch('toggleMobile')" />
+      Mobile version
     </label>
     <CardSearch v-if="page == config.ALL_PAGE_NAME"></CardSearch>
     <TableSearch v-else-if="page" :type="page"></TableSearch>
@@ -17,6 +19,7 @@ import NavBar from './NavBar'
 import config from './config'
 import Collection from './Collection'
 import SldStore from './SldStore'
+import SearchBox from './SearchBox'
 
 export default {
   name: 'SearchListDetail',
@@ -40,6 +43,7 @@ export default {
     NavBar,
     CardSearch,
     TableSearch,
+    SearchBox,
   },
   data() {
     return {
@@ -127,11 +131,6 @@ export default {
       })
     })
   },
-  methods: {
-    toggleMobile() {
-      this.$store.dispatch('toggleMobile')
-    },
-  },
 }
 </script>
 
@@ -145,9 +144,9 @@ export default {
   color: var(--text-color);
   background-color: white;
   display: grid;
-  grid-template-areas: 'nav' 'settings' 'results';
-  /* collapses first two as much as possible */
-  grid-template-rows: auto auto 1fr;
+  grid-template-areas: 'search' 'nav' 'settings' 'results';
+  /* collapses first three as much as possible */
+  grid-template-rows: auto auto auto 1fr;
   /* change this depending on application */
   height: 100vh;
 }

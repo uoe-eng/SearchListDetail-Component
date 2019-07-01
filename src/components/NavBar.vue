@@ -47,13 +47,9 @@ export default {
 
 <style scoped>
 #nav-bar {
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding: 10px;
   margin-bottom: 10px;
-  height: 20px;
   border-radius: 3px;
-  background-color: #fff;
-  box-shadow: rgba(0, 0, 0, 0.3) 0 1px 3px;
   overflow-x: auto;
   white-space: nowrap;
   width: fit-content;
@@ -61,16 +57,14 @@ export default {
 }
 
 #nav-bar .nav-bar-item {
-  padding: 20px;
+  color: var(--alt-text-color);
+  padding: 10px;
   cursor: pointer;
   text-transform: uppercase;
 }
 
 #nav-bar .nav-bar-item.selected {
-  background-color: var(--highlight-color);
-}
-
-#nav-bar .nav-bar-item:hover {
-  background-color: var(--highlight-color);
+  color: var(--text-color);
+  font-weight: bold;
 }
 </style>

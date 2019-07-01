@@ -7,6 +7,7 @@ export default {
     collections: {},
     allExpanded: {},
     componentOptions: {},
+    search: '',
   },
   mutations: {
     // called on creation so it can be used in the future
@@ -33,8 +34,13 @@ export default {
     setCollection(state, collection) {
       state.collections[collection.type] = collection
     },
-    // useful to use instead of setCollection since the class methods might
-    // get overwritten if a deep copy is modified
+    // following update functions are useful to use instead of setCollection
+    // since the class methods might get overwritten if a deep copy is modified
+    updateEntries(state, args) {
+      const entries = args.entries
+      const type = args.type
+      state.collections[type].entries = entries
+    },
     updateEntry(state, args) {
       const newEntry = args.newEntry
       const type = args.type
@@ -115,6 +121,9 @@ export default {
     setCollection(context, collection) {
       context.commit('setCollection', collection)
       context.dispatch('refreshPage')
+    },
+    updateEntries(context, args) {
+      context.commit('updateEntries', args)
     },
     updateEntry(context, args) {
       context.commit('updateEntry', args)

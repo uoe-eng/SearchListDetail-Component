@@ -27,7 +27,7 @@
                     class="relationship"
                   >
                     {{
-                      collections[related.type].entries[related.id][
+                      collections[related.type].unfilteredEntries[related.id][
                         column.split('.')[1]
                       ]
                     }}
@@ -124,7 +124,7 @@ export default {
       return this.collections[this.type]
     },
     entry() {
-      return this.collection.entries[this.id]
+      return this.collection.unfilteredEntries[this.id]
     },
     // boolean to determine if there are overlays to be displayed
     shouldShowOverlay() {
@@ -138,8 +138,7 @@ export default {
     title() {
       // don't set the title unless specified
       if (this.$store.state.sld.componentOptions.firstAttrAsCardTitle) {
-        const entry = this.collection.entries[this.id]
-        return entry[this.collection.fullCols[0]]
+        return this.entry[this.collection.fullCols[0]]
       } else {
         return null
       }

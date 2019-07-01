@@ -1,11 +1,48 @@
 export default class Collection {
   constructor(type, entries, fullCols, previewCols) {
     this.type = type
-    this.entries = entries
+    this.entries = {}
+    this.unfilteredEntries = entries
     this.fullCols = fullCols
     this.previewCols = previewCols
     // the sorting for each column is stored in the collection object
     this.columnSorting = undefined
+  }
+
+  // sets this.entries to be the filtered search results
+  filter(search, store) {
+    if (search == '') {
+      store.dispatch('updateEntries', {
+        entries: {},
+        type: this.type,
+      })
+      return
+    }
+    const ids = Object.keys(this.unfilteredEntries)
+    const filteredIds = ids.filter((id) => {
+      const entry = this.unfilteredEntries[id]
+      const columns = Object.keys(entry)
+      // array of boolean for if the value in the column matches the search
+      const matchedColumns = columns.map((column) => {
+        if (typeof entry[column] != 'string') return false
+        return entry[column].includes(search)
+      })
+      // apply OR operator on all values of the array
+      // if one or more column matches, this entry will appear in the search
+      const entryMatchesFilter = matchedColumns.reduce((a, b) => {
+        return a || b
+      })
+      return entryMatchesFilter
+    })
+    let filteredEntries = {}
+    // convert ids to entries
+    filteredIds.forEach((id) => {
+      filteredEntries[id] = this.unfilteredEntries[id]
+    })
+    store.dispatch('updateEntries', {
+      entries: filteredEntries,
+      type: this.type,
+    })
   }
 
   // gets the entry of id
