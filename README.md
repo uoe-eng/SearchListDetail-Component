@@ -23,6 +23,7 @@
 ## Next steps
 * Add advanced search settings with column filters
 * Keyboard navigation for switching tabs
+* Add automated tests
 
 ## Project setup
 ```

@@ -1,6 +1,7 @@
 <template>
   <div id="sld">
     <SearchBox></SearchBox>
+    <AdvancedSearch></AdvancedSearch>
     <NavBar v-if="search != ''" :displayResultCount="countResults"></NavBar>
     <!-- temporary way to see the mobile version -->
     <label v-if="search">
@@ -20,6 +21,7 @@ import config from './config'
 import Collection from './Collection'
 import SldStore from './SldStore'
 import SearchBox from './SearchBox'
+import AdvancedSearch from './AdvancedSearch'
 
 export default {
   name: 'SearchListDetail',
@@ -48,6 +50,7 @@ export default {
     CardSearch,
     TableSearch,
     SearchBox,
+    AdvancedSearch,
   },
   data() {
     return {
@@ -117,6 +120,7 @@ export default {
     this.$store.commit('initialiseExpanded', this.resultOptions)
     this.$store.commit('defineNextTick', this.$nextTick)
     this.$store.commit('setComponentOptions', this.componentOptions)
+    this.$store.commit('initialiseSearchOptions', this.resultOptions)
     const collectionNames = Object.keys(this.resultOptions)
     // for each collection
     collectionNames.forEach((collectionName) => {

@@ -8,6 +8,7 @@ export default {
     allExpanded: {},
     componentOptions: {},
     search: '',
+    searchOptions: {},
   },
   mutations: {
     // called on creation so it can be used in the future
@@ -24,6 +25,21 @@ export default {
         allExpanded[name] = {}
       })
       state.allExpanded = allExpanded
+    },
+    initialiseSearchOptions(state, resultOptions) {
+      const collectionNames = Object.keys(resultOptions)
+      collectionNames.forEach((collectionName) => {
+        state.searchOptions[collectionName] = {}
+        const columns = resultOptions[collectionName].columns
+        columns.forEach((column) => {
+          state.searchOptions[collectionName][column.name] = true
+        })
+      })
+    },
+    toggleCheckBox(state, args) {
+      const type = args.type
+      const column = args.column
+      state.searchOptions[type][column] = !state.searchOptions[type][column]
     },
     setComponentOptions(state, options) {
       state.componentOptions = options
@@ -150,6 +166,9 @@ export default {
     },
     setSearch(context, search) {
       context.commit('setSearch', search)
+    },
+    toggleCheckBox(context, args) {
+      context.commit('toggleCheckBox', args)
     },
   },
 }
