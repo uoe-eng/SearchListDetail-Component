@@ -89,10 +89,11 @@ export default class Collection {
       const colNumber = this.columnSorting.column - 1
       const colName = this.fullCols[colNumber]
       // the comparator function in sort() expects a number
+      const results = this.searchResults
       if (this.columnSorting.sortOrder == 'asc') {
-        return this.searchResults[a][colName] >= this.searchResults[b][colName] ? 1 : -1
+        return results[a][colName] >= results[b][colName] ? 1 : -1
       } else {
-        return this.searchResults[a][colName] >= this.searchResults[b][colName] ? -1 : 1
+        return results[a][colName] >= results[b][colName] ? -1 : 1
       }
     })
   }

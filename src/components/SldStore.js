@@ -124,7 +124,7 @@ export default {
       Object.keys(state.collections).forEach((collectionName) => {
         const collection = state.collections[collectionName]
         const results = collection.filter(state.search, this)
-        state.collections[collectionName].searchResults = state.search ? results : {}
+        collection.searchResults = state.search ? results : {}
       })
     },
   },
