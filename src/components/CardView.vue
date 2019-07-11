@@ -115,15 +115,17 @@ export default {
     return {
       // defined here so the template can use it
       config: config,
-      collections: this.$store.state.sld.collections,
     }
   },
   computed: {
     page() {
       return this.$store.state.sld.page
     },
+    collections() {
+      return this.$store.state.sld.collections
+    },
     collection() {
-      return this.$store.state.sld.collections[this.type]
+      return this.collections[this.type]
     },
     entry() {
       const entry = this.$store.getters['jv/get'](`${this.type}/${this.id}`)

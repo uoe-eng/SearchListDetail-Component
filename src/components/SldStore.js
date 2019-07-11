@@ -120,11 +120,11 @@ export default {
     },
     updateSerachResults(state) {
       // for each collection, filter the results from the store and put them into
-      // the .entries attribute
+      // the .searchResults attribute
       Object.keys(state.collections).forEach((collectionName) => {
         const collection = state.collections[collectionName]
         const results = collection.filter(state.search, this)
-        state.collections[collectionName].entries = state.search ? results : {}
+        state.collections[collectionName].searchResults = state.search ? results : {}
       })
     },
   },

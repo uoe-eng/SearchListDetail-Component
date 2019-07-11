@@ -1,7 +1,7 @@
 <template>
   <div id="card-search">
     <div v-for="(collection, name) of collectionsToShow" :key="name">
-      <div v-for="(entry, id) of collection.entries" :key="id">
+      <div v-for="(entry, id) of collection.searchResults" :key="id">
         <CardView
           :type="collection.type"
           :id="id"
@@ -29,6 +29,7 @@ export default {
     collections() {
       return this.$store.state.sld.collections
     },
+    // returns a list of collections that should be displayed on the page
     // if specified, only show one collection
     collectionsToShow() {
       if (this.showOnly) {

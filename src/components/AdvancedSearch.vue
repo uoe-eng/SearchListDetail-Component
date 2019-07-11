@@ -40,15 +40,18 @@ export default {
     },
   },
   methods: {
+    // toggles if the advanced search is opened or not
     toggleOpen() {
       this.$store.commit('toggleAdvancedSearch')
     },
+    // handles toggling individual checkboxes
     handleClick(type, column) {
       this.$store.dispatch('toggleCheckBox', {
         type: type,
         column: column,
       })
     },
+    // toggles all checkboxes for that collection at once
     toggleAll(collectionName) {
       this.$store.dispatch('toggleAllCheckboxes', collectionName)
     },

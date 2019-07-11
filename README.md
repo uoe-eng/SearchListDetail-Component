@@ -30,6 +30,7 @@
 ## Next steps
 * Keyboard navigation for switching tabs
 * Add automated tests
+* Filter results on server
 
 ## Project setup
 ```

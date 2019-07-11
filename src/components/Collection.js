@@ -8,7 +8,7 @@ export default class Collection {
     this.columnOptions = columnOptions
     // this.store = store
     // represents the search results (empty to begin with)
-    this.entries = {}
+    this.searchResults = {}
     // the sorting for each column is stored in the collection object
     this.columnSorting = undefined
   }
@@ -77,24 +77,12 @@ export default class Collection {
   }
 
   get(id) {
-    return this.entries[id]
-  }
-
-  // gets the entry but only with keys that aren't objects (also a deep copy)
-  getShallow(id) {
-    let entry = {}
-    const columns = Object.keys(this.entries[id])
-    columns.forEach((column) => {
-      const columnValue = this.entries[id][column]
-      if (typeof columnValue == 'object') return
-      entry[column] = columnValue
-    })
-    return entry
+    return this.searchResults[id]
   }
 
   // returns (in order) the ids of the collection in an array
   ids() {
-    return Object.keys(this.entries).sort((a, b) => {
+    return Object.keys(this.searchResults).sort((a, b) => {
       // normal numerical sort by id
       if (this.columnSorting == undefined) return a - b
       // otherwise sort by column
@@ -102,9 +90,9 @@ export default class Collection {
       const colName = this.fullCols[colNumber]
       // the comparator function in sort() expects a number
       if (this.columnSorting.sortOrder == 'asc') {
-        return this.entries[a][colName] >= this.entries[b][colName] ? 1 : -1
+        return this.searchResults[a][colName] >= this.searchResults[b][colName] ? 1 : -1
       } else {
-        return this.entries[a][colName] >= this.entries[b][colName] ? -1 : 1
+        return this.searchResults[a][colName] >= this.searchResults[b][colName] ? -1 : 1
       }
     })
   }
@@ -150,7 +138,7 @@ export default class Collection {
         // special case for relationship column
         if (column.includes('.')) {
           const relCollection = column.split('.')[0]
-          const relatedItems = this.entries[id][relCollection]
+          const relatedItems = this.searchResults[id][relCollection]
           // 0 items
           if (!relatedItems) return '0 items'
           // 1 item
@@ -160,7 +148,7 @@ export default class Collection {
           return itemCount + ' items...'
         }
         // normal attribute column
-        return this.entries[id][column]
+        return this.searchResults[id][column]
       })
 
       // add the expand details cell to the left of each row

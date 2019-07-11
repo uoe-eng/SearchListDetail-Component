@@ -54,8 +54,8 @@ export default {
         const collections = this.$store.state.sld.collections
         // while collection is still being downloaded, show ... to indicate it
         if (!collections[collectionName]) return loadingText
-        const entries = collections[collectionName].entries
-        return Object.keys(entries).length
+        const searchResults = collections[collectionName].searchResults
+        return Object.keys(searchResults).length
       }
     },
   },
