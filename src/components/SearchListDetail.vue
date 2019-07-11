@@ -1,7 +1,7 @@
 <template>
   <div id="sld">
     <SearchBox></SearchBox>
-    <AdvancedSearch></AdvancedSearch>
+    <AdvancedSearch v-if="page"></AdvancedSearch>
     <NavBar v-if="search != ''" :displayResultCount="countResults"></NavBar>
     <label v-if="search">
       <input type="checkbox" @click="$store.dispatch('toggleMobile')" />

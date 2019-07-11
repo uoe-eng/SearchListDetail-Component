@@ -9,6 +9,7 @@ export default {
     componentOptions: {},
     search: '',
     searchOptions: {},
+    expandedAdvancedSearch: false,
   },
   mutations: {
     // called on creation so it can be used in the future
@@ -40,6 +41,14 @@ export default {
       const type = args.type
       const column = args.column
       state.searchOptions[type][column] = !state.searchOptions[type][column]
+    },
+    toggleAllCheckboxes(state, collectionName) {
+      const columns = state.collections[collectionName].fullCols
+      const currentState = state.searchOptions[collectionName][columns[0]]
+      console.log('toggling all to', !currentState)
+      columns.forEach((column) => {
+        state.searchOptions[collectionName][column] = !currentState
+      })
     },
     setComponentOptions(state, options) {
       state.componentOptions = options
@@ -97,6 +106,9 @@ export default {
     },
     toggleMobile(state) {
       state.componentOptions.mobile = !state.componentOptions.mobile
+    },
+    toggleAdvancedSearch(state) {
+      state.expandedAdvancedSearch = !state.expandedAdvancedSearch
     },
     setSearch(state, search) {
       console.log('setting search to', search)
@@ -157,5 +169,10 @@ export default {
       context.commit('updateSerachResults')
       context.dispatch('refreshPage')
     },
+    toggleAllCheckboxes(context, collectionName) {
+      context.commit('toggleAllCheckboxes', collectionName)
+      context.commit('updateSerachResults')
+      context.dispatch('refreshPage')
+    }
   },
 }

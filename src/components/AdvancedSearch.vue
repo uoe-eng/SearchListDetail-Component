@@ -2,7 +2,8 @@
   <div v-if="opened" id="advanced-search">
     <div>ADVANCED SEARCH</div>
     <div v-for="collection in collections" :key="collection.type">
-      Colection: {{ collection.type }}
+      <b>Colection: {{ collection.type }}</b>
+      <button @click="toggleAll(collection.type)">toggle all</button>
       <br />
       <span v-for="column in collection.fullCols" :key="column">
         <label>
@@ -15,10 +16,10 @@
         </label>
       </span>
     </div>
-    <button @click="opened = false">Close</button>
+    <button @click="toggleOpen">Close</button>
   </div>
   <div v-else>
-    <button @click="opened = true" class="advanced-search-button">
+    <button @click="toggleOpen" class="advanced-search-button">
       Advanced settings
     </button>
   </div>
@@ -27,12 +28,10 @@
 <script>
 export default {
   name: 'AdvancedSearch',
-  data() {
-    return {
-      opened: false,
-    }
-  },
   computed: {
+    opened() {
+      return this.$store.state.sld.expandedAdvancedSearch
+    },
     collections() {
       return this.$store.state.sld.collections
     },
@@ -41,11 +40,17 @@ export default {
     },
   },
   methods: {
+    toggleOpen() {
+      this.$store.commit('toggleAdvancedSearch')
+    },
     handleClick(type, column) {
       this.$store.dispatch('toggleCheckBox', {
         type: type,
         column: column,
       })
+    },
+    toggleAll(collectionName) {
+      this.$store.dispatch('toggleAllCheckboxes', collectionName)
     },
   },
 }
