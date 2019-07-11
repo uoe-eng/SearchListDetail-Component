@@ -16,6 +16,10 @@
 * Edited fields will patch to the server from both the table and cards
 * Closing a card will revert any change made by the user in that card
 * Escape closes card, enter saves card
+* Columns can be relationships
+* Table shows how many related record there are for a relationship column
+* Expanded cards show buttons for relationship columns which will bring up the card for the related record
+* Collapsed cards just show a list of texts for the relationship column
 * Simple search box available (client side filtering only)
 * In the props, each column can have search options (operator, case sensitivity)
 * Search operators are configurable in config.js

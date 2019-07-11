@@ -3,7 +3,6 @@
     <SearchBox></SearchBox>
     <AdvancedSearch></AdvancedSearch>
     <NavBar v-if="search != ''" :displayResultCount="countResults"></NavBar>
-    <!-- temporary way to see the mobile version -->
     <label v-if="search">
       <input type="checkbox" @click="$store.dispatch('toggleMobile')" />
       Mobile version
@@ -59,6 +58,9 @@ export default {
     }
   },
   computed: {
+    expanded() {
+      return this.$store.state.sld.allExpanded[this.page]
+    },
     page() {
       return this.$store.state.sld.page
     },
@@ -127,16 +129,16 @@ export default {
       // get collection from server
       // sparse fields not working?
       const url = `${collectionName}`
+      console.log('getting', url, 'from server...')
       this.$store.dispatch('jv/get', url).then(() => {
-        // create a reactive object from the collection in the store
-        let collection = new Collection(
+        let collectionDescriptor = new Collection(
           collectionName,
-          this.$store.getters['jv/get'](collectionName),
           this.fullColumnNames[collectionName],
           this.previewColumnNames[collectionName],
           this.columnOptions(collectionName)
         )
-        this.$store.dispatch('setCollection', collection)
+        // save collection class to store
+        this.$store.dispatch('setCollectionDescriptor', collectionDescriptor)
       })
     })
   },
@@ -166,9 +168,9 @@ export default {
   color: var(--text-color);
   background-color: white;
   display: grid;
-  grid-template-areas: 'search' 'nav' 'settings' 'results';
+  grid-template-areas: 'search' 'advanced' 'nav' 'settings' 'results';
   /* collapses first three as much as possible */
-  grid-template-rows: auto auto auto 1fr;
+  grid-template-rows: auto auto auto auto 1fr;
   /* change this depending on application */
   height: 100vh;
 }

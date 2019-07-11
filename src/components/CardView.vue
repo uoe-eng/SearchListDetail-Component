@@ -30,9 +30,9 @@
                     }"
                   >
                     {{
-                      collections[related.type].unfilteredEntries[related.id][
-                        column.split('.')[1]
-                      ]
+                      collections[related.type].getEntriesFrom($store)[
+                        related.id
+                      ][column.split('.')[1]]
                     }}
                   </button>
                 </span>
@@ -113,10 +113,7 @@ export default {
     return {
       // defined here so the template can use it
       config: config,
-      // create a deep copy since the user will want to explicitly save
-      collections: JSON.parse(
-        JSON.stringify(this.$store.state.sld.collections)
-      ),
+      collections: this.$store.state.sld.collections,
     }
   },
   computed: {
@@ -124,10 +121,11 @@ export default {
       return this.$store.state.sld.page
     },
     collection() {
-      return this.collections[this.type]
+      return this.$store.state.sld.collections[this.type]
     },
     entry() {
-      return this.collection.unfilteredEntries[this.id]
+      const entry = this.$store.getters['jv/get'](`${this.type}/${this.id}`)
+      return JSON.parse(JSON.stringify(entry))
     },
     // boolean to determine if there are overlays to be displayed
     shouldShowOverlay() {
@@ -217,14 +215,8 @@ export default {
     handleSave() {
       // don't allow saves when showing an overlay
       if (this.shouldShowOverlay) return
-      const record = this.collections[this.type].unfilteredEntries[this.id]
       // patch the modified record up to the server
-      this.$store.dispatch('jv/patch', record)
-      this.$store.dispatch('updateEntry', {
-        newEntry: this.entry,
-        type: this.type,
-        id: this.id,
-      })
+      this.$store.dispatch('jv/patch', this.entry)
       // remove the top child card
       this.$store.dispatch('removeOneOverlay')
     },

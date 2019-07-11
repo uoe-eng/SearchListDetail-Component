@@ -6,7 +6,7 @@
     placeholder="Type to search..."
     autocomplete="off"
     autofocus
-    @input="quickSearch()"
+    @input="quickSearch"
   />
 </template>
 
@@ -20,16 +20,14 @@ export default {
   },
   computed: {
     collections() {
+      console.log('computing collections')
       return this.$store.state.sld.collections
     },
   },
   methods: {
-    quickSearch: function() {
-      Object.keys(this.collections).forEach((collectionName) => {
-        const collection = this.collections[collectionName]
-        collection.filter(this.search, this.$store)
-      })
-      this.$store.dispatch('setSearch', this.search)
+    quickSearch() {
+      console.log('quick search')
+      this.$store.dispatch('search', this.search)
       this.$store.dispatch('setExpanded', {
         page: this.$store.state.sld.page,
         type: null,

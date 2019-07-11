@@ -29,15 +29,10 @@ export default {
       const collection = context.collections[context.type]
       const id = collection.fromCoordinates(row, col).id
       const colName = collection.fromCoordinates(row, col).col
-      context.$store.dispatch('updateCell', {
-        newValue: newValue,
-        type: context.type,
-        id: id,
-        column: colName,
-      })
-      const record = collection.entries[id]
-      // patch the modified record up to the server
-      context.$store.dispatch('jv/patch', record)
+      const record = context.$store.getters['jv/get'](`${context.type}/${id}`)
+      const deepRecord = JSON.parse(JSON.stringify(record))
+      deepRecord[colName] = newValue
+      context.$store.dispatch('jv/patch', deepRecord)
     }
     Handsontable.hooks.add(
       'afterChange',

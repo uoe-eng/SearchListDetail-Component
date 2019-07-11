@@ -2,39 +2,41 @@
   <div id="app">
     <SearchListDetail
       :resultOptions="{
-        person: {
+        people: {
           columns: [
             {
-              name: 'name',
+              name: 'given_name',
               // caseSensitive defaults to false
               // searchOperator defaults to 'contains'
-              searchOperator: 'startsWith',
             },
             {
-              name: 'title',
-              searchOperator: 'matches',
+              name: 'family_name',
             },
             {
-              name: 'job',
-              caseSensitive: true,
+              name: 'preferred_name',
+            },
+            {
+              name: 'email_addresses.email_address',
+            },
+            {
+              name: 'phone_number.phone_number',
             },
           ],
-          previewOrder: ['name', 'title'],
+          previewOrder: ['preferred_name', 'family_name'],
         },
-        widget: {
+        phone_numbers: {
+          columns:[
+            {
+              name: 'phone_number',
+            },
+          ],
+        },
+        email_addresses: {
           columns: [
             {
-              name: 'name',
-            },
-            {
-              name: 'color',
-              searchOperator: 'endsWith',
-            },
-            {
-              name: 'widgets.name',
+              name: 'email_address',
             },
           ],
-          previewOrder: ['name', 'widgets.name'],
         },
       }"
       :firstAttrAsCardTitle="true"

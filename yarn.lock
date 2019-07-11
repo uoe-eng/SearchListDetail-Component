@@ -5347,6 +5347,17 @@ json5@^2.1.0:
   dependencies:
     minimist "^1.2.0"
 
+jsonapi-vuex@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/jsonapi-vuex/-/jsonapi-vuex-2.0.0.tgz#dadc41fdde05fd421e5c035fcc9f44d078157803"
+  integrity sha512-Izxrlgia8F4JGxDx7pZDIZm5PomAlchsz23RQvh5rrJhR2LVSKckhS7zPKhb8lkLrX6hht1cDjGjOVMU90sgUg==
+  dependencies:
+    jsonpath "^1.0.0"
+    lodash.clonedeep "^4.5.0"
+    lodash.get "^4.4.2"
+    lodash.isequal "^4.5.0"
+    lodash.merge "^4.6.1"
+
 jsonfile@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/jsonfile/-/jsonfile-4.0.0.tgz#8771aae0799b64076b76640fca058f9c10e33ecb"
@@ -5359,7 +5370,7 @@ jsonify@~0.0.0:
   resolved "https://registry.yarnpkg.com/jsonify/-/jsonify-0.0.0.tgz#2c74b6ee41d93ca51b7b5aaee8f503631d252a73"
   integrity sha1-LHS27kHZPKUbe1qu6PUDYx0lKnM=
 
-jsonpath@^1.0.2:
+jsonpath@^1.0.0, jsonpath@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/jsonpath/-/jsonpath-1.0.2.tgz#e6aae681d03e9a77b4651d5d96eac5fc63b1fd13"
   integrity sha512-rmzlgFZiQPc6q4HDyK8s9Qb4oxBnI5sF61y/Co5PV0lc3q2bIuRsNdueVbhoSHdKM4fxeimphOAtfz47yjCfeA==

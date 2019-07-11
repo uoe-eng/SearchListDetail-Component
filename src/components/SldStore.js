@@ -47,31 +47,9 @@ export default {
     setPage(state, page) {
       state.page = page
     },
-    setCollection(state, collection) {
+    setCollectionDescriptor(state, collection) {
       state.collections[collection.type] = collection
-    },
-    // used to set the search results
-    updateEntries(state, args) {
-      const entries = args.entries
-      const type = args.type
-      state.collections[type].entries = entries
-    },
-    // following update functions are useful to use instead of setCollection
-    // since the class methods might get overwritten if a deep copy is modified
-    // updates the unfiltered entries
-    updateEntry(state, args) {
-      const newEntry = args.newEntry
-      const type = args.type
-      const id = args.id
-      state.collections[type].unfilteredEntries[id] = newEntry
-    },
-    // updates the unfiltered entries
-    updateCell(state, args) {
-      const newValue = args.newValue
-      const type = args.type
-      const id = args.id
-      const column = args.column
-      state.collections[type].unfilteredEntries[id][column] = newValue
+      console.log(collection.type, 'collection descriptor saved in store')
     },
     setExpanded(state, args) {
       console.log('expanding', args)
@@ -121,7 +99,17 @@ export default {
       state.componentOptions.mobile = !state.componentOptions.mobile
     },
     setSearch(state, search) {
+      console.log('setting search to', search)
       state.search = search
+    },
+    updateSerachResults(state) {
+      // for each collection, filter the results from the store and put them into
+      // the .entries attribute
+      Object.keys(state.collections).forEach((collectionName) => {
+        const collection = state.collections[collectionName]
+        const results = collection.filter(state.search, this)
+        state.collections[collectionName].entries = state.search ? results : {}
+      })
     },
   },
   actions: {
@@ -140,18 +128,13 @@ export default {
       context.commit('setExpanded', args)
       context.dispatch('refreshPage')
     },
-    setCollection(context, collection) {
-      context.commit('setCollection', collection)
-      // context.dispatch('refreshPage')
+    setCollectionDescriptor(context, collection) {
+      context.commit('setCollectionDescriptor', collection)
+      context.commit('updateSerachResults')
+      context.dispatch('refreshPage')
     },
     updateEntries(context, args) {
       context.commit('updateEntries', args)
-    },
-    updateEntry(context, args) {
-      context.commit('updateEntry', args)
-    },
-    updateCell(context, args) {
-      context.commit('updateCell', args)
     },
     addOverlay(context, args) {
       context.commit('addOverlay', args)
@@ -164,8 +147,9 @@ export default {
     toggleMobile(context) {
       context.commit('toggleMobile')
     },
-    setSearch(context, search) {
+    search(context, search) {
       context.commit('setSearch', search)
+      context.commit('updateSerachResults')
     },
     toggleCheckBox(context, args) {
       context.commit('toggleCheckBox', args)

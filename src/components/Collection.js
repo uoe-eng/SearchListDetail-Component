@@ -1,38 +1,37 @@
 import config from './config'
 
 export default class Collection {
-  constructor(type, entries, fullCols, previewCols, columnOptions) {
+  constructor(type, fullCols, previewCols, columnOptions) {
     this.type = type
-    // represents the search results (empty to begin with)
-    this.entries = {}
-    this.unfilteredEntries = entries
     this.fullCols = fullCols
     this.previewCols = previewCols
     this.columnOptions = columnOptions
+    // this.store = store
+    // represents the search results (empty to begin with)
+    this.entries = {}
     // the sorting for each column is stored in the collection object
     this.columnSorting = undefined
   }
 
-  // sets this.entries to be the filtered search results
+  getEntriesFrom(store) {
+    return store.getters['jv/get'](this.type)
+  }
+
+  // returns a deep copy of entries that match the search
   filter(search, store) {
-    // display no entries and stop if no search term
-    if (search == '') {
-      store.dispatch('updateEntries', {
-        entries: {},
-        type: this.type,
-      })
-      return
-    }
     // create array of ids that match filter
-    const ids = Object.keys(this.unfilteredEntries)
+    const ids = Object.keys(this.getEntriesFrom(store))
     const filteredIds = ids.filter((id) => {
       // if this entry should be displayed, return true in here
-      const entry = this.unfilteredEntries[id]
+      const entry = this.getEntriesFrom(store)[id]
       const columns = Object.keys(entry)
 
       // array of booleans for if the value in the column matches the search
       const matchedColumns = columns.map((column) => {
+        // don't search anything that isn't a string (for now)
         if (typeof entry[column] != 'string') return false
+        // don't search columns that haven't been specified to show
+        if (!this.columnOptions[column]) return false
         const operatorName = this.columnOptions[column].searchOperator
         const operator = config.SEARCH_OPERATORS[operatorName]
         if (this.columnOptions[column].caseSensitive) {
@@ -52,17 +51,27 @@ export default class Collection {
     // convert ids to entries
     let filteredEntries = {}
     filteredIds.forEach((id) => {
-      filteredEntries[id] = this.unfilteredEntries[id]
+      const entryFromStore = this.getEntriesFrom(store)[id]
+      filteredEntries[id] = JSON.parse(JSON.stringify(entryFromStore))
     })
-    store.dispatch('updateEntries', {
-      entries: filteredEntries,
-      type: this.type,
-    })
+    return filteredEntries
   }
 
   // gets the entry of id
   get(id) {
     return this.entries[id]
+  }
+
+  // gets the entry but only with keys that aren't objects (also a deep copy)
+  getShallow(id) {
+    let entry = {}
+    const columns = Object.keys(this.entries[id])
+    columns.forEach((column) => {
+      const columnValue = this.entries[id][column]
+      if (typeof columnValue == 'object') return
+      entry[column] = columnValue
+    })
+    return entry
   }
 
   // returns (in order) the ids of the collection in an array

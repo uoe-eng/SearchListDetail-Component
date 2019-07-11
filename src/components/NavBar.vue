@@ -48,7 +48,10 @@ export default {
           return count + this.countResults(collectionName)
         }, 0)
       } else {
-        const entries = this.collections[collectionName].entries
+        const collections = this.$store.state.sld.collections
+        // while collection is still being downloaded, show ... to indicate it
+        if (!collections[collectionName]) return '...'
+        const entries = collections[collectionName].entries
         return Object.keys(entries).length
       }
     },
@@ -57,11 +60,8 @@ export default {
     selected() {
       return this.$store.state.sld.page
     },
-    collections() {
-      return this.$store.state.sld.collections
-    },
     collectionNames() {
-      return Object.keys(this.collections)
+      return Object.keys(this.$store.state.sld.searchOptions)
     },
   },
 }
@@ -69,13 +69,14 @@ export default {
 
 <style scoped>
 #nav-bar {
-  padding: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   margin-bottom: 10px;
   border-radius: 3px;
   overflow-x: auto;
   white-space: nowrap;
   width: fit-content;
-  max-width: 100%;
+  max-width: 100vw;
 }
 
 #nav-bar .nav-bar-item {
