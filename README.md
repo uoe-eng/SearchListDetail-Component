@@ -23,9 +23,11 @@
 * Simple search box available (client side filtering only)
 * In the props, each column can have search options (operator, case sensitivity)
 * Search operators are configurable in config.js
+* Advanced search available to filter by column
+* Can toggle multiple columns on/off at once
+* Can specify an alias for a column (eg. to show "First Name" instead of "preferred_name")
 
 ## Next steps
-* Add advanced search settings with column filters
 * Keyboard navigation for switching tabs
 * Add automated tests
 

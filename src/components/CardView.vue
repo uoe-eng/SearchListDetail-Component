@@ -14,7 +14,9 @@
       <form v-on:submit.prevent="handleSave">
         <table class="sld-card-view-details">
           <tr v-for="(column, index) of columnsToShow" :key="column">
-            <td class="column">{{ column }}:&nbsp;</td>
+            <td class="column">
+              {{ collection.getAlias(column, $store) }}:&nbsp;
+            </td>
             <td class="value">
               <!-- if column is a relationship -->
               <span v-if="column.includes('.')">

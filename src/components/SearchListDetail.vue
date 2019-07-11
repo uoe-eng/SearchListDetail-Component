@@ -119,10 +119,11 @@ export default {
   // on creation, fetch the collections from the server
   created() {
     this.$store.registerModule('sld', SldStore)
-    this.$store.commit('initialiseExpanded', this.resultOptions)
+    this.$store.commit('setResultOptions', this.resultOptions)
+    this.$store.commit('initialiseExpanded')
     this.$store.commit('defineNextTick', this.$nextTick)
     this.$store.commit('setComponentOptions', this.componentOptions)
-    this.$store.commit('initialiseSearchOptions', this.resultOptions)
+    this.$store.commit('initialiseSearchOptions')
     const collectionNames = Object.keys(this.resultOptions)
     // for each collection
     collectionNames.forEach((collectionName) => {

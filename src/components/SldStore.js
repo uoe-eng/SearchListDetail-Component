@@ -10,6 +10,7 @@ export default {
     search: '',
     searchOptions: {},
     expandedAdvancedSearch: false,
+    resultOptions: {},
   },
   mutations: {
     // called on creation so it can be used in the future
@@ -17,25 +18,28 @@ export default {
       state.nextTick = nextTick
     },
     // called on creation to define the data structure for allExpanded
-    initialiseExpanded(state, resultOptions) {
+    initialiseExpanded(state) {
       let allExpanded = {
         [config.ALL_PAGE_NAME]: {},
       }
-      const collectionNames = Object.keys(resultOptions)
+      const collectionNames = Object.keys(state.resultOptions)
       collectionNames.forEach((name) => {
         allExpanded[name] = {}
       })
       state.allExpanded = allExpanded
     },
-    initialiseSearchOptions(state, resultOptions) {
-      const collectionNames = Object.keys(resultOptions)
+    initialiseSearchOptions(state) {
+      const collectionNames = Object.keys(state.resultOptions)
       collectionNames.forEach((collectionName) => {
         state.searchOptions[collectionName] = {}
-        const columns = resultOptions[collectionName].columns
+        const columns = state.resultOptions[collectionName].columns
         columns.forEach((column) => {
           state.searchOptions[collectionName][column.name] = true
         })
       })
+    },
+    setResultOptions(state, resultOptions) {
+      state.resultOptions = resultOptions
     },
     toggleCheckBox(state, args) {
       const type = args.type
@@ -173,6 +177,6 @@ export default {
       context.commit('toggleAllCheckboxes', collectionName)
       context.commit('updateSerachResults')
       context.dispatch('refreshPage')
-    }
+    },
   },
 }

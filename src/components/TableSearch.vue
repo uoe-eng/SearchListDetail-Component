@@ -54,15 +54,23 @@ export default {
     // common settings for both the top and bottom table (no data)
     tableSettings() {
       return {
-        colHeaders: [this.componentOptions.detailsTitle].concat(
-          this.collections[this.type].fullCols
-        ),
+        colHeaders: this.colHeaders,
         columnSorting: true,
         // manualColumnResize: true,
         selectionMode: 'single',
         // stretchH: 'all',
         licenseKey: 'non-commercial-and-evaluation',
       }
+    },
+    colHeaders() {
+      return [this.componentOptions.detailsTitle]
+        .concat(this.collection.fullCols)
+        .map((header, index) => {
+          // skip first header
+          if (index == 0) return header
+          // otherwise get the alias for that header
+          return this.collection.getAlias(header, this.$store)
+        })
     },
   },
   created() {

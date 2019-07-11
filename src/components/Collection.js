@@ -13,6 +13,24 @@ export default class Collection {
     this.columnSorting = undefined
   }
 
+  // returns the alias for a given column if one is specified, else return column name
+  getAlias(columnName, store) {
+    // type array
+    const columns = store.state.sld.resultOptions[this.type].columns
+    let alias
+    columns.forEach((column) => {
+      if (column.name == columnName) {
+        if (!column.alias) {
+          // if no alias specified, use the name which is always required
+          alias = column.name
+        } else {
+          alias = column.alias
+        }
+      }
+    })
+    return alias
+  }
+
   getEntriesFrom(store) {
     return store.getters['jv/get'](this.type)
   }
@@ -58,7 +76,6 @@ export default class Collection {
     return filteredEntries
   }
 
-  // gets the entry of id
   get(id) {
     return this.entries[id]
   }

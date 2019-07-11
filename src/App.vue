@@ -5,21 +5,22 @@
         people: {
           columns: [
             {
-              name: 'given_name',
+              name: 'preferred_name',
+              alias: 'First Name',
               // caseSensitive defaults to false
               // searchOperator defaults to 'contains'
             },
             {
               name: 'family_name',
-            },
-            {
-              name: 'preferred_name',
+              alias: 'Last Name',
             },
             {
               name: 'email_addresses.email_address',
+              alias: 'Email',
             },
             {
               name: 'phone_number.phone_number',
+              alias: 'Phone',
             },
           ],
           previewOrder: ['preferred_name', 'family_name'],
@@ -28,6 +29,7 @@
           columns: [
             {
               name: 'phone_number',
+              alias: 'Number',
             },
           ],
         },
@@ -35,6 +37,7 @@
           columns: [
             {
               name: 'email_address',
+              alias: 'Email',
             },
           ],
         },
