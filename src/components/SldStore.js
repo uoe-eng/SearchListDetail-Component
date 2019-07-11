@@ -146,6 +146,7 @@ export default {
     },
     toggleMobile(context) {
       context.commit('toggleMobile')
+      context.dispatch('refreshPage')
     },
     search(context, search) {
       context.commit('setSearch', search)
@@ -153,6 +154,8 @@ export default {
     },
     toggleCheckBox(context, args) {
       context.commit('toggleCheckBox', args)
+      context.commit('updateSerachResults')
+      context.dispatch('refreshPage')
     },
   },
 }

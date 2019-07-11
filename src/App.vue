@@ -25,7 +25,7 @@
           previewOrder: ['preferred_name', 'family_name'],
         },
         phone_numbers: {
-          columns:[
+          columns: [
             {
               name: 'phone_number',
             },

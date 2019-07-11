@@ -32,6 +32,7 @@ export default class Collection {
         if (typeof entry[column] != 'string') return false
         // don't search columns that haven't been specified to show
         if (!this.columnOptions[column]) return false
+        if (!store.state.sld.searchOptions[this.type][column]) return false
         const operatorName = this.columnOptions[column].searchOperator
         const operator = config.SEARCH_OPERATORS[operatorName]
         if (this.columnOptions[column].caseSensitive) {

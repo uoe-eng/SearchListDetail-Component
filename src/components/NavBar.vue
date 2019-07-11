@@ -43,14 +43,17 @@ export default {
       this.$store.dispatch('setPage', page)
     },
     countResults(collectionName) {
+      const loadingText = '...'
       if (collectionName == config.ALL_PAGE_NAME) {
         return this.collectionNames.reduce((count, collectionName) => {
-          return count + this.countResults(collectionName)
+          const countedResults = this.countResults(collectionName)
+          if (countedResults == loadingText) return count
+          return count + countedResults
         }, 0)
       } else {
         const collections = this.$store.state.sld.collections
         // while collection is still being downloaded, show ... to indicate it
-        if (!collections[collectionName]) return '...'
+        if (!collections[collectionName]) return loadingText
         const entries = collections[collectionName].entries
         return Object.keys(entries).length
       }
