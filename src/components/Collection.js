@@ -1,11 +1,12 @@
 import config from './config'
 
 export default class Collection {
-  constructor(type, fullCols, previewCols, columnOptions) {
+  constructor(type, fullCols, previewCols, columnOptions, getStore) {
     this.type = type
     this.fullCols = fullCols
     this.previewCols = previewCols
     this.columnOptions = columnOptions
+    this.getStore = getStore
 
     // represents the search results (empty to begin with)
     this.searchResults = {}
@@ -15,8 +16,8 @@ export default class Collection {
   }
 
   // returns the alias for a given column if one is specified, else return column name
-  getAlias(columnName, store) {
-    const columns = store.state.sld.resultOptions[this.type].columns
+  getAlias(columnName) {
+    const columns = this.getStore().state.sld.resultOptions[this.type].columns
     let alias
 
     columns.forEach((column) => {
@@ -32,13 +33,20 @@ export default class Collection {
     return alias
   }
 
-  getEntriesFrom(store) {
-    return store.getters['jv/get'](this.type)
+  getEntriesFromStore() {
+    return this.getStore().getters['jv/get'](this.type)
+  }
+
+  get(id) {
+    let entry = this.searchResults[id]
+    // if it isn't in the search results, add it from the store
+    if (!entry) entry = this.getEntriesFromStore()[id]
+    return entry
   }
 
   // get a version (reference) of a search result without any of the relationships by id
   getClean(id) {
-    const entry = this.searchResults[id]
+    const entry = this.get(id)
     let clean = {
       _jv: entry._jv,
     }
@@ -50,13 +58,15 @@ export default class Collection {
   }
 
   // returns a list of deeply copied entries that match the search
-  filter(search, store) {
+  filter(search) {
+    const store = this.getStore()
+
     // create array of ids that match filter
-    const ids = Object.keys(this.getEntriesFrom(store))
+    const ids = Object.keys(this.getEntriesFromStore())
 
     const filteredIds = ids.filter((id) => {
       // if this entry should be displayed, return true in here
-      const entry = this.getEntriesFrom(store)[id]
+      const entry = this.getEntriesFromStore()[id]
       const columns = Object.keys(entry)
 
       // array of booleans for if the value in the column matches the search
@@ -92,14 +102,10 @@ export default class Collection {
     // convert ids to entries
     let filteredEntries = {}
     filteredIds.forEach((id) => {
-      const entryFromStore = this.getEntriesFrom(store)[id]
+      const entryFromStore = this.getEntriesFromStore()[id]
       filteredEntries[id] = JSON.parse(JSON.stringify(entryFromStore))
     })
     return filteredEntries
-  }
-
-  get(id) {
-    return this.searchResults[id]
   }
 
   // returns (in order) the ids of the collection in an array
@@ -163,13 +169,21 @@ export default class Collection {
         // special case for relationship column
         if (column.includes('.')) {
           const relCollection = column.split('.')[0]
-          const relatedItems = this.searchResults[id][relCollection]
-          // 0 items
-          if (!relatedItems) return '0 items'
-          // 1 item
-          if (relatedItems._jv) return relatedItems[column.split('.')[1]]
-          // many items
+          const relatedItems = this.get(id)[relCollection]
           const itemCount = Object.keys(relatedItems).length
+          // 0 items
+          if (itemCount == 0) return '-'
+          // 1 item
+          if (itemCount == 1) {
+            const relatedItem = relatedItems[Object.keys(relatedItems)[0]]
+            const relatedType = relatedItem._jv.type
+            const relatedId = relatedItem._jv.id
+            const relatedColumn = column.split('.')[1]
+            const relatedEntry =
+              this.getStore().getters['jv/get'](relatedType)[relatedId]
+            return relatedEntry[relatedColumn]
+          }
+          // many items
           return itemCount + ' items...'
         }
         // normal attribute column

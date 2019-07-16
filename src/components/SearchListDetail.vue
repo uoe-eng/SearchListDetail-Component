@@ -138,7 +138,8 @@ export default {
           collectionName,
           this.fullColumnNames[collectionName],
           this.previewColumnNames[collectionName],
-          this.columnOptions(collectionName)
+          this.columnOptions(collectionName),
+          () => this.$store
         )
         // save collection class to store
         this.$store.dispatch('setCollectionDescriptor', collectionDescriptor)

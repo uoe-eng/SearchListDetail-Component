@@ -32,7 +32,7 @@ export default {
       const colName = collection.fromCoordinates(row, col).col
 
       // set the value for the entry in the search results
-      collection.searchResults[id][colName] = newValue
+      collection.get(id)[colName] = newValue
 
       // call a patch which will use the now updated search entry
       context.$store.dispatch('patchResult', {

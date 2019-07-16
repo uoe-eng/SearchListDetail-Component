@@ -70,7 +70,7 @@ export default {
           // skip first header
           if (index == 0) return header
           // otherwise get the alias for that header
-          return this.collection.getAlias(header, this.$store)
+          return this.collection.getAlias(header)
         })
     },
   },

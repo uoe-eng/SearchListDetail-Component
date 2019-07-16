@@ -15,7 +15,7 @@
         <table class="sld-card-view-details">
           <tr v-for="(column, index) of columnsToShow" :key="column">
             <td class="column">
-              {{ collection.getAlias(column, $store) }}:&nbsp;
+              {{ collection.getAlias(column) }}:&nbsp;
             </td>
             <td class="value">
               <!-- if column is a relationship -->
@@ -32,7 +32,7 @@
                     }"
                   >
                     {{
-                      collections[related.type].getEntriesFrom($store)[
+                      collections[related.type].getEntriesFromStore()[
                         related.id
                       ][column.split('.')[1]]
                     }}
@@ -128,7 +128,7 @@ export default {
       return this.collections[this.type]
     },
     entry() {
-      return this.collection.searchResults[this.id]
+      return this.collection.get(this.id)
     },
 
     // boolean to determine if there are overlays to be displayed

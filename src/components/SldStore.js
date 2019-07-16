@@ -123,7 +123,7 @@ export default {
       // the .searchResults attribute
       Object.keys(state.collections).forEach((collectionName) => {
         const collection = state.collections[collectionName]
-        const results = collection.filter(state.search, this)
+        const results = collection.filter(state.search)
         collection.searchResults = state.search ? results : {}
       })
     },
