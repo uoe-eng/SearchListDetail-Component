@@ -129,6 +129,15 @@ export default {
     },
   },
   actions: {
+    patchResult(context, args) {
+      const type = args.type
+      const id = args.id
+      console.log('patching search result with id', id)
+      const entry = context.state.collections[type].getClean(id)
+      context.dispatch('jv/patch', entry).then(() => {
+        context.commit('updateSerachResults')
+      })
+    },
     setPage(context, page) {
       console.log('setting page', page)
       context.commit('setPage', null)

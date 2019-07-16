@@ -128,9 +128,9 @@ export default {
       return this.collections[this.type]
     },
     entry() {
-      const entry = this.$store.getters['jv/get'](`${this.type}/${this.id}`)
-      return JSON.parse(JSON.stringify(entry))
+      return this.collection.searchResults[this.id]
     },
+
     // boolean to determine if there are overlays to be displayed
     shouldShowOverlay() {
       return (
@@ -139,6 +139,7 @@ export default {
         this.expanded.id == this.id
       )
     },
+
     // the string for the title of the card (null if titles are disabled)
     title() {
       // don't set the title unless specified
@@ -148,6 +149,7 @@ export default {
         return null
       }
     },
+
     // the columns that will show in the body of the card
     columnsToShow() {
       // choose the columns to display, expanded means show all columns
@@ -155,6 +157,7 @@ export default {
         this.isExpanded && !this.expanded.overlay
           ? this.collection.fullCols
           : this.collection.previewCols
+
       // the first attribute is reserved for the title if specified, so remove it from body of card
       // card must also be read-only, since when editing it will be needed in the body
       if (
@@ -183,6 +186,7 @@ export default {
         id: id,
       })
     },
+
     // returns an array of {id, type} for the related entries of this card
     getRelationships(relColumn) {
       const relName = relColumn.split('.')[0]
@@ -197,10 +201,12 @@ export default {
     },
     handleClick() {
       if (this.isExpanded) return
+
       // determine if the page should be changed somewhere else
       const pageToNavTo = this.$store.state.sld.componentOptions.mobile
         ? this.$store.state.sld.page // current page
         : this.type // page for the type of card
+
       this.$store.dispatch('setExpanded', {
         page: pageToNavTo,
         type: this.type,
@@ -219,11 +225,20 @@ export default {
     handleSave() {
       // don't allow saves when showing an overlay
       if (this.shouldShowOverlay) return
-      // patch the modified record up to the server
-      this.$store.dispatch('jv/patch', this.entry)
-      // remove the top child card
-      this.$store.dispatch('removeOneOverlay')
+
+      // v-model will already update the values of the entry in the search results
+      // so just call a patch which will use the updated values in the search results
+      this.$store
+        .dispatch('patchResult', {
+          type: this.type,
+          id: this.id,
+        })
+        .then(() => {
+          // remove the top child card
+          this.$store.dispatch('removeOneOverlay')
+        })
     },
+
     // handles keypresses from the input boxes
     handleKeyDown(e, index) {
       const isFirst = index == 0
@@ -232,6 +247,7 @@ export default {
       const isTabBackward = e.key == 'Tab' && e.shiftKey
       const isEnter = e.key == 'Enter'
       const isEscape = e.key == 'Escape'
+
       // tab out of the card upwards
       if (isFirst && isTabBackward) {
         e.preventDefault()
@@ -252,6 +268,7 @@ export default {
     focusFirstInputBox() {
       // wait for the card to load into the DOM
       this.$nextTick(() => {
+        // grab a list of dom elements
         const inputs = this.$refs.input
         if (inputs && inputs.length > 0) {
           inputs[0].focus()

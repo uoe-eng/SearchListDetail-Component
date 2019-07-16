@@ -6,18 +6,19 @@ export default class Collection {
     this.fullCols = fullCols
     this.previewCols = previewCols
     this.columnOptions = columnOptions
-    // this.store = store
+
     // represents the search results (empty to begin with)
     this.searchResults = {}
+
     // the sorting for each column is stored in the collection object
     this.columnSorting = undefined
   }
 
   // returns the alias for a given column if one is specified, else return column name
   getAlias(columnName, store) {
-    // type array
     const columns = store.state.sld.resultOptions[this.type].columns
     let alias
+
     columns.forEach((column) => {
       if (column.name == columnName) {
         if (!column.alias) {
@@ -35,10 +36,24 @@ export default class Collection {
     return store.getters['jv/get'](this.type)
   }
 
-  // returns a deep copy of entries that match the search
+  // get a version (reference) of a search result without any of the relationships by id
+  getClean(id) {
+    const entry = this.searchResults[id]
+    let clean = {
+      _jv: entry._jv,
+    }
+    Object.keys(entry).forEach((column) => {
+      if (typeof entry[column] === 'object') return
+      clean[column] = entry[column]
+    })
+    return clean
+  }
+
+  // returns a list of deeply copied entries that match the search
   filter(search, store) {
     // create array of ids that match filter
     const ids = Object.keys(this.getEntriesFrom(store))
+
     const filteredIds = ids.filter((id) => {
       // if this entry should be displayed, return true in here
       const entry = this.getEntriesFrom(store)[id]
@@ -48,11 +63,16 @@ export default class Collection {
       const matchedColumns = columns.map((column) => {
         // don't search anything that isn't a string (for now)
         if (typeof entry[column] != 'string') return false
+
         // don't search columns that haven't been specified to show
         if (!this.columnOptions[column]) return false
+
+        // if the column isn't specified, don't search it
         if (!store.state.sld.searchOptions[this.type][column]) return false
+
         const operatorName = this.columnOptions[column].searchOperator
         const operator = config.SEARCH_OPERATORS[operatorName]
+
         if (this.columnOptions[column].caseSensitive) {
           return operator(entry[column], search)
         } else {
@@ -60,6 +80,7 @@ export default class Collection {
           return operator(entry[column].toUpperCase(), search.toUpperCase())
         }
       })
+
       // apply OR operator on all values of the array
       // if one or more column matches, this entry will appear in the search
       const entryMatchesFilter = matchedColumns.reduce((a, b) => {
@@ -67,6 +88,7 @@ export default class Collection {
       })
       return entryMatchesFilter
     })
+
     // convert ids to entries
     let filteredEntries = {}
     filteredIds.forEach((id) => {
@@ -85,9 +107,11 @@ export default class Collection {
     return Object.keys(this.searchResults).sort((a, b) => {
       // normal numerical sort by id
       if (this.columnSorting == undefined) return a - b
+
       // otherwise sort by column
       const colNumber = this.columnSorting.column - 1
       const colName = this.fullCols[colNumber]
+
       // the comparator function in sort() expects a number
       const results = this.searchResults
       if (this.columnSorting.sortOrder == 'asc') {

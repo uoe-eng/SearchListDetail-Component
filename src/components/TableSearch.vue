@@ -62,6 +62,7 @@ export default {
         licenseKey: 'non-commercial-and-evaluation',
       }
     },
+    // returns an array of all headers to be show in handsontable
     colHeaders() {
       return [this.componentOptions.detailsTitle]
         .concat(this.collection.fullCols)
@@ -84,12 +85,14 @@ export default {
         topTable.selectCell(topTable.countRows() - 1, topTable.countCols() - 1)
       }, 0)
     },
+
     // select the start of the bottom table
     onTabOutDown() {
       setTimeout(() => {
         this.$refs.bottomTable.hotInstance.selectCell(0, 0)
       }, 0)
     },
+
     // add data, meta, and hooks to each table
     populateTables() {
       // wait for the next tick when the table is loaded into the DOM
@@ -131,6 +134,7 @@ export default {
         TableHooks.afterColumnSort(this)
       })
     },
+
     // handles when the details cell is edited, expands the card
     handleEdit(row, column, tableInstance) {
       // ignore normal cell selections

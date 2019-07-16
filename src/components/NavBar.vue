@@ -44,7 +44,9 @@ export default {
     },
     countResults(collectionName) {
       const loadingText = '...'
+      // if counting results for all pages, go here
       if (collectionName == config.ALL_PAGE_NAME) {
+        // add up all the couting results from other pages
         return this.collectionNames.reduce((count, collectionName) => {
           const countedResults = this.countResults(collectionName)
           if (countedResults == loadingText) return count
@@ -52,8 +54,10 @@ export default {
         }, 0)
       } else {
         const collections = this.$store.state.sld.collections
+
         // while collection is still being downloaded, show ... to indicate it
         if (!collections[collectionName]) return loadingText
+
         const searchResults = collections[collectionName].searchResults
         return Object.keys(searchResults).length
       }

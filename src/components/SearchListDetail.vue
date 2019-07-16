@@ -124,13 +124,15 @@ export default {
     this.$store.commit('defineNextTick', this.$nextTick)
     this.$store.commit('setComponentOptions', this.componentOptions)
     this.$store.commit('initialiseSearchOptions')
-    const collectionNames = Object.keys(this.resultOptions)
+
     // for each collection
+    const collectionNames = Object.keys(this.resultOptions)
     collectionNames.forEach((collectionName) => {
       // get collection from server
       // sparse fields not working?
       const url = `${collectionName}`
       console.log('getting', url, 'from server...')
+
       this.$store.dispatch('jv/get', url).then(() => {
         let collectionDescriptor = new Collection(
           collectionName,

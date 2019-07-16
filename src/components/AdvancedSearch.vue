@@ -44,6 +44,7 @@ export default {
     toggleOpen() {
       this.$store.commit('toggleAdvancedSearch')
     },
+
     // handles toggling individual checkboxes
     handleClick(type, column) {
       this.$store.dispatch('toggleCheckBox', {
@@ -51,6 +52,7 @@ export default {
         column: column,
       })
     },
+
     // toggles all checkboxes for that collection at once
     toggleAll(collectionName) {
       this.$store.dispatch('toggleAllCheckboxes', collectionName)

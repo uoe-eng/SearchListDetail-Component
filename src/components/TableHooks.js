@@ -8,6 +8,7 @@ export default {
       // set the collection's sorting
       const sorting = destinationSortConfigs[0]
       context.collection.columnSorting = sorting
+
       // handsontable will not be able to sort the whole table when it is split
       // into two tables, so update the view to redraw the two tables
       context.$store.dispatch('refreshPage')
@@ -29,11 +30,17 @@ export default {
       const collection = context.collections[context.type]
       const id = collection.fromCoordinates(row, col).id
       const colName = collection.fromCoordinates(row, col).col
-      const record = context.$store.getters['jv/get'](`${context.type}/${id}`)
-      const deepRecord = JSON.parse(JSON.stringify(record))
-      deepRecord[colName] = newValue
-      context.$store.dispatch('jv/patch', deepRecord)
+
+      // set the value for the entry in the search results
+      collection.searchResults[id][colName] = newValue
+
+      // call a patch which will use the now updated search entry
+      context.$store.dispatch('patchResult', {
+        type: context.type,
+        id: id,
+      })
     }
+
     Handsontable.hooks.add(
       'afterChange',
       (change) => {
@@ -53,6 +60,7 @@ export default {
         const allExpanded = context.$store.state.sld.allExpanded
         const expanded = allExpanded[context.$store.state.sld.page]
         const expandedRow = context.collection.ids().indexOf(expanded)
+
         // interpret details from the given argument 'change'
         // expanded row will always be found since the bottom table only shows when a row is expanded
         // + 1 so that the first row after the card is 0
@@ -142,6 +150,7 @@ export default {
     const topTable = context.$refs.topTable.hotInstance
     const bottomTable = context.$refs.bottomTable.hotInstance
     const expandedID = context.expandedID
+
     // handle tabbing from the start of the top table to the end of the bottom table
     Handsontable.hooks.add(
       'beforeKeyDown',
@@ -153,10 +162,13 @@ export default {
         const col = topTable.getSelected()[0][1]
         const isTopCorner = row == 0 && col == 0
         const isTabBack = e.key == 'Tab' && e.shiftKey
+
         if (isTopCorner && isTabBack && expandedID) {
           topTable.deselectCell()
+
           // delay ensures cell selection happens after all keypress events (hacky?)
           setTimeout(() => {
+            // select the last cell
             bottomTable.selectCell(
               bottomTable.countRows() - 1,
               bottomTable.countCols() - 1
@@ -179,6 +191,7 @@ export default {
         const isTabForward = e.key == 'Tab' && !e.shiftKey
         if (isTopCorner && isTabForward && expandedID) {
           bottomTable.deselectCell()
+          // select the first cell
           topTable.selectCell(0, 0)
         }
       },

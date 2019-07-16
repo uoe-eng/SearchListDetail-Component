@@ -31,6 +31,7 @@
 * Keyboard navigation for switching tabs
 * Add automated tests
 * Filter results on server
+* Can specifty which collections are displayed in search
 
 ## Project setup
 ```
