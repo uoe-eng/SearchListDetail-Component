@@ -6,6 +6,9 @@ export default class Collection {
     this.fullCols = fullCols
     this.previewCols = previewCols
     this.columnOptions = columnOptions
+
+    // this is a getter function so that the data in the store (which is potentially circular)
+    // is not stored in this class object
     this.getStore = getStore
 
     // represents the search results (empty to begin with)
@@ -162,6 +165,7 @@ export default class Collection {
     }
   }
 
+  // create a table of arrays that will be what is displayed in the tables
   getAllData(detailsText) {
     return this.ids().map((id) => {
       // the row items will be determined by this.fullCols
@@ -171,21 +175,24 @@ export default class Collection {
           const relCollection = column.split('.')[0]
           const relatedItems = this.get(id)[relCollection]
           const itemCount = Object.keys(relatedItems).length
+
           // 0 items
           if (itemCount == 0) return '-'
+
           // 1 item
           if (itemCount == 1) {
             const relatedItem = relatedItems[Object.keys(relatedItems)[0]]
-            const relatedType = relatedItem._jv.type
-            const relatedId = relatedItem._jv.id
             const relatedColumn = column.split('.')[1]
-            const relatedEntry =
-              this.getStore().getters['jv/get'](relatedType)[relatedId]
+            const relatedEntry = this.getStore().getters['jv/get'](
+              relatedItem._jv.type
+            )[relatedItem._jv.id]
             return relatedEntry[relatedColumn]
           }
+
           // many items
           return itemCount + ' items...'
         }
+
         // normal attribute column
         return this.searchResults[id][column]
       })
