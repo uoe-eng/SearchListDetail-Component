@@ -96,16 +96,16 @@ describe('NavBar.vue', () => {
 
   it('displays results', () => {
     wrapper.setProps({ displayResultCount: false })
-    expect(navBarItems.at(0).contains('span > span')).to.equal(false)
-    expect(navBarItems.at(1).contains('span > span')).to.equal(false)
-    expect(navBarItems.at(2).contains('span > span')).to.equal(false)
-    expect(navBarItems.at(3).contains('span > span')).to.equal(false)
+    expect(navBarItems.at(0).contains('span > span')).to.be.false
+    expect(navBarItems.at(1).contains('span > span')).to.be.false
+    expect(navBarItems.at(2).contains('span > span')).to.be.false
+    expect(navBarItems.at(3).contains('span > span')).to.be.false
 
     wrapper.setProps({ displayResultCount: true })
-    expect(navBarItems.at(0).contains('span > span')).to.equal(true)
-    expect(navBarItems.at(1).contains('span > span')).to.equal(true)
-    expect(navBarItems.at(2).contains('span > span')).to.equal(true)
-    expect(navBarItems.at(3).contains('span > span')).to.equal(true)
+    expect(navBarItems.at(0).contains('span > span')).to.be.true
+    expect(navBarItems.at(1).contains('span > span')).to.be.true
+    expect(navBarItems.at(2).contains('span > span')).to.be.true
+    expect(navBarItems.at(3).contains('span > span')).to.be.true
     // prettier-ignore
     expect(navBarItems.at(0).find('span > span').text()).to.equal('(8)')
     // prettier-ignore
