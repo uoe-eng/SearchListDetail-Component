@@ -5,7 +5,7 @@
       :class="{ selected: selected == config.ALL_PAGE_NAME }"
       @click="setPage(config.ALL_PAGE_NAME)"
     >
-      All
+      {{ config.ALL_PAGE_TEXT }}
       <span v-if="displayResultCount">
         ({{ countResults(config.ALL_PAGE_NAME) }})
       </span>
