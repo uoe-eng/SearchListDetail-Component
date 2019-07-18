@@ -5,39 +5,37 @@ import NavBar from '@/components/NavBar'
 import config from '@/components/config'
 import sinon from 'sinon'
 
-describe('NavBar.vue', () => {
+describe('NavBar.vue', function() {
   let store, localVue, setPageSpy, wrapper, navBarItems
 
-  beforeEach(() => {
+  beforeEach(function() {
     localVue = createLocalVue()
     localVue.use(Vuex)
     setPageSpy = sinon.spy()
 
     store = new Vuex.Store({
       state: {
-        sld: {
-          page: config.ALL_PAGE_NAME,
-          searchOptions: { people: '', phone_numbers: '', emails: '' },
-          collections: {
-            people: {
-              searchResults: {
-                result1: '',
-                result2: '',
-                result3: '',
-                result4: '',
-                result5: '',
-              },
+        page: config.ALL_PAGE_NAME,
+        searchOptions: { people: '', phone_numbers: '', emails: '' },
+        collections: {
+          people: {
+            searchResults: {
+              result1: '',
+              result2: '',
+              result3: '',
+              result4: '',
+              result5: '',
             },
-            phone_numbers: {
-              searchResults: {
-                result1: '',
-                result2: '',
-                result3: '',
-              },
+          },
+          phone_numbers: {
+            searchResults: {
+              result1: '',
+              result2: '',
+              result3: '',
             },
-            emails: {
-              searchResults: {},
-            },
+          },
+          emails: {
+            searchResults: {},
           },
         },
       },
@@ -46,11 +44,16 @@ describe('NavBar.vue', () => {
       },
     })
 
-    wrapper = shallowMount(NavBar, { store, localVue })
+    wrapper = shallowMount(NavBar, {
+      localVue,
+      propsData: {
+        localstore: store,
+      },
+    })
     navBarItems = wrapper.findAll('.nav-bar-item')
   })
 
-  it('draws the correct four tabs', () => {
+  it('draws the correct four tabs', function() {
     expect(navBarItems.length).to.equal(4)
     expect(navBarItems.at(0).text()).to.equal(config.ALL_PAGE_TEXT)
     expect(navBarItems.at(1).text()).to.equal('people')
@@ -58,26 +61,26 @@ describe('NavBar.vue', () => {
     expect(navBarItems.at(3).text()).to.equal('emails')
   })
 
-  it('updates the .selected class correctly', () => {
+  it('updates the .selected class correctly', function() {
     expect(navBarItems.at(0).classes()).to.contain('selected')
     expect(navBarItems.at(1).classes()).to.not.contain('selected')
     expect(navBarItems.at(2).classes()).to.not.contain('selected')
     expect(navBarItems.at(3).classes()).to.not.contain('selected')
 
-    store.state.sld.page = 'people'
+    store.state.page = 'people'
     expect(navBarItems.at(0).classes()).to.not.contain('selected')
     expect(navBarItems.at(1).classes()).to.contain('selected')
     expect(navBarItems.at(2).classes()).to.not.contain('selected')
     expect(navBarItems.at(3).classes()).to.not.contain('selected')
 
-    store.state.sld.page = config.ALL_PAGE_NAME
+    store.state.page = config.ALL_PAGE_NAME
     expect(navBarItems.at(0).classes()).to.contain('selected')
     expect(navBarItems.at(1).classes()).to.not.contain('selected')
     expect(navBarItems.at(2).classes()).to.not.contain('selected')
     expect(navBarItems.at(3).classes()).to.not.contain('selected')
   })
 
-  it('updates selected page in store', () => {
+  it('updates selected page in store', function() {
     navBarItems.at(0).trigger('click')
     navBarItems.at(1).trigger('click')
     navBarItems.at(0).trigger('click')
@@ -94,7 +97,7 @@ describe('NavBar.vue', () => {
     expect(setPageSpy.getCall(5).args[1]).to.equal('emails')
   })
 
-  it('displays results count', () => {
+  it('displays results count', function() {
     wrapper.setProps({ displayResultCount: false })
     expect(navBarItems.at(0).contains('span > span')).to.be.false
     expect(navBarItems.at(1).contains('span > span')).to.be.false

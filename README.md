@@ -1,4 +1,4 @@
-# SearchListDeatil Component
+# SearchListDetail Component
 
 ## Current features
 * Results separated by type in tabs with a sticky navigation bar
@@ -26,12 +26,15 @@
 * Advanced search available to filter by column
 * Can toggle multiple columns on/off at once
 * Can specify an alias for a column (eg. to show "First Name" instead of "preferred_name")
+* Multiple SLD components can be used at the same time (vuex stores are separated)
 
 ## Next steps
 * Keyboard navigation for switching tabs
 * Add automated tests
 * Filter results on server
 * Can specifty which collections are displayed in search
+* Change collections to be fixed order array
+* Allow multiple stores to exist when multiple SLDs exist
 
 ## Project setup
 ```

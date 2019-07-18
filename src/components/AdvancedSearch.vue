@@ -28,26 +28,29 @@
 <script>
 export default {
   name: 'AdvancedSearch',
+  props: {
+    localstore: Object,
+  },
   computed: {
     opened() {
-      return this.$store.state.sld.expandedAdvancedSearch
+      return this.localstore.state.expandedAdvancedSearch
     },
     collections() {
-      return this.$store.state.sld.collections
+      return this.localstore.state.collections
     },
     searchOptions() {
-      return this.$store.state.sld.searchOptions
+      return this.localstore.state.searchOptions
     },
   },
   methods: {
     // toggles if the advanced search is opened or not
     toggleOpen() {
-      this.$store.commit('toggleAdvancedSearch')
+      this.localstore.commit('toggleAdvancedSearch')
     },
 
     // handles toggling individual checkboxes
     handleClick(type, column) {
-      this.$store.dispatch('toggleCheckBox', {
+      this.localstore.dispatch('toggleCheckBox', {
         type: type,
         column: column,
       })
@@ -55,7 +58,7 @@ export default {
 
     // toggles all checkboxes for that collection at once
     toggleAll(collectionName) {
-      this.$store.dispatch('toggleAllCheckboxes', collectionName)
+      this.localstore.dispatch('toggleAllCheckboxes', collectionName)
     },
   },
 }

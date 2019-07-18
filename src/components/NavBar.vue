@@ -31,6 +31,7 @@ import config from './config'
 export default {
   name: 'NavBar',
   props: {
+    localstore: Object,
     displayResultCount: Boolean,
   },
   data() {
@@ -40,7 +41,7 @@ export default {
   },
   methods: {
     setPage(page) {
-      this.$store.dispatch('setPage', page)
+      this.localstore.dispatch('setPage', page)
     },
     countResults(collectionName) {
       const loadingText = '...'
@@ -53,7 +54,7 @@ export default {
           return count + countedResults
         }, 0)
       } else {
-        const collections = this.$store.state.sld.collections
+        const collections = this.localstore.state.collections
 
         // while collection is still being downloaded, show ... to indicate it
         if (!collections[collectionName]) return loadingText
@@ -65,10 +66,10 @@ export default {
   },
   computed: {
     selected() {
-      return this.$store.state.sld.page
+      return this.localstore.state.page
     },
     collectionNames() {
-      return Object.keys(this.$store.state.sld.searchOptions)
+      return Object.keys(this.localstore.state.searchOptions)
     },
   },
 }

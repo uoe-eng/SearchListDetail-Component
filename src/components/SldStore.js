@@ -1,11 +1,13 @@
+import Vue from 'vue'
+import Vuex from 'vuex'
 import config from './config'
 
-export default {
+Vue.use(Vuex)
+
+export default new Vuex.Store({
   state: {
-    nextTick: undefined,
     page: config.ALL_PAGE_NAME,
     collections: {},
-    allExpanded: {},
     componentOptions: {},
     search: '',
     searchOptions: {},
@@ -15,7 +17,7 @@ export default {
   mutations: {
     // called on creation so it can be used in the future
     defineNextTick(state, nextTick) {
-      state.nextTick = nextTick
+      Vue.set(state, 'nextTick', nextTick)
     },
     // called on creation to define the data structure for allExpanded
     initialiseExpanded(state) {
@@ -26,7 +28,7 @@ export default {
       collectionNames.forEach((name) => {
         allExpanded[name] = {}
       })
-      state.allExpanded = allExpanded
+      Vue.set(state, 'allExpanded', allExpanded)
     },
     initialiseSearchOptions(state) {
       const collectionNames = Object.keys(state.resultOptions)
@@ -34,42 +36,46 @@ export default {
         state.searchOptions[collectionName] = {}
         const columns = state.resultOptions[collectionName].columns
         columns.forEach((column) => {
-          state.searchOptions[collectionName][column.name] = true
+          Vue.set(state.searchOptions[collectionName], column.name, true)
         })
       })
     },
     setResultOptions(state, resultOptions) {
-      state.resultOptions = resultOptions
+      Vue.set(state, 'resultOptions', resultOptions)
     },
     toggleCheckBox(state, args) {
       const type = args.type
       const column = args.column
-      state.searchOptions[type][column] = !state.searchOptions[type][column]
+      Vue.set(
+        state.searchOptions[type],
+        column,
+        !state.searchOptions[type][column]
+      )
     },
     toggleAllCheckboxes(state, collectionName) {
       const columns = state.collections[collectionName].fullCols
       const currentState = state.searchOptions[collectionName][columns[0]]
       console.log('toggling all to', !currentState)
       columns.forEach((column) => {
-        state.searchOptions[collectionName][column] = !currentState
+        Vue.set(state.searchOptions[collectionName], column, !currentState)
       })
     },
     setComponentOptions(state, options) {
-      state.componentOptions = options
+      Vue.set(state, 'componentOptions', options)
     },
     setPage(state, page) {
-      state.page = page
+      Vue.set(state, 'page', page)
     },
     setCollectionDescriptor(state, collection) {
-      state.collections[collection.type] = collection
+      Vue.set(state.collections, collection.type, collection)
       console.log(collection.type, 'collection descriptor saved in store')
     },
     setExpanded(state, args) {
       console.log('expanding', args)
-      state.allExpanded[args.page] = {
+      Vue.set(state.allExpanded, args.page, {
         type: args.type,
         id: args.id,
-      }
+      })
     },
     // add an overlay object to the last object in the overlay chain
     addOverlay(state, args) {
@@ -81,9 +87,9 @@ export default {
         if (expanded.overlay) {
           addOverlay(expanded.overlay, type, id)
         } else {
-          expanded.overlay = {}
-          expanded.overlay.type = type
-          expanded.overlay.id = id
+          Vue.set(expanded, 'overlay', {})
+          Vue.set(expanded.overlay, 'type', type)
+          Vue.set(expanded.overlay, 'id', id)
         }
       }
       addOverlay(state.allExpanded[state.page], type, id)
@@ -94,8 +100,8 @@ export default {
       const expanded = state.allExpanded[state.page]
       // if card has no overlays, just collapse it
       if (!expanded.overlay) {
-        expanded.type = null
-        expanded.id = null
+        Vue.set(expanded, 'type', null)
+        Vue.set(expanded, 'id', null)
         return
       }
       const removeOneOverlay = (expanded) => {
@@ -103,20 +109,20 @@ export default {
         if (expanded.overlay.overlay) {
           removeOneOverlay(expanded.overlay)
         } else {
-          delete expanded.overlay
+          Vue.delete(expanded, 'overlay')
         }
       }
       removeOneOverlay(expanded)
     },
     toggleMobile(state) {
-      state.componentOptions.mobile = !state.componentOptions.mobile
+      Vue.set(state.componentOptions, 'mobile', !state.componentOptions.mobile)
     },
     toggleAdvancedSearch(state) {
-      state.expandedAdvancedSearch = !state.expandedAdvancedSearch
+      Vue.set(state, 'expandedAdvancedSearch', !state.expandedAdvancedSearch)
     },
     setSearch(state, search) {
       console.log('setting search to', search)
-      state.search = search
+      Vue.set(state, 'search', search)
     },
     updateSerachResults(state) {
       // for each collection, filter the results from the store and put them into
@@ -124,20 +130,11 @@ export default {
       Object.keys(state.collections).forEach((collectionName) => {
         const collection = state.collections[collectionName]
         const results = collection.filter(state.search)
-        collection.searchResults = state.search ? results : {}
+        Vue.set(collection, 'searchResults', state.search ? results : {})
       })
     },
   },
   actions: {
-    patchResult(context, args) {
-      const type = args.type
-      const id = args.id
-      console.log('patching search result with id', id)
-      const entry = context.state.collections[type].getClean(id)
-      context.dispatch('jv/patch', entry).then(() => {
-        context.commit('updateSerachResults')
-      })
-    },
     setPage(context, page) {
       console.log('setting page', page)
       context.commit('setPage', null)
@@ -145,33 +142,24 @@ export default {
         context.commit('setPage', page)
       })
     },
-    refreshPage(context) {
-      console.log('refreshing page')
-      context.dispatch('setPage', context.state.page)
-    },
     setExpanded(context, args) {
       context.commit('setExpanded', args)
-      context.dispatch('refreshPage')
     },
     setCollectionDescriptor(context, collection) {
       context.commit('setCollectionDescriptor', collection)
       context.commit('updateSerachResults')
-      context.dispatch('refreshPage')
     },
     updateEntries(context, args) {
       context.commit('updateEntries', args)
     },
     addOverlay(context, args) {
       context.commit('addOverlay', args)
-      context.dispatch('refreshPage')
     },
     removeOneOverlay(context) {
       context.commit('removeOneOverlay')
-      context.dispatch('refreshPage')
     },
     toggleMobile(context) {
       context.commit('toggleMobile')
-      context.dispatch('refreshPage')
     },
     search(context, search) {
       context.commit('setSearch', search)
@@ -180,12 +168,10 @@ export default {
     toggleCheckBox(context, args) {
       context.commit('toggleCheckBox', args)
       context.commit('updateSerachResults')
-      context.dispatch('refreshPage')
     },
     toggleAllCheckboxes(context, collectionName) {
       context.commit('toggleAllCheckboxes', collectionName)
       context.commit('updateSerachResults')
-      context.dispatch('refreshPage')
     },
   },
-}
+})

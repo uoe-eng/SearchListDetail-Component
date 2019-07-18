@@ -1,14 +1,25 @@
 <template>
   <div id="sld">
-    <SearchBox></SearchBox>
-    <AdvancedSearch v-if="page"></AdvancedSearch>
-    <NavBar v-if="search != ''" :displayResultCount="countResults"></NavBar>
+    <SearchBox :localstore="localstore"></SearchBox>
+    <AdvancedSearch v-if="page" :localstore="localstore"></AdvancedSearch>
+    <NavBar
+      v-if="search != ''"
+      :displayResultCount="countResults"
+      :localstore="localstore"
+    ></NavBar>
     <label v-if="search">
-      <input type="checkbox" @click="$store.dispatch('toggleMobile')" />
+      <input type="checkbox" @click="localstore.dispatch('toggleMobile')" />
       Mobile version
     </label>
-    <CardSearch v-if="page == config.ALL_PAGE_NAME && search"></CardSearch>
-    <TableSearch v-else-if="page && search" :type="page"></TableSearch>
+    <CardSearch
+      v-if="page == config.ALL_PAGE_NAME && search"
+      :localstore="localstore"
+    ></CardSearch>
+    <TableSearch
+      v-else-if="page && search"
+      :type="page"
+      :localstore="localstore"
+    ></TableSearch>
   </div>
 </template>
 
@@ -55,17 +66,19 @@ export default {
     return {
       config: config,
       mobile: false,
+      // each instance of an SLD has it's own locally scoped store object
+      localstore: SldStore,
     }
   },
   computed: {
     expanded() {
-      return this.$store.state.sld.allExpanded[this.page]
+      return this.localstore.state.allExpanded[this.page]
     },
     page() {
-      return this.$store.state.sld.page
+      return this.localstore.state.page
     },
     search() {
-      return this.$store.state.sld.search
+      return this.localstore.state.search
     },
     // group together all options to pass around in other components as a single prop
     componentOptions() {
@@ -118,12 +131,11 @@ export default {
   },
   // on creation, fetch the collections from the server
   created() {
-    this.$store.registerModule('sld', SldStore)
-    this.$store.commit('setResultOptions', this.resultOptions)
-    this.$store.commit('initialiseExpanded')
-    this.$store.commit('defineNextTick', this.$nextTick)
-    this.$store.commit('setComponentOptions', this.componentOptions)
-    this.$store.commit('initialiseSearchOptions')
+    this.localstore.commit('setResultOptions', this.resultOptions)
+    this.localstore.commit('initialiseExpanded')
+    this.localstore.commit('defineNextTick', this.$nextTick)
+    this.localstore.commit('setComponentOptions', this.componentOptions)
+    this.localstore.commit('initialiseSearchOptions')
 
     // for each collection
     const collectionNames = Object.keys(this.resultOptions)
@@ -139,10 +151,14 @@ export default {
           this.fullColumnNames[collectionName],
           this.previewColumnNames[collectionName],
           this.columnOptions(collectionName),
-          () => this.$store
+          this.localstore,
+          this.$store
         )
         // save collection class to store
-        this.$store.dispatch('setCollectionDescriptor', collectionDescriptor)
+        this.localstore.dispatch(
+          'setCollectionDescriptor',
+          collectionDescriptor
+        )
       })
     })
   },

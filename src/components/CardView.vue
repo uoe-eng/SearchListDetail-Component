@@ -79,6 +79,7 @@
     <!-- child card for when there are overlays -->
     <CardView
       v-if="shouldShowOverlay"
+      :localstore="localstore"
       :type="expanded.overlay.type"
       :id="expanded.overlay.id"
       :isReadOnly="false"
@@ -94,6 +95,7 @@ import config from './config'
 export default {
   name: 'CardView',
   props: {
+    localstore: Object,
     type: String, // type of entry in collection
     id: String, // id of entry in collection
     isReadOnly: Boolean,
@@ -113,14 +115,15 @@ export default {
     return {
       // defined here so the template can use it
       config: config,
+      old: this.localstore.state.collections[this.type].get(this.id, true),
     }
   },
   computed: {
     page() {
-      return this.$store.state.sld.page
+      return this.localstore.state.page
     },
     collections() {
-      return this.$store.state.sld.collections
+      return this.localstore.state.collections
     },
     collection() {
       return this.collections[this.type]
@@ -141,7 +144,7 @@ export default {
     // the string for the title of the card (null if titles are disabled)
     title() {
       // don't set the title unless specified
-      if (this.$store.state.sld.componentOptions.firstAttrAsCardTitle) {
+      if (this.localstore.state.componentOptions.firstAttrAsCardTitle) {
         return this.entry[this.collection.fullCols[0]]
       } else {
         return null
@@ -160,7 +163,7 @@ export default {
       // card must also be read-only, since when editing it will be needed in the body
       if (
         this.expanded.overlay ||
-        (this.$store.state.sld.componentOptions.firstAttrAsCardTitle &&
+        (this.localstore.state.componentOptions.firstAttrAsCardTitle &&
           this.isReadOnly)
       ) {
         // take all columns except the first
@@ -179,7 +182,7 @@ export default {
     addOverlay(type, id) {
       // don't allow adding overlays if an overlay is already showing
       if (this.shouldShowOverlay) return
-      this.$store.dispatch('addOverlay', {
+      this.localstore.dispatch('addOverlay', {
         type: type,
         id: id,
       })
@@ -201,24 +204,30 @@ export default {
       if (this.isExpanded) return
 
       // determine if the page should be changed somewhere else
-      const pageToNavTo = this.$store.state.sld.componentOptions.mobile
-        ? this.$store.state.sld.page // current page
+      const pageToNavTo = this.localstore.state.componentOptions.mobile
+        ? this.localstore.state.page // current page
         : this.type // page for the type of card
 
-      this.$store.dispatch('setExpanded', {
+      this.localstore.dispatch('setExpanded', {
         page: pageToNavTo,
         type: this.type,
         id: this.id,
       })
 
       // then switch to that page
-      this.$store.dispatch('setPage', pageToNavTo)
+      this.localstore.dispatch('setPage', pageToNavTo)
     },
     handleClose() {
       // don't allow closing when showing overlay
       if (this.shouldShowOverlay) return
-      // remove the top child card
-      this.$store.dispatch('removeOneOverlay')
+      // settimeout to let the click event finish, so it won't reclick when closed
+      setTimeout(() => {
+        this.localstore.state.collections[this.type].searchResults[
+          this.id
+        ] = this.old
+        // remove the top child card
+        this.localstore.dispatch('removeOneOverlay')
+      }, 0)
     },
     handleSave() {
       // don't allow saves when showing an overlay
@@ -226,15 +235,8 @@ export default {
 
       // v-model will already update the values of the entry in the search results
       // so just call a patch which will use the updated values in the search results
-      this.$store
-        .dispatch('patchResult', {
-          type: this.type,
-          id: this.id,
-        })
-        .then(() => {
-          // remove the top child card
-          this.$store.dispatch('removeOneOverlay')
-        })
+      this.collection.patch(this.id)
+      this.localstore.dispatch('removeOneOverlay')
     },
 
     // handles keypresses from the input boxes

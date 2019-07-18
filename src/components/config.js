@@ -2,6 +2,7 @@ export default {
   // reserved name for showing all collections
   ALL_PAGE_NAME: '_all',
   ALL_PAGE_TEXT: 'ALL',
+  STORE_NAME: '_sld',
   DEFAULT_DETAILS_TITLE: 'details',
   DEFAULT_DETAILS_TEXT: '+',
   SAVE_BUTTON_REF: 'save',

@@ -4,25 +4,26 @@ export default {
   // every time a column is sorted by the user, the sorting information for
   // the collection is updated in the collection object
   afterColumnSort: (context) => {
+    const topTable = context.$refs.topTable.hotInstance
+    const bottomTable = context.$refs.bottomTable.hotInstance
     const hook = (currentSortConfig, destinationSortConfigs) => {
+      if (currentSortConfig[0] == destinationSortConfigs[0]) return
+      if (
+        currentSortConfig[0] &&
+        destinationSortConfigs[0] &&
+        currentSortConfig[0].column == destinationSortConfigs[0].column &&
+        currentSortConfig[0].sortOrder == destinationSortConfigs[0].sortOrder
+      )
+        return
+      console.log(currentSortConfig[0], destinationSortConfigs[0])
       // set the collection's sorting
       const sorting = destinationSortConfigs[0]
       context.collection.columnSorting = sorting
 
-      // handsontable will not be able to sort the whole table when it is split
-      // into two tables, so update the view to redraw the two tables
-      context.$store.dispatch('refreshPage')
+      context.populateTables()
     }
-    Handsontable.hooks.add(
-      'afterColumnSort',
-      hook,
-      context.$refs.topTable.hotInstance
-    )
-    Handsontable.hooks.add(
-      'afterColumnSort',
-      hook,
-      context.$refs.bottomTable.hotInstance
-    )
+    Handsontable.hooks.add('afterColumnSort', hook, topTable)
+    Handsontable.hooks.add('afterColumnSort', hook, bottomTable)
   },
   // when a cell is edited, the value is updated in the reactive object
   addAfterChange: (context) => {
@@ -34,16 +35,15 @@ export default {
       // set the value for the entry in the search results
       collection.get(id)[colName] = newValue
 
-      // call a patch which will use the now updated search entry
-      context.$store.dispatch('patchResult', {
-        type: context.type,
-        id: id,
-      })
+      // patch up to the server
+      collection.patch(id)
     }
 
     Handsontable.hooks.add(
       'afterChange',
       (change) => {
+        if (!change) return
+
         // interpret details from the given argument 'change'
         const row = change[0][0]
         const col = change[0][1] - 1 // adjust for the leftmost cell
@@ -56,9 +56,11 @@ export default {
     Handsontable.hooks.add(
       'afterChange',
       (change) => {
+        if (!change) return
+
         // find the expanded row
-        const allExpanded = context.$store.state.sld.allExpanded
-        const expanded = allExpanded[context.$store.state.sld.page]
+        const allExpanded = context.localstore.state.allExpanded
+        const expanded = allExpanded[context.localstore.state.page]
         const expandedRow = context.collection.ids().indexOf(expanded)
 
         // interpret details from the given argument 'change'
@@ -81,6 +83,7 @@ export default {
     Handsontable.hooks.add(
       'afterBeginEditing',
       (row, column) => {
+        if (column == 0) topTable.deselectCell()
         handleEdit(row, column, topTable)
       },
       topTable
@@ -88,6 +91,7 @@ export default {
     Handsontable.hooks.add(
       'afterBeginEditing',
       (row, column) => {
+        if (column == 0) bottomTable.deselectCell()
         handleEdit(row, column, bottomTable)
       },
       bottomTable

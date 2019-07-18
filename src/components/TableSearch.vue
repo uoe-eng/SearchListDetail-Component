@@ -3,6 +3,7 @@
     <hot-table ref="topTable" :settings="tableSettings"></hot-table>
     <div v-if="expanded && expanded.id != null">
       <CardView
+        :localstore="localstore"
         :type="type"
         :id="expanded.id"
         :expanded="expanded"
@@ -15,7 +16,12 @@
     </div>
     <hot-table ref="bottomTable" :settings="tableSettings"></hot-table>
   </div>
-  <CardSearch v-else :collections="collections" :showOnly="type"></CardSearch>
+  <CardSearch
+    v-else
+    :collections="collections"
+    :showOnly="type"
+    :localstore="localstore"
+  ></CardSearch>
 </template>
 
 <script>
@@ -26,20 +32,21 @@ import TableHooks from './TableHooks'
 
 export default {
   props: {
+    localstore: Object,
     type: String,
   },
   computed: {
     collections() {
-      return this.$store.state.sld.collections
+      return this.localstore.state.collections
     },
     collection() {
       return this.collections[this.type]
     },
     expanded() {
-      return this.$store.state.sld.allExpanded[this.page]
+      return this.localstore.state.allExpanded[this.page]
     },
     page() {
-      return this.$store.state.sld.page
+      return this.localstore.state.page
     },
     // data for the tables calculated from the collection and expanded id
     tableData() {
@@ -49,7 +56,7 @@ export default {
       )
     },
     componentOptions() {
-      return this.$store.state.sld.componentOptions
+      return this.localstore.state.componentOptions
     },
     // common settings for both the top and bottom table (no data)
     tableSettings() {
@@ -76,6 +83,12 @@ export default {
   },
   created() {
     this.populateTables()
+    this.addHooks()
+  },
+  updated() {
+    this.populateTables()
+    this.$refs.topTable.hotInstance.render()
+    this.$refs.bottomTable.hotInstance.render()
   },
   methods: {
     // select the end of the top table
@@ -95,6 +108,7 @@ export default {
 
     // add data, meta, and hooks to each table
     populateTables() {
+      console.log('populating tables...')
       // wait for the next tick when the table is loaded into the DOM
       this.$nextTick(() => {
         // stop if the tables don't exist (for example in mobile view)
@@ -125,8 +139,16 @@ export default {
         bottomTableInstance
           .getPlugin('columnSorting')
           .sort(this.collection.columnSorting)
+      })
+    },
 
-        // add the hooks to the tables
+    // add the hooks to the tables
+    addHooks() {
+      this.$nextTick(() => {
+        // stop if the tables don't exist (for example in mobile view)
+        if (!this.$refs.topTable || !this.$refs.bottomTable) {
+          return
+        }
         TableHooks.addAfterChange(this)
         TableHooks.addAfterBeginEditing(this)
         TableHooks.addTableToCard(this)
@@ -142,7 +164,7 @@ export default {
       // read the cell meta value for id
       const id = tableInstance.getCellMeta(row, column).id
       // this.expandCard(this.collection.type, id, this.collection.type)
-      this.$store.dispatch('setExpanded', {
+      this.localstore.dispatch('setExpanded', {
         page: this.type,
         type: this.type,
         id: id,

@@ -8,6 +8,7 @@
           :isReadOnly="!isExpanded(id, collection)"
           :isExpanded="isExpanded(id, collection)"
           :expanded="expanded"
+          :localstore="localstore"
         ></CardView>
       </div>
     </div>
@@ -20,6 +21,7 @@ import CardView from './CardView'
 export default {
   name: 'CardSearch',
   props: {
+    localstore: Object,
     showOnly: String,
   },
   components: {
@@ -27,7 +29,7 @@ export default {
   },
   computed: {
     collections() {
-      return this.$store.state.sld.collections
+      return this.localstore.state.collections
     },
     // returns a list of collections that should be displayed on the page
     // if specified, only show one collection
@@ -41,10 +43,10 @@ export default {
       }
     },
     expanded() {
-      return this.$store.state.sld.allExpanded[this.page]
+      return this.localstore.state.allExpanded[this.page]
     },
     page() {
-      return this.$store.state.sld.page
+      return this.localstore.state.page
     },
   },
   methods: {

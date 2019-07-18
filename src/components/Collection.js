@@ -1,15 +1,23 @@
 import config from './config'
 
 export default class Collection {
-  constructor(type, fullCols, previewCols, columnOptions, getStore) {
+  constructor(
+    type,
+    fullCols,
+    previewCols,
+    columnOptions,
+    localstore,
+    globalstore
+  ) {
     this.type = type
     this.fullCols = fullCols
     this.previewCols = previewCols
     this.columnOptions = columnOptions
+    this.localstore = localstore
 
     // this is a getter function so that the data in the store (which is potentially circular)
-    // is not stored in this class object
-    this.getStore = getStore
+    // is not stored in this class object and passed around in vue
+    this.getStore = () => globalstore
 
     // represents the search results (empty to begin with)
     this.searchResults = {}
@@ -18,9 +26,22 @@ export default class Collection {
     this.columnSorting = undefined
   }
 
+  get globalstore() {
+    return this.getStore()
+  }
+
+  // patches an entry to the server
+  patch(id) {
+    console.log('patching search result with id', id)
+    const entry = this.getClean(id)
+    this.globalstore.dispatch('jv/patch', entry).then(() => {
+      this.localstore.commit('updateSerachResults')
+    })
+  }
+
   // returns the alias for a given column if one is specified, else return column name
   getAlias(columnName) {
-    const columns = this.getStore().state.sld.resultOptions[this.type].columns
+    const columns = this.localstore.state.resultOptions[this.type].columns
     let alias
 
     columns.forEach((column) => {
@@ -37,14 +58,16 @@ export default class Collection {
   }
 
   getEntriesFromStore() {
-    return this.getStore().getters['jv/get'](this.type)
+    return this.globalstore.getters['jv/get'](this.type)
   }
 
-  get(id) {
-    let entry = this.searchResults[id]
+  get(id, deep = false) {
     // if it isn't in the search results, add it from the store
-    if (!entry) entry = this.getEntriesFromStore()[id]
-    return entry
+    if (!this.searchResults[id]) {
+      this.searchResults[id] = this.deep(this.getEntriesFromStore()[id])
+    }
+    let entry = this.searchResults[id]
+    return deep ? this.deep(entry) : entry
   }
 
   // get a version (reference) of a search result without any of the relationships by id
@@ -62,8 +85,6 @@ export default class Collection {
 
   // returns a list of deeply copied entries that match the search
   filter(search) {
-    const store = this.getStore()
-
     // create array of ids that match filter
     const ids = Object.keys(this.getEntriesFromStore())
 
@@ -81,7 +102,8 @@ export default class Collection {
         if (!this.columnOptions[column]) return false
 
         // if the column isn't specified, don't search it
-        if (!store.state.sld.searchOptions[this.type][column]) return false
+        if (!this.localstore.state.searchOptions[this.type][column])
+          return false
 
         const operatorName = this.columnOptions[column].searchOperator
         const operator = config.SEARCH_OPERATORS[operatorName]
@@ -106,7 +128,7 @@ export default class Collection {
     let filteredEntries = {}
     filteredIds.forEach((id) => {
       const entryFromStore = this.getEntriesFromStore()[id]
-      filteredEntries[id] = JSON.parse(JSON.stringify(entryFromStore))
+      filteredEntries[id] = this.deep(entryFromStore)
     })
     return filteredEntries
   }
@@ -183,7 +205,7 @@ export default class Collection {
           if (itemCount == 1) {
             const relatedItem = relatedItems[Object.keys(relatedItems)[0]]
             const relatedColumn = column.split('.')[1]
-            const relatedEntry = this.getStore().getters['jv/get'](
+            const relatedEntry = this.globalstore.getters['jv/get'](
               relatedItem._jv.type
             )[relatedItem._jv.id]
             return relatedEntry[relatedColumn]
@@ -200,5 +222,9 @@ export default class Collection {
       // add the expand details cell to the left of each row
       return [detailsText].concat(row)
     })
+  }
+
+  deep(object) {
+    return JSON.parse(JSON.stringify(object))
   }
 }

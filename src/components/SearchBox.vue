@@ -13,6 +13,9 @@
 <script>
 export default {
   name: 'SearchBox',
+  props: {
+    localstore: Object,
+  },
   data() {
     return {
       search: '',
@@ -21,15 +24,15 @@ export default {
   computed: {
     collections() {
       console.log('computing collections')
-      return this.$store.state.sld.collections
+      return this.localstore.state.collections
     },
   },
   methods: {
     quickSearch() {
       console.log('quick search')
-      this.$store.dispatch('search', this.search)
-      this.$store.dispatch('setExpanded', {
-        page: this.$store.state.sld.page,
+      this.localstore.dispatch('search', this.search)
+      this.localstore.dispatch('setExpanded', {
+        page: this.localstore.state.page,
         type: null,
         id: null,
       })
