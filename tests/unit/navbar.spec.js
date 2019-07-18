@@ -94,7 +94,7 @@ describe('NavBar.vue', () => {
     expect(setPageSpy.getCall(5).args[1]).to.equal('emails')
   })
 
-  it('displays results', () => {
+  it('displays results count', () => {
     wrapper.setProps({ displayResultCount: false })
     expect(navBarItems.at(0).contains('span > span')).to.be.false
     expect(navBarItems.at(1).contains('span > span')).to.be.false
