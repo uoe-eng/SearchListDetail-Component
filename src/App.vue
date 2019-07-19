@@ -1,46 +1,51 @@
 <template>
   <div id="app">
     <SearchListDetail
-      :resultOptions="{
-        people: {
-          columns: [
-            {
-              name: 'preferred_name',
-              alias: 'First Name',
-              // caseSensitive defaults to false
-              // searchOperator defaults to 'contains'
-            },
-            {
-              name: 'family_name',
-              alias: 'Last Name',
-            },
-            {
-              name: 'email_addresses.email_address',
-              alias: 'Email',
-            },
-            {
-              name: 'phone_number.phone_number',
-              alias: 'Phone',
-            },
-          ],
-          previewOrder: ['preferred_name', 'family_name'],
-        },
-        phone_numbers: {
-          columns: [
-            {
-              name: 'phone_number',
-              alias: 'Number',
-            },
-          ],
-        },
-        email_addresses: {
-          columns: [
-            {
-              name: 'email_address',
-              alias: 'Email',
-            },
-          ],
-        },
+      :options="{
+        collections: [
+          {
+            name: 'people',
+            columns: [
+              {
+                name: 'preferred_name',
+                alias: 'First Name',
+                // caseSensitive defaults to false
+                // searchOperator defaults to 'contains'
+              },
+              {
+                name: 'family_name',
+                alias: 'Last Name',
+              },
+              {
+                name: 'email_addresses.email_address',
+                alias: 'Email',
+              },
+              {
+                name: 'phone_number.phone_number',
+                alias: 'Phone',
+              },
+            ],
+            previewOrder: ['preferred_name', 'family_name'],
+          },
+          {
+            name: 'phone_numbers',
+            columns: [
+              {
+                name: 'phone_number',
+                alias: 'Number',
+              },
+            ],
+          },
+          {
+            name: 'email_addresses',
+            columns: [
+              {
+                name: 'email_address',
+                alias: 'Email',
+              },
+            ],
+          },
+        ],
       }"
       :firstAttrAsCardTitle="true"
       detailsTitle="details"

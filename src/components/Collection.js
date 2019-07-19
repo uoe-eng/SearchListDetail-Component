@@ -1,18 +1,9 @@
 import config from './config'
 
 export default class Collection {
-  constructor(
-    type,
-    fullCols,
-    previewCols,
-    columnOptions,
-    localstore,
-    globalstore
-  ) {
-    this.type = type
-    this.fullCols = fullCols
-    this.previewCols = previewCols
-    this.columnOptions = columnOptions
+  constructor(options, localstore, globalstore) {
+    this.name = options.name
+    this.options = options
     this.localstore = localstore
 
     // this is a getter function so that the data in the store (which is potentially circular)
@@ -41,7 +32,7 @@ export default class Collection {
 
   // returns the alias for a given column if one is specified, else return column name
   getAlias(columnName) {
-    const columns = this.localstore.state.resultOptions[this.type].columns
+    const columns = this.localstore.state.resultOptions[this.name].columns
     let alias
 
     columns.forEach((column) => {
@@ -58,7 +49,7 @@ export default class Collection {
   }
 
   getEntriesFromStore() {
-    return this.globalstore.getters['jv/get'](this.type)
+    return this.globalstore.getters['jv/get'](this.name)
   }
 
   get(id, deep = false) {
@@ -102,7 +93,7 @@ export default class Collection {
         if (!this.columnOptions[column]) return false
 
         // if the column isn't specified, don't search it
-        if (!this.localstore.state.searchOptions[this.type][column])
+        if (!this.localstore.state.searchOptions[this.name][column])
           return false
 
         const operatorName = this.columnOptions[column].searchOperator

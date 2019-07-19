@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import TableSearch from './TableSearch'
 import CardSearch from './CardSearch'
 import NavBar from './NavBar'
@@ -32,11 +33,12 @@ import Collection from './Collection'
 import SldStore from './SldStore'
 import SearchBox from './SearchBox'
 import AdvancedSearch from './AdvancedSearch'
+import SldProp from './SldProp'
 
 export default {
   name: 'SearchListDetail',
   props: {
-    resultOptions: Object,
+    options: Object,
     // extra configuration options
     firstAttrAsCardTitle: {
       type: Boolean,
@@ -131,30 +133,23 @@ export default {
   },
   // on creation, fetch the collections from the server
   created() {
-    this.localstore.commit('setResultOptions', this.resultOptions)
+    Vue.set(this.localstore.state, 'sldProp', this.options)
+    // this.localstore.commit('setResultOptions', this.resultOptions)
     this.localstore.commit('initialiseExpanded')
     this.localstore.commit('defineNextTick', this.$nextTick)
     this.localstore.commit('setComponentOptions', this.componentOptions)
     this.localstore.commit('initialiseSearchOptions')
 
-    // for each collection
-    const collectionNames = Object.keys(this.resultOptions)
-    collectionNames.forEach((collectionName) => {
-      // get collection from server
-      // sparse fields not working?
-      const url = `${collectionName}`
+    this.options.collections.forEach((collectionOptions) => {
+      const url = `${collectionOptions.name}`
       console.log('getting', url, 'from server...')
 
       this.$store.dispatch('jv/get', url).then(() => {
-        let collectionDescriptor = new Collection(
-          collectionName,
-          this.fullColumnNames[collectionName],
-          this.previewColumnNames[collectionName],
-          this.columnOptions(collectionName),
+        const collectionDescriptor = new Collection(
+          collectionOptions,
           this.localstore,
           this.$store
         )
-        // save collection class to store
         this.localstore.dispatch(
           'setCollectionDescriptor',
           collectionDescriptor

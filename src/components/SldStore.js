@@ -12,7 +12,7 @@ export default new Vuex.Store({
     search: '',
     searchOptions: {},
     expandedAdvancedSearch: false,
-    resultOptions: {},
+    sldProp: {},
   },
   mutations: {
     // called on creation so it can be used in the future
