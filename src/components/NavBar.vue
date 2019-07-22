@@ -24,7 +24,6 @@
 </template>
 
 <script>
-import Vue from 'vue'
 import config from './config'
 
 export default {
@@ -40,7 +39,7 @@ export default {
   },
   methods: {
     setPage(page) {
-      Vue.set(this.localstore.state, 'page', page)
+      this.localstore.dispatch('setPage', page)
     },
     countResults(listOfCollections) {
       return listOfCollections.reduce((count, collection) => {

@@ -31,9 +31,6 @@ export default new Vuex.Store({
     setPage(state, page) {
       Vue.set(state, 'page', page)
     },
-    toggleMobile(state) {
-      Vue.set(state.componentOptions, 'mobile', !state.componentOptions.mobile)
-    },
     setSearch(state, search) {
       console.log('setting search to', search)
       Vue.set(state, 'search', search)
@@ -58,24 +55,12 @@ export default new Vuex.Store({
         context.commit('setPage', page)
       })
     },
-    setExpanded(context, args) {
-      context.commit('setExpanded', args)
-    },
     setCollectionDescriptor(context, collection) {
       context.commit('setCollectionDescriptor', collection)
       context.commit('updateSerachResults')
     },
     updateEntries(context, args) {
       context.commit('updateEntries', args)
-    },
-    addOverlay(context, args) {
-      context.commit('addOverlay', args)
-    },
-    removeOneOverlay(context) {
-      context.commit('removeOneOverlay')
-    },
-    toggleMobile(context) {
-      context.commit('toggleMobile')
     },
     search(context, search) {
       context.commit('setSearch', search)

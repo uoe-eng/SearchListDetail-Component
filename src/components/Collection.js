@@ -29,10 +29,18 @@ export default class Collection {
 
       column.searchable = true
     })
+
+    if (this.options.previewOrder === undefined) {
+      this.options.previewOrder = this.columnNames
+    }
   }
 
   get globalstore() {
     return this.getStore()
+  }
+
+  get columnNames() {
+    return this.options.columns.map((column) => column.name)
   }
 
   // patches an entry to the server
@@ -46,17 +54,10 @@ export default class Collection {
 
   // returns the alias for a given column if one is specified, else return column name
   getAlias(columnName) {
-    const columns = this.localstore.state.resultOptions[this.name].columns
     let alias
-
-    columns.forEach((column) => {
+    this.options.columns.forEach((column) => {
       if (column.name == columnName) {
-        if (!column.alias) {
-          // if no alias specified, use the name which is always required
-          alias = column.name
-        } else {
-          alias = column.alias
-        }
+        alias = column.alias
       }
     })
     return alias
@@ -137,7 +138,7 @@ export default class Collection {
 
       // otherwise sort by column
       const colNumber = this.columnSorting.column - 1
-      const colName = this.fullCols[colNumber]
+      const colName = this.columnNames[colNumber]
 
       // the comparator function in sort() expects a number
       const results = this.searchResults
@@ -153,7 +154,7 @@ export default class Collection {
   fromCoordinates(row, col) {
     return {
       id: this.ids()[row],
-      col: this.fullCols[col],
+      col: this.columnNames[col],
     }
   }
 
@@ -186,8 +187,7 @@ export default class Collection {
   // create a table of arrays that will be what is displayed in the tables
   getAllData(detailsText) {
     return this.ids().map((id) => {
-      // the row items will be determined by this.fullCols
-      const row = this.fullCols.map((column) => {
+      const row = this.columnNames.map((column) => {
         // special case for relationship column
         if (column.includes('.')) {
           const relCollection = column.split('.')[0]

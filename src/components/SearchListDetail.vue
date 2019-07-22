@@ -8,7 +8,7 @@
       :localstore="localstore"
     ></NavBar>
     <label v-if="search">
-      <input type="checkbox" @click="localstore.dispatch('toggleMobile')" />
+      <input type="checkbox" @click="toggleMobile" />
       Mobile version
     </label>
     <CardSearch
@@ -50,7 +50,6 @@ export default {
   data() {
     return {
       config: config,
-      mobile: false,
       // each instance of an SLD has it's own locally scoped store object
       localstore: SldStore,
     }
@@ -74,34 +73,6 @@ export default {
       } else {
         return [this.page]
       }
-    },
-    // column names that are shown in the table and expanded card view
-    fullColumnNames() {
-      let names = {}
-      const collectionNames = Object.keys(this.resultOptions)
-      collectionNames.forEach((collectionName) => {
-        // array of column names, each column in a collection has a name
-        names[collectionName] = this.resultOptions[collectionName].columns.map(
-          (column) => column.name
-        )
-      })
-      return names
-    },
-    // column names that are shown in the collapsed card view
-    previewColumnNames() {
-      let names = {}
-      const collectionNames = Object.keys(this.resultOptions)
-      collectionNames.forEach((collectionName) => {
-        const previewColumns = this.resultOptions[collectionName].previewOrder
-        if (previewColumns) {
-          names[collectionName] = previewColumns
-        } else {
-          names[collectionName] = this.resultOptions[
-            collectionName
-          ].columns.map((column) => column.name)
-        }
-      })
-      return names
     },
   },
   // on creation, fetch the collections from the server
@@ -140,6 +111,10 @@ export default {
     )
   },
   methods: {
+    toggleMobile() {
+      Vue.set(this.localstore.state, 'mobile', !this.localstore.state.mobile)
+      this.$forceUpdate()
+    },
     columnOptions(collectionName) {
       const columnOptions = {}
       this.resultOptions[collectionName].columns.forEach((column) => {

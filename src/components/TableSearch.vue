@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!componentOptions.mobile" id="table-search">
+  <div v-if="!localstore.state.mobile" id="table-search">
     <hot-table ref="topTable" :settings="tableSettings"></hot-table>
     <div v-if="expanded && expanded.id != null">
       <CardView
@@ -28,7 +28,7 @@
 import { HotTable } from '@handsontable/vue'
 import CardView from './CardView'
 import CardSearch from './CardSearch'
-import TableHooks from './TableHooks'
+import addTableHooks from './addTableHooks'
 
 export default {
   props: {
@@ -40,10 +40,10 @@ export default {
       return this.localstore.state.collections
     },
     collection() {
-      return this.collections[this.type]
+      return this.localstore.state.getCollection(this.type)
     },
     expanded() {
-      return this.localstore.state.allExpanded[this.page]
+      return this.localstore.state.expansionState[this.page]
     },
     page() {
       return this.localstore.state.page
@@ -52,11 +52,11 @@ export default {
     tableData() {
       return this.collection.splitIntoTables(
         this.expanded,
-        this.componentOptions.detailsText
+        this.sldProp.detailsText
       )
     },
-    componentOptions() {
-      return this.localstore.state.componentOptions
+    sldProp() {
+      return this.localstore.state.sldProp
     },
     // common settings for both the top and bottom table (no data)
     tableSettings() {
@@ -71,14 +71,12 @@ export default {
     },
     // returns an array of all headers to be show in handsontable
     colHeaders() {
-      return [this.componentOptions.detailsTitle]
-        .concat(this.collection.fullCols)
-        .map((header, index) => {
-          // skip first header
-          if (index == 0) return header
+      return [this.sldProp.detailsTitle].concat(
+        this.collection.columnNames.map((header) => {
           // otherwise get the alias for that header
           return this.collection.getAlias(header)
         })
+      )
     },
   },
   created() {
@@ -149,11 +147,7 @@ export default {
         if (!this.$refs.topTable || !this.$refs.bottomTable) {
           return
         }
-        TableHooks.addAfterChange(this)
-        TableHooks.addAfterBeginEditing(this)
-        TableHooks.addTableToCard(this)
-        TableHooks.addTableWraparound(this)
-        TableHooks.afterColumnSort(this)
+        addTableHooks(this)
       })
     },
 
@@ -164,11 +158,7 @@ export default {
       // read the cell meta value for id
       const id = tableInstance.getCellMeta(row, column).id
       // this.expandCard(this.collection.type, id, this.collection.type)
-      this.localstore.dispatch('setExpanded', {
-        page: this.type,
-        type: this.type,
-        id: id,
-      })
+      this.localstore.state.expansionState.setExpanded(this.type, this.type, id)
     },
   },
   components: {

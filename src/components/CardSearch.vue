@@ -41,7 +41,7 @@ export default {
       }
     },
     expanded() {
-      return this.localstore.state.allExpanded[this.page]
+      return this.localstore.state.expansionState[this.page]
     },
     page() {
       return this.localstore.state.page
@@ -49,7 +49,7 @@ export default {
   },
   methods: {
     isExpanded(id, collection) {
-      return id == this.expanded.id && collection.type == this.expanded.type
+      return id == this.expanded.id && collection.name == this.expanded.type
     },
   },
 }

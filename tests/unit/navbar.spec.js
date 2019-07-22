@@ -16,28 +16,30 @@ describe('NavBar.vue', function() {
     store = new Vuex.Store({
       state: {
         page: config.ALL_PAGE_NAME,
-        searchOptions: { people: '', phone_numbers: '', emails: '' },
-        collections: {
-          people: {
+        collections: [
+          {
+            name: 'people',
             searchResults: {
-              result1: '',
-              result2: '',
-              result3: '',
-              result4: '',
-              result5: '',
+              '0': '',
+              '1': '',
+              '2': '',
+              '3': '',
+              '4': '',
             },
           },
-          phone_numbers: {
+          {
+            name: 'phone_numbers',
             searchResults: {
-              result1: '',
-              result2: '',
-              result3: '',
+              '0': '',
+              '1': '',
+              '2': '',
             },
           },
-          emails: {
+          {
+            name: 'emails',
             searchResults: {},
           },
-        },
+        ],
       },
       actions: {
         setPage: setPageSpy,
