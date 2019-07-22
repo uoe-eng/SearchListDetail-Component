@@ -11,6 +11,8 @@
 </template>
 
 <script>
+import Vue from 'vue'
+
 export default {
   name: 'SearchBox',
   props: {
@@ -21,21 +23,11 @@ export default {
       search: '',
     }
   },
-  computed: {
-    collections() {
-      console.log('computing collections')
-      return this.localstore.state.collections
-    },
-  },
   methods: {
     quickSearch() {
-      console.log('quick search')
-      this.localstore.dispatch('search', this.search)
-      this.localstore.dispatch('setExpanded', {
-        page: this.localstore.state.page,
-        type: null,
-        id: null,
-      })
+      console.log('setting search in store to', this.search)
+      Vue.set(this.localstore.state, 'search', this.search)
+      this.localstore.dispatch('updateSerachResults')
     },
   },
 }

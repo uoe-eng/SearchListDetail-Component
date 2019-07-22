@@ -6,26 +6,25 @@
       @click="setPage(config.ALL_PAGE_NAME)"
     >
       {{ config.ALL_PAGE_TEXT }}
-      <span v-if="displayResultCount">
-        ({{ countResults(config.ALL_PAGE_NAME) }})
-      </span>
+      <span v-if="displayResultCount">({{ countResults(collections) }})</span>
     </span>
     <span
-      v-for="collectionName of collectionNames"
-      :key="collectionName"
+      v-for="collection of collections"
+      :key="collection.name"
       class="nav-bar-item"
-      :class="{ selected: selected == collectionName }"
-      @click="setPage(collectionName)"
+      :class="{ selected: selected == collection.name }"
+      @click="setPage(collection.name)"
     >
-      {{ collectionName }}
+      {{ collection.name }}
       <span v-if="displayResultCount">
-        ({{ countResults(collectionName) }})
+        ({{ countResults([collection]) }})
       </span>
     </span>
   </div>
 </template>
 
 <script>
+import Vue from 'vue'
 import config from './config'
 
 export default {
@@ -41,35 +40,20 @@ export default {
   },
   methods: {
     setPage(page) {
-      this.localstore.dispatch('setPage', page)
+      Vue.set(this.localstore.state, 'page', page)
     },
-    countResults(collectionName) {
-      const loadingText = '...'
-      // if counting results for all pages, go here
-      if (collectionName == config.ALL_PAGE_NAME) {
-        // add up all the couting results from other pages
-        return this.collectionNames.reduce((count, collectionName) => {
-          const countedResults = this.countResults(collectionName)
-          if (countedResults == loadingText) return count
-          return count + countedResults
-        }, 0)
-      } else {
-        const collections = this.localstore.state.collections
-
-        // while collection is still being downloaded, show ... to indicate it
-        if (!collections[collectionName]) return loadingText
-
-        const searchResults = collections[collectionName].searchResults
-        return Object.keys(searchResults).length
-      }
+    countResults(listOfCollections) {
+      return listOfCollections.reduce((count, collection) => {
+        return count + Object.keys(collection.searchResults).length
+      }, 0)
     },
   },
   computed: {
     selected() {
       return this.localstore.state.page
     },
-    collectionNames() {
-      return Object.keys(this.localstore.state.searchOptions)
+    collections() {
+      return this.localstore.state.collections
     },
   },
 }

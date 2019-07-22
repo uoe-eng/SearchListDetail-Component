@@ -15,6 +15,20 @@ export default class Collection {
 
     // the sorting for each column is stored in the collection object
     this.columnSorting = undefined
+
+    // fill out defaults for options
+    this.options.columns.forEach((column) => {
+      if (column.name === undefined)
+        console.error('no name given to column in', this)
+
+      if (column.searchOperator === undefined)
+        column.searchOperator = 'contains'
+
+      if (column.alias === undefined) column.alias = column.name
+      if (column.caseSensitive === undefined) column.caseSensitive = false
+
+      column.searchable = true
+    })
   }
 
   get globalstore() {
@@ -74,36 +88,27 @@ export default class Collection {
     return clean
   }
 
-  // returns a list of deeply copied entries that match the search
+  // returns a list of deeply copied entries from the _jv store that match the search
   filter(search) {
+    const storeEntries = this.getEntriesFromStore()
+
     // create array of ids that match filter
-    const ids = Object.keys(this.getEntriesFromStore())
+    const ids = Object.keys(storeEntries)
 
     const filteredIds = ids.filter((id) => {
       // if this entry should be displayed, return true in here
-      const entry = this.getEntriesFromStore()[id]
-      const columns = Object.keys(entry)
+      const entry = storeEntries[id]
 
       // array of booleans for if the value in the column matches the search
-      const matchedColumns = columns.map((column) => {
-        // don't search anything that isn't a string (for now)
-        if (typeof entry[column] != 'string') return false
-
-        // don't search columns that haven't been specified to show
-        if (!this.columnOptions[column]) return false
-
-        // if the column isn't specified, don't search it
-        if (!this.localstore.state.searchOptions[this.name][column])
-          return false
-
-        const operatorName = this.columnOptions[column].searchOperator
-        const operator = config.SEARCH_OPERATORS[operatorName]
-
-        if (this.columnOptions[column].caseSensitive) {
-          return operator(entry[column], search)
+      const matchedColumns = this.options.columns.map((column) => {
+        const value = entry[column.name]
+        // for example for relationships
+        if (value === undefined) return false
+        const operator = config.SEARCH_OPERATORS[column.searchOperator]
+        if (column.caseSensitive) {
+          return operator(value, search)
         } else {
-          // case insensitive, so convert everything to upper case before searching
-          return operator(entry[column].toUpperCase(), search.toUpperCase())
+          return operator(value.toUpperCase(), search.toUpperCase())
         }
       })
 

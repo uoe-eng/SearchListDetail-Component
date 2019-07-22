@@ -1,9 +1,9 @@
 <template>
   <div id="card-search">
-    <div v-for="(collection, name) of collectionsToShow" :key="name">
+    <div v-for="collection of collectionsToShow" :key="collection.name">
       <div v-for="(entry, id) of collection.searchResults" :key="id">
         <CardView
-          :type="collection.type"
+          :type="collection.name"
           :id="id"
           :isReadOnly="!isExpanded(id, collection)"
           :isExpanded="isExpanded(id, collection)"
@@ -35,9 +35,7 @@ export default {
     // if specified, only show one collection
     collectionsToShow() {
       if (this.showOnly) {
-        return {
-          [this.showOnly]: this.collections[this.showOnly],
-        }
+        return [this.localstore.state.getCollection(this.showOnly)]
       } else {
         return this.collections
       }

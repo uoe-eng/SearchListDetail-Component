@@ -1,18 +1,18 @@
 <template>
   <div v-if="opened" id="advanced-search">
     <div>ADVANCED SEARCH</div>
-    <div v-for="collection in collections" :key="collection.type">
-      <b>Colection: {{ collection.type }}</b>
-      <button @click="toggleAll(collection.type)">toggle all</button>
+    <div v-for="collection in collections" :key="collection.name">
+      <b>Colection: {{ collection.name }}</b>
+      <button @click="toggleAll(collection)">toggle all</button>
       <br />
-      <span v-for="column in collection.fullCols" :key="column">
+      <span v-for="column in collection.options.columns" :key="column.alias">
         <label>
           <input
             type="checkbox"
-            :checked="searchOptions[collection.type][column]"
-            @click="handleClick(collection.type, column)"
+            :checked="column.searchable"
+            @click="setColumn(column, !column.searchable)"
           />
-          {{ column }}
+          {{ column.alias }}
         </label>
       </span>
     </div>
@@ -26,6 +26,8 @@
 </template>
 
 <script>
+import Vue from 'vue'
+
 export default {
   name: 'AdvancedSearch',
   props: {
@@ -45,20 +47,25 @@ export default {
   methods: {
     // toggles if the advanced search is opened or not
     toggleOpen() {
-      this.localstore.commit('toggleAdvancedSearch')
+      Vue.set(
+        this.localstore.state,
+        'expandedAdvancedSearch',
+        !this.localstore.state.expandedAdvancedSearch
+      )
     },
 
     // handles toggling individual checkboxes
-    handleClick(type, column) {
-      this.localstore.dispatch('toggleCheckBox', {
-        type: type,
-        column: column,
-      })
+    setColumn(column, state) {
+      Vue.set(column, 'searchable', state)
+      this.$forceUpdate()
     },
 
     // toggles all checkboxes for that collection at once
-    toggleAll(collectionName) {
-      this.localstore.dispatch('toggleAllCheckboxes', collectionName)
+    toggleAll(collection) {
+      const currentState = collection.options.columns[0].searchable
+      collection.options.columns.forEach((column) => {
+        this.setColumn(column, !currentState)
+      })
     },
   },
 }

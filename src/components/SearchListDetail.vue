@@ -4,7 +4,7 @@
     <AdvancedSearch v-if="page" :localstore="localstore"></AdvancedSearch>
     <NavBar
       v-if="search != ''"
-      :displayResultCount="countResults"
+      :displayResultCount="options.countResults"
       :localstore="localstore"
     ></NavBar>
     <label v-if="search">
@@ -33,29 +33,12 @@ import Collection from './Collection'
 import SldStore from './SldStore'
 import SearchBox from './SearchBox'
 import AdvancedSearch from './AdvancedSearch'
-import SldProp from './SldProp'
+import ExpansionState from './ExpansionState'
 
 export default {
   name: 'SearchListDetail',
   props: {
     options: Object,
-    // extra configuration options
-    firstAttrAsCardTitle: {
-      type: Boolean,
-      default: true,
-    },
-    detailsTitle: {
-      type: String,
-      default: config.DEFAULT_DETAILS_TITLE,
-    },
-    detailsText: {
-      type: String,
-      default: config.DEFAULT_DETAILS_TEXT,
-    },
-    countResults: {
-      type: Boolean,
-      default: true,
-    },
   },
   components: {
     NavBar,
@@ -81,16 +64,6 @@ export default {
     },
     search() {
       return this.localstore.state.search
-    },
-    // group together all options to pass around in other components as a single prop
-    componentOptions() {
-      return {
-        firstAttrAsCardTitle: this.firstAttrAsCardTitle,
-        detailsTitle: this.detailsTitle,
-        detailsText: this.detailsText,
-        countResults: this.countResults,
-        mobile: false,
-      }
     },
     // the collections that will be shown
     // if it's the "all" page, return all collections, otherwise just return one
@@ -133,29 +106,38 @@ export default {
   },
   // on creation, fetch the collections from the server
   created() {
-    Vue.set(this.localstore.state, 'sldProp', this.options)
+    // Vue.set(this.localstore.state, 'sldProp', this.options)
     // this.localstore.commit('setResultOptions', this.resultOptions)
-    this.localstore.commit('initialiseExpanded')
-    this.localstore.commit('defineNextTick', this.$nextTick)
-    this.localstore.commit('setComponentOptions', this.componentOptions)
-    this.localstore.commit('initialiseSearchOptions')
+    // this.localstore.commit('defineNextTick', this.$nextTick)
+    // this.localstore.commit('setComponentOptions', this.componentOptions)
+    // this.localstore.commit('initialiseSearchOptions')
+    Vue.set(this.localstore.state, 'nextTick', this.$nextTick)
+    Vue.set(this.localstore.state, 'sldProp', this.options)
+
+    let collections = []
 
     this.options.collections.forEach((collectionOptions) => {
+      const collection = new Collection(
+        collectionOptions,
+        this.localstore,
+        this.$store
+      )
+      collections.push(collection)
+
       const url = `${collectionOptions.name}`
       console.log('getting', url, 'from server...')
-
       this.$store.dispatch('jv/get', url).then(() => {
-        const collectionDescriptor = new Collection(
-          collectionOptions,
-          this.localstore,
-          this.$store
-        )
-        this.localstore.dispatch(
-          'setCollectionDescriptor',
-          collectionDescriptor
-        )
+        console.log('finished getting', collectionOptions.name)
+        this.localstore.dispatch('updateSerachResults')
       })
     })
+    Vue.set(this.localstore.state, 'collections', collections)
+
+    Vue.set(
+      this.localstore.state,
+      'expansionState',
+      new ExpansionState(this.options.collections.map((c) => c.name))
+    )
   },
   methods: {
     columnOptions(collectionName) {
