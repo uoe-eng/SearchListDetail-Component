@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint",
     "test:e2e": "vue-cli-service test:e2e",
     "test:unit": "vue-cli-service test:unit",
+    "test:coverage": "nyc --reporter=text --reporter=text-summary vue-cli-service test:unit",
     "testapp": "concurrently --kill-others \"npm:fakeapiserver\" \"vue-cli-service serve\"",
     "fakeapiserver": "node fake-json-api-server.js"
   },
@@ -17,6 +18,7 @@
     "jsonapi-vuex": "^2.0.0",
     "jsonpath": "^1.0.2",
     "lodash": "^4.17.11",
+    "nyc": "^14.1.1",
     "sinon": "^7.3.2",
     "uuid": "^3.3.2",
     "vue": "^2.6.10",
@@ -38,6 +40,7 @@
     "eslint-plugin-vue": "^5.0.0",
     "fake-json-api-server": "^1.6.0",
     "handsontable": "^7.1.0",
+    "istanbul-instrumenter-loader": "^3.0.1",
     "lodash.clonedeep": "^4.5.0",
     "lodash.get": "^4.4.2",
     "lodash.isequal": "^4.5.0",
