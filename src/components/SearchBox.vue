@@ -25,7 +25,7 @@ export default {
   },
   methods: {
     quickSearch() {
-      console.log('setting search in store to', this.search)
+      console.debug('setting search in store to', this.search)
       Vue.set(this.localstore.state, 'search', this.search)
       this.localstore.dispatch('updateSerachResults')
     },

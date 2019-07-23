@@ -1,22 +1,28 @@
 <template>
   <div v-if="opened" id="advanced-search">
     <div>ADVANCED SEARCH</div>
-    <div v-for="collection in collections" :key="collection.name">
-      <b>Colection: {{ collection.name }}</b>
+    <div
+      class="collection"
+      v-for="collection in collections"
+      :key="collection.name"
+    >
+      <b class="title">{{
+        config.ADV_SEARCH_COLLECTION_TITLE_PREPEND + collection.name
+      }}</b>
       <button @click="toggleAll(collection)">toggle all</button>
       <br />
       <span v-for="column in collection.options.columns" :key="column.alias">
-        <label>
+        <label class="checkbox">
           <input
             type="checkbox"
             :checked="column.searchable"
-            @click="setColumn(column, !column.searchable)"
+            @click="toggleCheckBox(column)"
           />
           {{ column.alias }}
         </label>
       </span>
     </div>
-    <button @click="toggleOpen">Close</button>
+    <button @click="toggleOpen" id="advanced-search-close">Close</button>
   </div>
   <div v-else>
     <button @click="toggleOpen" class="advanced-search-button">
@@ -27,11 +33,17 @@
 
 <script>
 import Vue from 'vue'
+import config from './config'
 
 export default {
   name: 'AdvancedSearch',
   props: {
     localstore: Object,
+  },
+  data() {
+    return {
+      config: config,
+    }
   },
   computed: {
     opened() {
@@ -39,9 +51,6 @@ export default {
     },
     collections() {
       return this.localstore.state.collections
-    },
-    searchOptions() {
-      return this.localstore.state.searchOptions
     },
   },
   methods: {
@@ -55,16 +64,21 @@ export default {
     },
 
     // handles toggling individual checkboxes
-    setColumn(column, state) {
-      Vue.set(column, 'searchable', state)
-      this.$forceUpdate()
+    toggleCheckBox(column) {
+      Vue.set(column, 'searchable', !column.searchable)
+      this.localstore.dispatch('updateSerachResults').then(() => {
+        this.$forceUpdate()
+      })
     },
 
     // toggles all checkboxes for that collection at once
     toggleAll(collection) {
       const currentState = collection.options.columns[0].searchable
       collection.options.columns.forEach((column) => {
-        this.setColumn(column, !currentState)
+        Vue.set(column, 'searchable', !currentState)
+      })
+      this.localstore.dispatch('updateSerachResults').then(() => {
+        this.$forceUpdate()
       })
     },
   },

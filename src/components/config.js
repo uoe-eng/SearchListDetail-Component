@@ -11,6 +11,7 @@ export default {
   CLOSE_BUTTON_TEXT: 'Cancel',
   DEFAULT_CASE_SENSITIVE: false,
   DEFAULT_SEARCH_OPERATOR: 'contains',
+  ADV_SEARCH_COLLECTION_TITLE_PREPEND: 'Collection: ',
   SEARCH_OPERATORS: {
     contains: (value, search) => {
       return value.includes(search)

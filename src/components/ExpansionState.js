@@ -10,7 +10,7 @@ export default class ExpansionState {
   }
 
   setExpanded(page, type, id) {
-    console.log('setting expansion for', page, type, id)
+    console.debug('setting expansion for', page, type, id)
     Vue.set(this, page, {
       type: type,
       id: id,
@@ -18,7 +18,7 @@ export default class ExpansionState {
   }
 
   addOverlay(page, type, id) {
-    console.log('adding overlay to page', page, 'data:', type, id)
+    console.debug('adding overlay to page', page, 'data:', type, id)
     const addOverlayToDeepestOverlay = (overlay, type, id) => {
       if (overlay.overlay) {
         addOverlayToDeepestOverlay(overlay.overlay, type, id)
@@ -33,7 +33,7 @@ export default class ExpansionState {
   }
 
   removeOverlay(page) {
-    console.log('removing overlay from page', page)
+    console.debug('removing overlay from page', page)
     if (!this[page].overlay) {
       Vue.set(this, page, {})
       return

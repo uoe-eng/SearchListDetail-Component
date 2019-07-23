@@ -77,11 +77,6 @@ export default {
   },
   // on creation, fetch the collections from the server
   created() {
-    // Vue.set(this.localstore.state, 'sldProp', this.options)
-    // this.localstore.commit('setResultOptions', this.resultOptions)
-    // this.localstore.commit('defineNextTick', this.$nextTick)
-    // this.localstore.commit('setComponentOptions', this.componentOptions)
-    // this.localstore.commit('initialiseSearchOptions')
     Vue.set(this.localstore.state, 'nextTick', this.$nextTick)
     Vue.set(this.localstore.state, 'sldProp', this.options)
 
@@ -96,9 +91,9 @@ export default {
       collections.push(collection)
 
       const url = `${collectionOptions.name}`
-      console.log('getting', url, 'from server...')
+      console.debug('getting', url, 'from server...')
       this.$store.dispatch('jv/get', url).then(() => {
-        console.log('finished getting', collectionOptions.name)
+        console.debug('finished getting', collectionOptions.name)
         this.localstore.dispatch('updateSerachResults')
       })
     })

@@ -106,7 +106,7 @@ export default {
 
     // add data, meta, and hooks to each table
     populateTables() {
-      console.log('populating tables...')
+      console.debug('populating tables...')
       // wait for the next tick when the table is loaded into the DOM
       this.$nextTick(() => {
         // stop if the tables don't exist (for example in mobile view)

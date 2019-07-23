@@ -45,7 +45,7 @@ export default class Collection {
 
   // patches an entry to the server
   patch(id) {
-    console.log('patching search result with id', id)
+    console.debug('patching search result with id', id)
     const entry = this.getClean(id)
     this.globalstore.dispatch('jv/patch', entry).then(() => {
       this.localstore.commit('updateSerachResults')
@@ -102,6 +102,7 @@ export default class Collection {
 
       // array of booleans for if the value in the column matches the search
       const matchedColumns = this.options.columns.map((column) => {
+        if (!column.searchable) return false
         const value = entry[column.name]
         // for example for relationships
         if (value === undefined) return false

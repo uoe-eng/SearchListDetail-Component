@@ -17,23 +17,8 @@ export default new Vuex.Store({
     sldProp: {},
   },
   mutations: {
-    toggleAllCheckboxes(state, collectionName) {
-      const columns = state.collections[collectionName].options.columns
-      const currentState = columns[0].searchable
-      console.log('toggling all to', !currentState)
-      columns.forEach((column) => {
-        Vue.set(column, 'searchable', !currentState)
-      })
-    },
-    setComponentOptions(state, options) {
-      Vue.set(state, 'componentOptions', options)
-    },
     setPage(state, page) {
       Vue.set(state, 'page', page)
-    },
-    setSearch(state, search) {
-      console.log('setting search to', search)
-      Vue.set(state, 'search', search)
     },
     updateSerachResults(state) {
       // for each collection, filter the results from the store and put them into
@@ -46,33 +31,15 @@ export default new Vuex.Store({
   },
   actions: {
     updateSerachResults(context) {
+      console.debug('updating search results')
       context.commit('updateSerachResults')
     },
     setPage(context, page) {
-      console.log('setting page', page)
+      console.debug('setting page', page)
       context.commit('setPage', null)
       context.state.nextTick(() => {
         context.commit('setPage', page)
       })
-    },
-    setCollectionDescriptor(context, collection) {
-      context.commit('setCollectionDescriptor', collection)
-      context.commit('updateSerachResults')
-    },
-    updateEntries(context, args) {
-      context.commit('updateEntries', args)
-    },
-    search(context, search) {
-      context.commit('setSearch', search)
-      context.commit('updateSerachResults')
-    },
-    toggleCheckBox(context, args) {
-      context.commit('toggleCheckBox', args)
-      context.commit('updateSerachResults')
-    },
-    toggleAllCheckboxes(context, collectionName) {
-      context.commit('toggleAllCheckboxes', collectionName)
-      context.commit('updateSerachResults')
     },
   },
 })

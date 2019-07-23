@@ -99,6 +99,7 @@ describe('NavBar.vue', function() {
     expect(setPageSpy.getCall(5).args[1]).to.equal('emails')
   })
 
+  // prettier-ignore
   it('displays results count', function() {
     wrapper.setProps({ displayResultCount: false })
     expect(navBarItems.at(0).contains('span > span')).to.be.false
@@ -107,17 +108,13 @@ describe('NavBar.vue', function() {
     expect(navBarItems.at(3).contains('span > span')).to.be.false
 
     wrapper.setProps({ displayResultCount: true })
-    expect(navBarItems.at(0).contains('span > span')).to.be.true
-    expect(navBarItems.at(1).contains('span > span')).to.be.true
-    expect(navBarItems.at(2).contains('span > span')).to.be.true
-    expect(navBarItems.at(3).contains('span > span')).to.be.true
-    // prettier-ignore
+    expect(navBarItems.at(0).contains('span > span'))
+    expect(navBarItems.at(1).contains('span > span'))
+    expect(navBarItems.at(2).contains('span > span'))
+    expect(navBarItems.at(3).contains('span > span'))
     expect(navBarItems.at(0).find('span > span').text()).to.equal('(8)')
-    // prettier-ignore
     expect(navBarItems.at(1).find('span > span').text()).to.equal('(5)')
-    // prettier-ignore
     expect(navBarItems.at(2).find('span > span').text()).to.equal('(3)')
-    // prettier-ignore
     expect(navBarItems.at(3).find('span > span').text()).to.equal('(0)')
   })
 })
