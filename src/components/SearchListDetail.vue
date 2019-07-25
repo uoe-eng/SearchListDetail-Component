@@ -82,6 +82,7 @@ export default {
 
     let collections = []
 
+    // TODO: update to be neater
     this.options.collections.forEach((collectionOptions) => {
       const collection = new Collection(
         collectionOptions,
@@ -94,7 +95,7 @@ export default {
       console.debug('getting', url, 'from server...')
       this.$store.dispatch('jv/get', url).then(() => {
         console.debug('finished getting', collectionOptions.name)
-        this.localstore.dispatch('updateSerachResults')
+        this.localstore.dispatch('updateSearchResults')
       })
     })
     Vue.set(this.localstore.state, 'collections', collections)

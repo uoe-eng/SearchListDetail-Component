@@ -17,7 +17,7 @@ describe('SearchBox.vue', function() {
         search: '',
       },
       actions: {
-        updateSerachResults: spy,
+        updateSearchResults: spy,
       },
     })
 
@@ -36,7 +36,7 @@ describe('SearchBox.vue', function() {
     expect(store.state.search).to.equal('')
   })
 
-  it('calls updateSerachResults for each search', function() {
+  it('calls updateSearchResults for each search', function() {
     wrapper.find('input').setValue('Bob')
     expect(spy.callCount).to.equal(1)
     wrapper.find('input').setValue('')

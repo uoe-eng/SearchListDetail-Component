@@ -66,7 +66,7 @@ export default {
     // handles toggling individual checkboxes
     toggleCheckBox(column) {
       Vue.set(column, 'searchable', !column.searchable)
-      this.localstore.dispatch('updateSerachResults').then(() => {
+      this.localstore.dispatch('updateSearchResults').then(() => {
         this.$forceUpdate()
       })
     },
@@ -77,7 +77,7 @@ export default {
       collection.options.columns.forEach((column) => {
         Vue.set(column, 'searchable', !currentState)
       })
-      this.localstore.dispatch('updateSerachResults').then(() => {
+      this.localstore.dispatch('updateSearchResults').then(() => {
         this.$forceUpdate()
       })
     },

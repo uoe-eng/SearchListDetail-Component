@@ -13,9 +13,6 @@ export default class Collection {
     // represents the search results (empty to begin with)
     this.searchResults = {}
 
-    // the sorting for each column is stored in the collection object
-    this.columnSorting = undefined
-
     // fill out defaults for options
     this.options.columns.forEach((column) => {
       if (column.name === undefined)
@@ -45,10 +42,10 @@ export default class Collection {
 
   // patches an entry to the server
   patch(id) {
-    console.debug('patching search result with id', id)
+    // console.debug('patching search result with id', id)
     const entry = this.getClean(id)
     this.globalstore.dispatch('jv/patch', entry).then(() => {
-      this.localstore.commit('updateSerachResults')
+      this.localstore.dispatch('updateSearchResults')
     })
   }
 
@@ -91,6 +88,8 @@ export default class Collection {
 
   // returns a list of deeply copied entries from the _jv store that match the search
   filter(search) {
+    if (search === '') return {}
+
     const storeEntries = this.getEntriesFromStore()
 
     // create array of ids that match filter

@@ -20,7 +20,7 @@ export default new Vuex.Store({
     setPage(state, page) {
       Vue.set(state, 'page', page)
     },
-    updateSerachResults(state) {
+    updateSearchResults(state) {
       // for each collection, filter the results from the store and put them into
       // the .searchResults attribute
       state.collections.forEach((collection) => {
@@ -30,9 +30,9 @@ export default new Vuex.Store({
     },
   },
   actions: {
-    updateSerachResults(context) {
+    updateSearchResults(context) {
       console.debug('updating search results')
-      context.commit('updateSerachResults')
+      context.commit('updateSearchResults')
     },
     setPage(context, page) {
       console.debug('setting page', page)

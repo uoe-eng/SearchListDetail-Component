@@ -5,7 +5,7 @@ export default function addTableHooks(context) {
   const bottomTable = context.$refs.bottomTable.hotInstance
   const hooks = Handsontable.hooks
 
-  ////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
 
   // every time a column is sorted by the user, the sorting information for
   // the collection is updated in the collection object
@@ -29,7 +29,7 @@ export default function addTableHooks(context) {
   hooks.add('afterColumnSort', afterColumnSort, topTable)
   hooks.add('afterColumnSort', afterColumnSort, bottomTable)
 
-  ////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
 
   // when a cell is edited, the value is updated in the reactive object
 
@@ -75,7 +75,7 @@ export default function addTableHooks(context) {
   hooks.add('afterChange', afterChangeTop, topTable)
   hooks.add('afterChange', afterChangeBottom, bottomTable)
 
-  ////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
 
   // hook for when the detail cell is edited (double click or enter)
   // this will trigger the row to be expanded
@@ -93,7 +93,7 @@ export default function addTableHooks(context) {
   hooks.add('afterBeginEditing', onCellEditModeTop, topTable)
   hooks.add('afterBeginEditing', onCellEditModeBottom, bottomTable)
 
-  ////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
 
   // hook for tabbing from the table into the card
   // array of input boxes from the card
@@ -137,7 +137,7 @@ export default function addTableHooks(context) {
   hooks.add('afterDocumentKeyDown', tableToCardTop, topTable)
   hooks.add('beforeKeyDown', tableToCardBottom, bottomTable)
 
-  ////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////
 
   // hooks for wrapping around from the top to the bottom
 

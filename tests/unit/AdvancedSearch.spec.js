@@ -59,7 +59,7 @@ describe('AdvancedSearch.vue', function() {
         ],
       },
       actions: {
-        updateSerachResults: spy,
+        updateSearchResults: spy,
       },
     })
 
