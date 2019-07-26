@@ -3,6 +3,7 @@
     <div v-for="collection of collectionsToShow" :key="collection.name">
       <div v-for="(entry, id) of collection.searchResults" :key="id">
         <CardView
+          class="card-result"
           :type="collection.name"
           :id="id"
           :isReadOnly="!isExpanded(id, collection)"
