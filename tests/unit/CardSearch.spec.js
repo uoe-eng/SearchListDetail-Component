@@ -162,7 +162,7 @@ describe('CardSearch.vue', function() {
   })
 
   // prettier-ignore
-  it('tells cards if they should be expanded or not', function() {
+  it('tells cards if they should be expanded/readonly or not', function() {
     const cardResults = wrapper.findAll('.card-result')
 
     const expectState = (attr, state) => {

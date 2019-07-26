@@ -32,7 +32,7 @@
                     {{
                       localstore.state
                         .getCollection(related.type)
-                        .getEntriesFromStore()[related.id][column.split('.')[1]]
+                        .get(related.id)[column.split('.')[1]]
                     }}
                   </button>
                 </span>
@@ -79,6 +79,7 @@
     <!-- child card for when there are overlays -->
     <CardView
       v-if="shouldShowOverlay"
+      class="overlay"
       :localstore="localstore"
       :type="expanded.overlay.type"
       :id="expanded.overlay.id"
