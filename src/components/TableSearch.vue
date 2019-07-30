@@ -1,19 +1,19 @@
 <template>
   <div v-if="!localstore.state.mobile" id="table-search">
     <hot-table ref="topTable" :settings="tableSettings"></hot-table>
-    <div v-if="expanded && expanded.id != null">
-      <CardView
-        :localstore="localstore"
-        :type="type"
-        :id="expanded.id"
-        :expanded="expanded"
-        :isReadOnly="false"
-        :isExpanded="true"
-        :onTabOutUp="onTabOutUp"
-        :onTabOutDown="onTabOutDown"
-        ref="cardview"
-      ></CardView>
-    </div>
+    <CardView
+      v-if="expanded && expanded.id != null"
+      :localstore="localstore"
+      :type="type"
+      :id="expanded.id"
+      :expanded="expanded"
+      :isReadOnly="false"
+      :isExpanded="true"
+      :onTabOutUp="onTabOutUp"
+      :onTabOutDown="onTabOutDown"
+      ref="cardview"
+      class="expanded-card"
+    ></CardView>
     <hot-table ref="bottomTable" :settings="tableSettings"></hot-table>
   </div>
   <CardSearch
@@ -21,6 +21,8 @@
     :collections="collections"
     :showOnly="type"
     :localstore="localstore"
+    ref="cardsearch"
+    class="cardsearch"
   ></CardSearch>
 </template>
 
@@ -85,8 +87,8 @@ export default {
   },
   updated() {
     this.populateTables()
-    this.$refs.topTable.hotInstance.render()
-    this.$refs.bottomTable.hotInstance.render()
+    // this.$refs.topTable.hotInstance.render()
+    // this.$refs.bottomTable.hotInstance.render()
   },
   methods: {
     // select the end of the top table
@@ -106,13 +108,17 @@ export default {
 
     // add data, meta, and hooks to each table
     populateTables() {
-      console.debug('populating tables...')
+      // console.debug('populating tables...')
       // wait for the next tick when the table is loaded into the DOM
       this.$nextTick(() => {
         // stop if the tables don't exist (for example in mobile view)
-        if (!this.$refs.topTable || !this.$refs.bottomTable) {
+        if (
+          !this.$refs.topTable ||
+          !this.$refs.topTable.hotInstance ||
+          !this.$refs.bottomTable ||
+          !this.$refs.bottomTable.hotInstance
+        )
           return
-        }
 
         // get the top table instance
         const topTableInstance = this.$refs.topTable.hotInstance

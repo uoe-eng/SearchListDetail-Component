@@ -108,10 +108,10 @@ describe('NavBar.vue', function() {
     expect(navBarItems.at(3).contains('span > span')).to.be.false
 
     wrapper.setProps({ displayResultCount: true })
-    expect(navBarItems.at(0).contains('span > span'))
-    expect(navBarItems.at(1).contains('span > span'))
-    expect(navBarItems.at(2).contains('span > span'))
-    expect(navBarItems.at(3).contains('span > span'))
+    expect(navBarItems.at(0).contains('span > span')).to.be.true
+    expect(navBarItems.at(1).contains('span > span')).to.be.true
+    expect(navBarItems.at(2).contains('span > span')).to.be.true
+    expect(navBarItems.at(3).contains('span > span')).to.be.true
     expect(navBarItems.at(0).find('span > span').text()).to.equal('(8)')
     expect(navBarItems.at(1).find('span > span').text()).to.equal('(5)')
     expect(navBarItems.at(2).find('span > span').text()).to.equal('(3)')

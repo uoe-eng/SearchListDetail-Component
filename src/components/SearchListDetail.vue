@@ -1,11 +1,16 @@
 <template>
   <div id="sld">
-    <SearchBox :localstore="localstore"></SearchBox>
-    <AdvancedSearch v-if="page" :localstore="localstore"></AdvancedSearch>
+    <SearchBox :localstore="localstore" ref="searchbox"></SearchBox>
+    <AdvancedSearch
+      v-if="page"
+      :localstore="localstore"
+      ref="advsearch"
+    ></AdvancedSearch>
     <NavBar
       v-if="search != ''"
       :displayResultCount="options.countResults"
       :localstore="localstore"
+      ref="navbar"
     ></NavBar>
     <label v-if="search">
       <input type="checkbox" @click="toggleMobile" />
@@ -14,11 +19,13 @@
     <CardSearch
       v-if="page == config.ALL_PAGE_NAME && search"
       :localstore="localstore"
+      ref="cardsearch"
     ></CardSearch>
     <TableSearch
       v-else-if="page && search"
       :type="page"
       :localstore="localstore"
+      ref="tablesearch"
     ></TableSearch>
   </div>
 </template>
@@ -64,45 +71,34 @@ export default {
     search() {
       return this.localstore.state.search
     },
-    // the collections that will be shown
-    // if it's the "all" page, return all collections, otherwise just return one
-    selectedCollections() {
-      if (this.page == config.ALL_PAGE_NAME) {
-        // all collection names
-        return Object.keys(this.resultOptions)
-      } else {
-        return [this.page]
-      }
-    },
   },
   // on creation, fetch the collections from the server
   created() {
     Vue.set(this.localstore.state, 'nextTick', this.$nextTick)
     Vue.set(this.localstore.state, 'sldProp', this.options)
 
-    let collections = []
-
-    // TODO: update to be neater
-    this.options.collections.forEach((collectionOptions) => {
+    const collections = this.options.collections.map((collectionOptions) => {
       const collection = new Collection(
         collectionOptions,
         this.localstore,
         this.$store
       )
-      collections.push(collection)
 
       const url = `${collectionOptions.name}`
-      console.debug('getting', url, 'from server...')
+      // console.debug('getting', url, 'from server...')
       this.$store.dispatch('jv/get', url).then(() => {
-        console.debug('finished getting', collectionOptions.name)
+        // console.debug('finished getting', collectionOptions.name)
         this.localstore.dispatch('updateSearchResults')
       })
+
+      return collection
     })
     Vue.set(this.localstore.state, 'collections', collections)
 
     Vue.set(
       this.localstore.state,
       'expansionState',
+      // argument is an array of the column names
       new ExpansionState(this.options.collections.map((c) => c.name))
     )
   },
@@ -110,17 +106,6 @@ export default {
     toggleMobile() {
       Vue.set(this.localstore.state, 'mobile', !this.localstore.state.mobile)
       this.$forceUpdate()
-    },
-    columnOptions(collectionName) {
-      const columnOptions = {}
-      this.resultOptions[collectionName].columns.forEach((column) => {
-        columnOptions[column.name] = {
-          caseSensitive: column.caseSensitive || config.DEFAULT_CASE_SENSITIVE,
-          searchOperator:
-            column.searchOperator || config.DEFAULT_SEARCH_OPERATOR,
-        }
-      })
-      return columnOptions
     },
   },
 }

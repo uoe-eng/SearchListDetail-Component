@@ -66,10 +66,10 @@ export default class Collection {
 
   get(id, deep = false) {
     // if it isn't in the search results, add it from the store
-    if (!this.searchResults[id]) {
-      this.searchResults[id] = this.deep(this.getEntriesFromStore()[id])
-    }
     let entry = this.searchResults[id]
+    if (entry == undefined) {
+      entry = this.deep(this.getEntriesFromStore()[id])
+    }
     return deep ? this.deep(entry) : entry
   }
 

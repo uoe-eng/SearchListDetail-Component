@@ -74,19 +74,19 @@ describe('AdvancedSearch.vue', function() {
   it('opens and closes', function() {
     // check it's closed
     expect(wrapper.find('#advanced-search').exists()).to.be.false
-    expect(wrapper.find('.advanced-search-button').exists())
+    expect(wrapper.find('.advanced-search-button').exists()).to.be.true
 
     // open
     wrapper.find('.advanced-search-button').trigger('click')
     expect(store.state.expandedAdvancedSearch).to.be.true
-    expect(wrapper.find('#advanced-search').exists())
+    expect(wrapper.find('#advanced-search').exists()).to.be.true
     expect(wrapper.find('.advanced-search-button').exists()).to.be.false
 
     // close
     wrapper.find('#advanced-search-close').trigger('click')
     expect(store.state.expandedAdvancedSearch).to.be.false
     expect(wrapper.find('#advanced-search').exists()).to.be.false
-    expect(wrapper.find('.advanced-search-button').exists())
+    expect(wrapper.find('.advanced-search-button').exists()).to.be.true
   })
 
   it('displays the collections', function() {

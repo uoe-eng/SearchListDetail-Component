@@ -31,11 +31,11 @@ export default new Vuex.Store({
   },
   actions: {
     updateSearchResults(context) {
-      console.debug('updating search results')
+      // console.debug('updating search results')
       context.commit('updateSearchResults')
     },
     setPage(context, page) {
-      console.debug('setting page', page)
+      // console.debug('setting page', page)
       context.commit('setPage', null)
       context.state.nextTick(() => {
         context.commit('setPage', page)
