@@ -217,7 +217,11 @@ export default {
       if (this.shouldShowOverlay) return
       // settimeout to let the click event finish, so it won't reclick when closed
       setTimeout(() => {
-        this.collection.searchResults[this.id] = this.old
+        // overwrite the search result with the old result since changed don't want to be saved
+        // but, if it does not exist in the search results, don't accidentally create a new result
+        if (this.collection.searchResults[this.id] !== undefined) {
+          this.collection.searchResults[this.id] = this.old
+        }
         // remove the top child card
         this.localstore.state.expansionState.removeOverlay(this.page)
       }, 0)

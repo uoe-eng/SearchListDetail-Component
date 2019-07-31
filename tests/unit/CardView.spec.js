@@ -427,7 +427,7 @@ describe('CardView.vue', function() {
     const spy = sinon.spy()
     store.state.expansionState.removeOverlay = spy
 
-    store.state.collections[1].searchResults = {}
+    store.state.collections[1].searchResults = { '1': 'new value to replace' }
     store.state.page = 'cats'
 
     catCard.find('.close').trigger('click')
@@ -458,5 +458,20 @@ describe('CardView.vue', function() {
 
     expect(patchSpy.callCount).to.equal(1)
     expect(patchSpy.getCall(0).args).to.deep.equal(['1'])
+  })
+
+  it('does not write an entry to searchResults on card close if the result does not already exist (bugfix)', function() {
+    catCard.setProps({ isReadOnly: false, isExpanded: true })
+
+    store.state.collections[1].searchResults = {}
+    store.state.page = 'cats'
+
+    store.state.expansionState.removeOverlay = () => {}
+
+    catCard.find('.close').trigger('click')
+    setTimeout(() => {
+      // on close, search result is not set because it does not exist in the search results
+      expect(store.state.collections[1].searchResults).to.deep.equal({})
+    }, 0)
   })
 })
