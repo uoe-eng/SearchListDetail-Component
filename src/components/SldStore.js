@@ -15,6 +15,8 @@ export default new Vuex.Store({
     search: '',
     expandedAdvancedSearch: false,
     sldProp: {},
+    globalstore: {},
+    pendingRequests: 0,
   },
   mutations: {
     setPage(state, page) {
@@ -24,8 +26,31 @@ export default new Vuex.Store({
       // for each collection, filter the results from the store and put them into
       // the .searchResults attribute
       state.collections.forEach((collection) => {
+        // do a quick filter in case no columns are ticked
         const results = collection.filter(state.search)
         Vue.set(collection, 'searchResults', state.search ? results : {})
+
+        collection.options.columns.forEach((column) => {
+          if (!column.searchable) return
+
+          const filter = `filter[${column.name}:ilike]`
+          const action = [
+            collection.name,
+            {
+              params: {
+                [filter]: '*' + state.search + '*',
+              },
+            },
+          ]
+          state.pendingRequests++
+          state.globalstore.dispatch('jv/get', action).then(() => {
+            state.pendingRequests--
+            const results = collection.filter(state.search)
+            Vue.set(collection, 'searchResults', state.search ? results : {})
+          })
+        })
+        // collection.columnNames.forEach((column) => {
+        // })
       })
     },
   },

@@ -6,6 +6,7 @@
       :localstore="localstore"
       ref="advsearch"
     ></AdvancedSearch>
+    <span v-if="localstore.state.pendingRequests > 0">searching...</span>
     <NavBar
       v-if="search != ''"
       :displayResultCount="options.countResults"
@@ -76,6 +77,7 @@ export default {
   created() {
     Vue.set(this.localstore.state, 'nextTick', this.$nextTick)
     Vue.set(this.localstore.state, 'sldProp', this.options)
+    Vue.set(this.localstore.state, 'globalstore', this.$store)
 
     const collections = this.options.collections.map((collectionOptions) => {
       const collection = new Collection(
@@ -84,12 +86,11 @@ export default {
         this.$store
       )
 
-      const url = `${collectionOptions.name}`
       // console.debug('getting', url, 'from server...')
-      this.$store.dispatch('jv/get', url).then(() => {
-        // console.debug('finished getting', collectionOptions.name)
-        this.localstore.dispatch('updateSearchResults')
-      })
+      // this.$store.dispatch('jv/get', collectionOptions.name).then(() => {
+      //   // console.debug('finished getting', collectionOptions.name)
+      //   this.localstore.dispatch('updateSearchResults')
+      // })
 
       return collection
     })
