@@ -31,6 +31,7 @@ import { HotTable } from '@handsontable/vue'
 import CardView from './CardView'
 import CardSearch from './CardSearch'
 import addTableHooks from './addTableHooks'
+import config from './config'
 
 export default {
   props: {
@@ -108,7 +109,7 @@ export default {
 
     // add data, meta, and hooks to each table
     populateTables() {
-      // console.debug('populating tables...')
+      config.log('populating tables...')
       // wait for the next tick when the table is loaded into the DOM
       this.$nextTick(() => {
         // stop if the tables don't exist (for example in mobile view)

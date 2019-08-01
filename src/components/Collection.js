@@ -42,7 +42,7 @@ export default class Collection {
 
   // patches an entry to the server
   patch(id) {
-    // console.debug('patching search result with id', id)
+    config.log('patching search result with id', id)
     const entry = this.getClean(id)
     this.globalstore.dispatch('jv/patch', entry).then(() => {
       this.localstore.dispatch('updateSearchResults')
@@ -60,19 +60,6 @@ export default class Collection {
     return alias
   }
 
-  getEntriesFromStore() {
-    return this.globalstore.getters['jv/get'](this.name)
-  }
-
-  get(id, deep = false) {
-    // if it isn't in the search results, add it from the store
-    let entry = this.searchResults[id]
-    if (entry == undefined) {
-      entry = this.deep(this.getEntriesFromStore()[id])
-    }
-    return deep ? this.deep(entry) : entry
-  }
-
   // get a version (reference) of a search result without any of the relationships by id
   getClean(id) {
     const entry = this.get(id)
@@ -84,6 +71,19 @@ export default class Collection {
       clean[column] = entry[column]
     })
     return clean
+  }
+
+  get(id, deep = false) {
+    // if it isn't in the search results, add it from the store
+    let entry = this.searchResults[id]
+    if (entry == undefined) {
+      entry = this.deep(this.getEntriesFromStore()[id])
+    }
+    return deep ? this.deep(entry) : entry
+  }
+
+  getEntriesFromStore() {
+    return this.globalstore.getters['jv/get'](this.name)
   }
 
   // returns a list of deeply copied entries from the _jv store that match the search
@@ -128,6 +128,10 @@ export default class Collection {
       filteredEntries[id] = this.deep(entryFromStore)
     })
     return filteredEntries
+  }
+
+  deep(object) {
+    return JSON.parse(JSON.stringify(object))
   }
 
   // returns (in order) the ids of the collection in an array
@@ -218,9 +222,5 @@ export default class Collection {
       // add the expand details cell to the left of each row
       return [detailsText].concat(row)
     })
-  }
-
-  deep(object) {
-    return JSON.parse(JSON.stringify(object))
   }
 }

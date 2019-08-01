@@ -11,7 +11,7 @@
     >
       <span v-if="title != null" class="title">{{ title }}</span>
       <span class="subtitle">{{ type }} / {{ id }}</span>
-      <form v-on:submit.prevent="handleSave">
+      <form @submit.prevent="">
         <table class="sld-card-view-details">
           <tr v-for="(column, index) of columnsToShow" :key="column">
             <td class="column">{{ collection.getAlias(column) }}:&nbsp;</td>
@@ -21,6 +21,7 @@
                 <span
                   v-for="(related, index) in getRelationships(column)"
                   :key="index"
+                  style="display: inline-block"
                 >
                   <button
                     @click="addOverlay(related.type, related.id)"
@@ -35,7 +36,13 @@
                         .get(related.id)[column.split('.')[1]]
                     }}
                   </button>
+                  <button class="unlink" @click="handleUnlink(index, column)">
+                    ×
+                  </button>
                 </span>
+                <button class="add" @click="handleAdd(column)">
+                  +
+                </button>
               </span>
               <!-- if column is read only - read only is overruled if there is an overlay -->
               <span v-else-if="isReadOnly || expanded.overlay">
@@ -91,6 +98,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import config from './config'
 
 export default {
@@ -195,6 +203,11 @@ export default {
       }
     },
 
+    setRelationships(relColumn, rels) {
+      const relName = relColumn.split('.')[0]
+      Vue.set(this.entry._jv.relationships[relName], 'data', rels)
+    },
+
     handleClick() {
       if (this.isExpanded) return
 
@@ -213,6 +226,7 @@ export default {
       this.localstore.dispatch('setPage', pageToNavTo)
     },
     handleClose() {
+      config.log('closing card')
       // don't allow closing when showing overlay
       if (this.shouldShowOverlay) return
       // settimeout to let the click event finish, so it won't reclick when closed
@@ -227,6 +241,7 @@ export default {
       }, 0)
     },
     handleSave() {
+      config.log('saving card')
       // don't allow saves when showing an overlay
       if (this.shouldShowOverlay) return
 
@@ -272,6 +287,32 @@ export default {
         }
       })
     },
+    handleUnlink(index, fromCol) {
+      config.log('unlink', index, fromCol)
+      // const rels = this.getRelationships(fromCol)
+      // const newRels = rels.filter((rel, pos) => pos !== index)
+      // this.setRelationships(fromCol, newRels)
+      // config.log(newRels)
+
+      // const relName = fromCol.split('.')[0]
+      // const api = axios.create({
+      //   // connect to local jsonapi-mock server
+      //   baseURL: 'http://localhost:6543/api',
+      //   headers: {
+      //     'Content-Type': 'application/vnd.api+json',
+      //     Accept: 'application/vnd.api+json',
+      //   },
+      // })
+      // api.patch(this.type + '/' + this.id + '/' + relName, newRels).then(() => {
+      //   console.log('done')
+      // })
+    },
+    handleAdd(fromCol) {
+      config.log('add relationship to', fromCol)
+      // const rels = this.getRelationships(fromCol)
+      // const newRels = rels.concat({ id: '1', type: 'email_addresses' })
+      // this.setRelationships(fromCol, newRels)
+    },
   },
 }
 </script>
@@ -315,7 +356,9 @@ export default {
   font-size: inherit;
 }
 
-.sld-card-view button.relationship {
+.sld-card-view button.relationship,
+button.unlink,
+button.add {
   padding: 7px;
   margin: 5px;
   border: 1px var(--alt-text-color) solid;
@@ -324,7 +367,9 @@ export default {
   cursor: pointer;
 }
 
-.sld-card-view button.relationship:hover {
+.sld-card-view button.relationship:hover,
+button.unlink:hover,
+button.add:hover {
   background-color: var(--highlight-color);
 }
 
@@ -361,5 +406,10 @@ export default {
 
 .sld-card-view-details {
   padding-top: 10px;
+}
+
+button.unlink,
+button.add {
+  font-weight: bold;
 }
 </style>

@@ -12,6 +12,7 @@
 
 <script>
 import Vue from 'vue'
+import config from './config'
 
 export default {
   name: 'SearchBox',
@@ -25,7 +26,7 @@ export default {
   },
   methods: {
     quickSearch() {
-      // console.debug('setting search in store to', this.search)
+      config.log('setting search in store to', this.search)
       Vue.set(this.localstore.state, 'search', this.search)
       this.localstore.dispatch('updateSearchResults')
     },

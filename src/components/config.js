@@ -26,4 +26,7 @@ export default {
       return value.endsWith(search)
     },
   },
+  log: (...x) => {
+    console.log(...x)
+  },
 }

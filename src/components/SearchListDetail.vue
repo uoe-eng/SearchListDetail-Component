@@ -85,9 +85,9 @@ export default {
       )
 
       const url = `${collectionOptions.name}`
-      // console.debug('getting', url, 'from server...')
+      config.log('getting', url, 'from server...')
       this.$store.dispatch('jv/get', url).then(() => {
-        // console.debug('finished getting', collectionOptions.name)
+        config.log('finished getting', collectionOptions.name)
         this.localstore.dispatch('updateSearchResults')
       })
 
