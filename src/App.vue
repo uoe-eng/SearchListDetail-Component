@@ -24,6 +24,14 @@
                 name: 'phone_number.phone_number',
                 alias: 'Phone',
               },
+              {
+                name: 'matriculation_numbers.matriculation_number',
+                alias: 'Matriculation Number',
+              },
+              {
+                name: 'uun.uun',
+                alias: 'UUN',
+              },
             ],
             previewOrder: ['preferred_name', 'family_name'],
           },
@@ -35,6 +43,7 @@
                 alias: 'Number',
               },
             ],
+            show: false,
           },
           {
             name: 'email_addresses',
@@ -44,6 +53,24 @@
                 alias: 'Email',
               },
             ],
+          },
+          {
+            name: 'matriculation_numbers',
+            columns: [
+              {
+                name: 'matriculation_number',
+              },
+            ],
+            show: false,
+          },
+          {
+            name: 'usernames',
+            columns: [
+              {
+                name: 'uun',
+              },
+            ],
+            show: false,
           },
         ],
         firstAttrAsCardTitle: true,

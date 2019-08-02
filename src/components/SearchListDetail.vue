@@ -77,7 +77,7 @@ export default {
   created() {
     Vue.set(this.localstore.state, 'nextTick', this.$nextTick)
     Vue.set(this.localstore.state, 'sldProp', this.options)
-    Vue.set(this.localstore.state, 'globalstore', this.$store)
+    Vue.set(this.localstore.state, 'globalstore', () => this.$store)
 
     const collections = this.options.collections.map((collectionOptions) => {
       const collection = new Collection(

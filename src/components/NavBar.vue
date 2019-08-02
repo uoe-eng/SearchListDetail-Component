@@ -52,7 +52,9 @@ export default {
       return this.localstore.state.page
     },
     collections() {
-      return this.localstore.state.collections
+      return this.localstore.state.collections.filter((collection) => {
+        return collection.options.show
+      })
     },
   },
 }
@@ -68,6 +70,7 @@ export default {
   white-space: nowrap;
   width: fit-content;
   max-width: 100vw;
+  min-height: 20px;
 }
 
 #nav-bar .nav-bar-item {

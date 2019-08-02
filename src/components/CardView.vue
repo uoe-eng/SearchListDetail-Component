@@ -1,7 +1,9 @@
 <template>
   <!-- empty div to hold parent and childern cards -->
   <div>
+    <div v-if="!collection">Collection undefined</div>
     <div
+      v-else
       class="sld-card-view"
       :class="{
         pointer: !isExpanded,
@@ -23,18 +25,16 @@
                   :key="index"
                 >
                   <button
+                    v-if="getRelatedItem(related, column)"
                     @click="addOverlay(related.type, related.id)"
                     :class="{
                       relationship: isExpanded && !shouldShowOverlay,
                       relationshipNoClick: !(isExpanded && !shouldShowOverlay),
                     }"
                   >
-                    {{
-                      localstore.state
-                        .getCollection(related.type)
-                        .get(related.id)[column.split('.')[1]]
-                    }}
+                    {{ getRelatedItem(related, column) }}
                   </button>
+                  <span v-else>loading...</span>
                 </span>
               </span>
               <!-- if column is read only - read only is overruled if there is an overlay -->
@@ -116,7 +116,7 @@ export default {
     return {
       // defined here so the template can use it
       config: config,
-      old: this.localstore.state.getCollection(this.type).get(this.id, true),
+      old: this.localstore.state.getEntry(this.type, this.id),
     }
   },
   computed: {
@@ -127,7 +127,7 @@ export default {
       return this.localstore.state.getCollection(this.type)
     },
     entry() {
-      return this.collection.get(this.id)
+      return this.localstore.state.getEntry(this.type, this.id)
     },
 
     // boolean to determine if there are overlays to be displayed
@@ -271,6 +271,10 @@ export default {
           inputs[0].focus()
         }
       })
+    },
+    getRelatedItem(related, column) {
+      const entry = this.localstore.state.getEntry(related.type, related.id)
+      return entry && entry[column.split('.')[1]]
     },
   },
 }

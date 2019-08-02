@@ -30,6 +30,10 @@ export default class Collection {
     if (this.options.previewOrder === undefined) {
       this.options.previewOrder = this.columnNames
     }
+
+    if (this.options.show === undefined) {
+      this.options.show = true
+    }
   }
 
   get globalstore() {
@@ -68,7 +72,7 @@ export default class Collection {
     // if it isn't in the search results, add it from the store
     let entry = this.searchResults[id]
     if (entry == undefined) {
-      entry = this.deep(this.getEntriesFromStore()[id])
+      entry = this.deep(this.localstore.state.getEntry(this.name, id))
     }
     return deep ? this.deep(entry) : entry
   }
@@ -89,6 +93,7 @@ export default class Collection {
   // returns a list of deeply copied entries from the _jv store that match the search
   filter(search) {
     if (search === '') return {}
+    if (this.options.show === false) return {}
 
     const storeEntries = this.getEntriesFromStore()
 
@@ -191,20 +196,21 @@ export default class Collection {
         // special case for relationship column
         if (column.includes('.')) {
           const relCollection = column.split('.')[0]
-          const relatedItems = this.get(id)[relCollection]
-          const itemCount = Object.keys(relatedItems).length
+          const relatedItems = this.get(id)._jv.relationships[relCollection]
+            .data
+          const itemCount = relatedItems.length
 
           // 0 items
           if (itemCount == 0) return '-'
 
           // 1 item
           if (itemCount == 1) {
-            const relatedItem = relatedItems[Object.keys(relatedItems)[0]]
-            const relatedColumn = column.split('.')[1]
-            const relatedEntry = this.globalstore.getters['jv/get'](
-              relatedItem._jv.type
-            )[relatedItem._jv.id]
-            return relatedEntry[relatedColumn]
+            const relatedItem = relatedItems[0]
+            const entry = this.globalstore.getters['jv/get'](
+              relatedItem.type + '/' + relatedItem.id
+            )
+            if (Object.keys(entry).length === 0) return '1 item...'
+            return entry[column.split('.')[1]]
           }
 
           // many items
@@ -221,6 +227,7 @@ export default class Collection {
   }
 
   deep(object) {
+    if (object === undefined) return {}
     return JSON.parse(JSON.stringify(object))
   }
 }

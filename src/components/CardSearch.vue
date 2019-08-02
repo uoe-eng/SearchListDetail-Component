@@ -55,10 +55,3 @@ export default {
   },
 }
 </script>
-
-<style scoped>
-#card-search {
-  max-width: var(--card-width);
-  overflow-y: auto;
-}
-</style>
