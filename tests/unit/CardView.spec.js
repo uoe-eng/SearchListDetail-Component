@@ -14,7 +14,8 @@ describe('CardView.vue', function() {
     getPeopleAliasStub,
     getPersonStub,
     getCatStub,
-    getCatAliasStub
+    getCatAliasStub,
+    getEntryStub
 
   beforeEach(function() {
     localVue = createLocalVue()
@@ -26,30 +27,28 @@ describe('CardView.vue', function() {
     getPeopleAliasStub.withArgs('last_name').returns('Surname')
     getPeopleAliasStub.withArgs('cat_name').returns('Cat Name')
 
-    getPersonStub = sinon.stub()
-    getPersonStub.withArgs('1').returns({
-      first_name: 'Alice',
-      last_name: 'Smith',
-      cat_name: 'Ella',
-    })
-    getPersonStub.withArgs('2').returns({
-      first_name: 'Bob',
-      last_name: 'Smithers',
-      cat_name: 'Felix',
-    })
-    getPersonStub.withArgs('3').returns({
-      first_name: 'Charlie',
-      last_name: 'Smithson',
-      cat_name: 'Felix',
-    })
-
     getCatAliasStub = sinon.stub()
     getCatAliasStub.withArgs('name').returns('Name')
     getCatAliasStub.withArgs('owners.first_name').returns('Owners')
     getCatAliasStub.withArgs('siblings.name').returns('Siblings')
 
-    getCatStub = sinon.stub()
-    getCatStub.withArgs('1').returns({
+    getEntryStub = sinon.stub()
+    getEntryStub.withArgs('people', '1').returns({
+      first_name: 'Alice',
+      last_name: 'Smith',
+      cat_name: 'Ella',
+    })
+    getEntryStub.withArgs('people', '2').returns({
+      first_name: 'Bob',
+      last_name: 'Smithers',
+      cat_name: 'Felix',
+    })
+    getEntryStub.withArgs('people', '3').returns({
+      first_name: 'Charlie',
+      last_name: 'Smithson',
+      cat_name: 'Felix',
+    })
+    getEntryStub.withArgs('cats', '1').returns({
       name: 'Ella',
       _jv: {
         relationships: {
@@ -62,7 +61,7 @@ describe('CardView.vue', function() {
         },
       },
     })
-    getCatStub.withArgs('2').returns({
+    getEntryStub.withArgs('cats', '2').returns({
       name: 'Felix',
       _jv: {
         relationships: {
@@ -88,6 +87,7 @@ describe('CardView.vue', function() {
         sldProp: {
           firstAttrAsCardTitle: false,
         },
+        getEntry: getEntryStub,
         collections: [
           {
             name: 'people',
@@ -115,7 +115,6 @@ describe('CardView.vue', function() {
           {
             name: 'cats',
             columnNames: ['name', 'owners.first_name', 'siblings.name'],
-            get: getCatStub,
             getAlias: getCatAliasStub,
             options: {
               columns: [
@@ -436,7 +435,7 @@ describe('CardView.vue', function() {
       expect(spy.getCall(0).args).to.deep.equal(['cats'])
       // on close, search result is reset to the old value
       expect(store.state.collections[1].searchResults).to.deep.equal({
-        '1': getCatStub('1'),
+        '1': getEntryStub('cats', '1'),
       })
     }, 0)
   })
