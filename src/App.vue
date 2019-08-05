@@ -56,6 +56,9 @@
                 name: 'email_address',
                 alias: 'Email',
               },
+              {
+                name: 'person.preferred_name',
+              },
             ],
           },
           {

@@ -93,7 +93,7 @@ export default new Vuex.Store({
       const fetchRelationships = () => {
         if (state.pendingRequests !== 0) {
           console.log('short search not complete yet...')
-          setTimeout(fetchRelationships, config.LONG_SEARCH_TIMEOUT)
+          setTimeout(fetchRelationships, 0)
           return
         }
         console.log('long search')

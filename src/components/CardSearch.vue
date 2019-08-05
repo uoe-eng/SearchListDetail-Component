@@ -60,7 +60,7 @@ export default {
           noResults = false
         }
       })
-      return noResults
+      return noResults && this.localstore.state.pendingRequests === 0
     },
   },
 }

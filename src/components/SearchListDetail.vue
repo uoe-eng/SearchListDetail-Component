@@ -1,22 +1,22 @@
 <template>
   <div id="sld" ref="sld">
     <SearchBox :localstore="localstore" ref="searchbox"></SearchBox>
+    <label v-if="search">
+      <input type="checkbox" @click="toggleMobile" />
+      Mobile version
+    </label>
     <AdvancedSearch
       v-if="page"
       :localstore="localstore"
       ref="advsearch"
     ></AdvancedSearch>
-    <!-- <span v-if="localstore.state.pendingRequests > 0">searching... {{ localstore.state.pendingRequests }}</span> -->
     <NavBar
       v-if="search != ''"
       :displayResultCount="options.countResults"
       :localstore="localstore"
       ref="navbar"
     ></NavBar>
-    <label v-if="search">
-      <input type="checkbox" @click="toggleMobile" />
-      Mobile version
-    </label>
+    <span v-if="localstore.state.pendingRequests > 0">Loading...</span>
     <CardSearch
       v-if="page == config.ALL_PAGE_NAME && search"
       :localstore="localstore"
