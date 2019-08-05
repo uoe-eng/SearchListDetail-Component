@@ -12,7 +12,8 @@ export default {
   DEFAULT_CASE_SENSITIVE: false,
   DEFAULT_SEARCH_OPERATOR: 'contains',
   ADV_SEARCH_COLLECTION_TITLE_PREPEND: 'Collection: ',
-  SEARCH_TIMEOUT: 1000,
+  SHORT_SEARCH_TIMEOUT: 500,
+  LONG_SEARCH_TIMEOUT: 2000,
   SEARCH_OPERATORS: {
     contains: (value, search) => {
       return value.includes(search)
@@ -40,5 +41,5 @@ export default {
     endsWith: (search) => {
       return '*' + search
     },
-  }
+  },
 }

@@ -1,5 +1,6 @@
 <template>
   <div id="card-search">
+    <span v-if="noResults()">No results :(</span>
     <div v-for="collection of collectionsToShow" :key="collection.name">
       <div v-for="(entry, id) of collection.searchResults" :key="id">
         <CardView
@@ -51,6 +52,15 @@ export default {
   methods: {
     isExpanded(id, collection) {
       return id == this.expanded.id && collection.name == this.expanded.type
+    },
+    noResults() {
+      let noResults = true
+      this.collectionsToShow.forEach((collection) => {
+        if (Object.keys(collection.searchResults).length !== 0) {
+          noResults = false
+        }
+      })
+      return noResults
     },
   },
 }

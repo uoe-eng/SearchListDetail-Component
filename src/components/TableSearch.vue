@@ -38,6 +38,9 @@ export default {
     type: String,
   },
   computed: {
+    searchTerm() {
+      return this.localstore.state.search
+    },
     collections() {
       return this.localstore.state.collections
     },
@@ -82,6 +85,7 @@ export default {
     },
   },
   created() {
+    this.localstore.state.populateTables = () => this.populateTables()
     this.populateTables()
     this.addHooks()
   },
@@ -108,7 +112,7 @@ export default {
 
     // add data, meta, and hooks to each table
     populateTables() {
-      // console.debug('populating tables...')
+      console.log('populating tables...')
       // wait for the next tick when the table is loaded into the DOM
       this.$nextTick(() => {
         // stop if the tables don't exist (for example in mobile view)

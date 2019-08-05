@@ -1,12 +1,12 @@
 <template>
-  <div id="sld">
+  <div id="sld" ref="sld">
     <SearchBox :localstore="localstore" ref="searchbox"></SearchBox>
     <AdvancedSearch
       v-if="page"
       :localstore="localstore"
       ref="advsearch"
     ></AdvancedSearch>
-    <span v-if="localstore.state.pendingRequests > 0">searching...</span>
+    <!-- <span v-if="localstore.state.pendingRequests > 0">searching... {{ localstore.state.pendingRequests }}</span> -->
     <NavBar
       v-if="search != ''"
       :displayResultCount="options.countResults"

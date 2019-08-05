@@ -22,12 +22,12 @@ export default new Vuex.Store({
     },
     getEntry: function(type, id) {
       const entry = this.globalstore().getters['jv/get'](type)[id]
-      if (entry === undefined) {
-        console.log('GETTING', type + '/' + id)
-        setTimeout(() => {
-          this.globalstore().dispatch('jv/get', type + '/' + id)
-        }, 0)
-      }
+      // if (entry === undefined) {
+      //   console.log('GETTING', type + '/' + id)
+      //   setTimeout(() => {
+      //     this.globalstore().dispatch('jv/get', type + '/' + id)
+      //   }, 0)
+      // }
       return entry
     },
     search: '',
@@ -36,25 +36,26 @@ export default new Vuex.Store({
     globalstore: () => {},
     pendingRequests: 0,
     searchTimeout: null,
+    populateTables: () => {},
   },
   mutations: {
     setPage(state, page) {
       Vue.set(state, 'page', page)
     },
     updateSearchResults(state) {
-
       const fetchEntries = () => {
+        console.log('short search')
         // for each collection, filter the results from the store and put them into
         // the .searchResults attribute
         state.collections.forEach((collection) => {
           if (collection.options.show === false) return
-  
+
           // do a quick filter in case no columns are ticked
           const results = collection.filter(state.search)
           Vue.set(collection, 'searchResults', state.search ? results : {})
-  
+
           if (state.search === '') return
-  
+
           collection.options.columns.forEach((column) => {
             fetchEntry(collection, column)
           })
@@ -76,32 +77,42 @@ export default new Vuex.Store({
               },
             },
           ]
-        ).then((data) => {
+        ).then(() => {
           const results = collection.filter(state.search)
           Vue.set(collection, 'searchResults', state.search ? results : {})
+          state.populateTables()
 
           state.pendingRequests--
           // if this is the last request to finish
           if (state.pendingRequests === 0) {
-            fetchRelationships(data)
+            // fetchRelationships()
           }
         })
       }
 
-      const fetchRelationships = (lastEntry) => {
+      const fetchRelationships = () => {
+        if (state.pendingRequests !== 0) {
+          console.log('short search not complete yet...')
+          setTimeout(fetchRelationships, config.LONG_SEARCH_TIMEOUT)
+          return
+        }
+        console.log('long search')
         // fetch relationships for all columns
         state.collections.forEach((collection) => {
           if (collection.options.show === false) return
 
-          const anyEntry = collection.searchResults[Object.keys(lastEntry)[0]]
+          const resultKeys = Object.keys(collection.searchResults)
+          if (resultKeys.length === 0) return
+
+          const anyEntry = collection.searchResults[resultKeys[0]]
           const relationships = Object.keys(anyEntry._jv.relationships)
-          console.log('last request!', relationships)
           collection.options.columns.forEach((column) => {
             fetchRelationship(collection, column, relationships)
           })
         })
       }
 
+      // prettier-ignore
       const fetchRelationship = (collection, column, relationships) => {
         state.pendingRequests++
         state.globalstore().dispatch(
@@ -114,15 +125,26 @@ export default new Vuex.Store({
                 include: relationships.join(','),
               },
             },
-          ]
+          ],
         ).then(() => {
           state.pendingRequests--
           const results = collection.filter(state.search)
           Vue.set(collection, 'searchResults', state.search ? results : {})
+          state.populateTables()
         })
       }
 
-      fetchEntries()
+      clearTimeout(state.shortSearchTimeout)
+      state.shortSearchTimeout = setTimeout(
+        fetchEntries,
+        config.SHORT_SEARCH_TIMEOUT
+      )
+
+      clearTimeout(state.longSearchTimeout)
+      state.longSearchTimeout = setTimeout(
+        fetchRelationships,
+        config.LONG_SEARCH_TIMEOUT
+      )
     },
   },
   actions: {
@@ -131,7 +153,7 @@ export default new Vuex.Store({
       context.commit('updateSearchResults')
     },
     setPage(context, page) {
-      // console.debug('setting page', page)
+      console.debug('setting page', page)
       context.commit('setPage', null)
       context.state.nextTick(() => {
         context.commit('setPage', page)

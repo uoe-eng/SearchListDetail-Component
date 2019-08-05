@@ -33,7 +33,11 @@
                 alias: 'UUN',
               },
             ],
-            previewOrder: ['preferred_name', 'family_name'],
+            previewOrder: [
+              'preferred_name',
+              'family_name',
+              'email_addresses.email_address',
+            ],
           },
           {
             name: 'phone_numbers',
