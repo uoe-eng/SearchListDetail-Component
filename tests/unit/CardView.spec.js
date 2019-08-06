@@ -12,8 +12,6 @@ describe('CardView.vue', function() {
     catCard,
     getCollectionStub,
     getPeopleAliasStub,
-    getPersonStub,
-    getCatStub,
     getCatAliasStub,
     getEntryStub
 
@@ -92,7 +90,6 @@ describe('CardView.vue', function() {
           {
             name: 'people',
             columnNames: ['first_name', 'last_name', 'cat_name'],
-            get: getPersonStub,
             getAlias: getPeopleAliasStub,
             options: {
               columns: [

@@ -65,9 +65,9 @@ describe('Collection.js', function() {
       3: {
         name: 'Gelard',
       },
-    }
+    },
   }
-  
+
   let collection,
     updateSearchResultsSpy,
     jvPatchSpy,
