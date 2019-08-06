@@ -130,14 +130,16 @@ describe('SearchListDetail.vue', function() {
   })
 
   it('shows only search box and advanced search initially', function() {
-    expect(Object.keys(wrapper.vm.$refs).length).to.equal(2)
+    expect(Object.keys(wrapper.vm.$refs).length).to.equal(3)
+    expect(wrapper.vm.$refs.sld).to.exist
     expect(wrapper.vm.$refs.searchbox).to.exist
     expect(wrapper.vm.$refs.advsearch).to.exist
   })
 
   it('shows a navbar and CardSearch with a search', function() {
     Vue.set(wrapper.vm.localstore.state, 'search', 's')
-    expect(Object.keys(wrapper.vm.$refs).length).to.equal(4)
+    expect(Object.keys(wrapper.vm.$refs).length).to.equal(5)
+    expect(wrapper.vm.$refs.sld).to.exist
     expect(wrapper.vm.$refs.searchbox).to.exist
     expect(wrapper.vm.$refs.advsearch).to.exist
     expect(wrapper.vm.$refs.navbar).to.exist
@@ -173,11 +175,5 @@ describe('SearchListDetail.vue', function() {
     expect(wrapper.vm.localstore.state.expansionState).to.deep.equal(
       new ExpansionState(['people', 'cats'])
     )
-  })
-
-  it('calls jv/get for each of the collections', function() {
-    expect(dispatchSpy.callCount).to.equal(2)
-    expect(dispatchSpy.getCall(0).args).to.deep.equal(['jv/get', 'people'])
-    expect(dispatchSpy.getCall(1).args).to.deep.equal(['jv/get', 'cats'])
   })
 })
