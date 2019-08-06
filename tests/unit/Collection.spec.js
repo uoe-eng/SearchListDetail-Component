@@ -3,6 +3,71 @@ import Collection from '@/components/Collection'
 import sinon from 'sinon'
 
 describe('Collection.js', function() {
+  const database = {
+    people: {
+      1: {
+        first_name: 'Alice',
+        last_name: 'Smith',
+        _jv: {
+          relationships: {
+            cats: { data: [] },
+          },
+        },
+      },
+      2: {
+        first_name: 'Bob',
+        last_name: 'Smithers',
+        _jv: {
+          relationships: {
+            cats: {
+              data: [{ type: 'cats', id: 1 }],
+            },
+          },
+        },
+      },
+      3: {
+        first_name: 'Charlie',
+        last_name: 'Smithson',
+        _jv: {
+          relationships: {
+            cats: {
+              data: [
+                {
+                  type: 'cats',
+                  id: 1,
+                },
+                {
+                  type: 'cats',
+                  id: 2,
+                },
+              ],
+            },
+          },
+        },
+      },
+      4: {
+        first_name: 'David',
+        last_name: 'Smith',
+        _jv: {
+          relationships: {
+            cats: { data: [] },
+          },
+        },
+      },
+    },
+    cats: {
+      1: {
+        name: 'Ella',
+      },
+      2: {
+        name: 'Felix',
+      },
+      3: {
+        name: 'Gelard',
+      },
+    }
+  }
+  
   let collection,
     updateSearchResultsSpy,
     jvPatchSpy,
@@ -29,54 +94,20 @@ describe('Collection.js', function() {
     jvGetStub = sinon.stub()
     jvGetStub.withArgs('people').callsFake(() => {
       jvGetSpy()
-      return {
-        1: {
-          first_name: 'Alice',
-          last_name: 'Smith',
-          cats: {},
-        },
-        2: {
-          first_name: 'Bob',
-          last_name: 'Smithers',
-          cats: {
-            1: {
-              name: 'Ella',
-            },
-          },
-        },
-        3: {
-          first_name: 'Charlie',
-          last_name: 'Smithson',
-          cats: {
-            1: {
-              name: 'Ella',
-            },
-            2: {
-              name: 'Felix',
-            },
-          },
-        },
-        4: {
-          first_name: 'David',
-          last_name: 'Smith',
-          cats: {},
-        },
-      }
+      return database.people
     })
+    jvGetStub.withArgs('people/1').callsFake(() => jvGetStub('people')[1])
+    jvGetStub.withArgs('people/2').callsFake(() => jvGetStub('people')[2])
+    jvGetStub.withArgs('people/3').callsFake(() => jvGetStub('people')[3])
+    jvGetStub.withArgs('people/4').callsFake(() => jvGetStub('people')[4])
+
     jvGetStub.withArgs('cats').callsFake(() => {
       jvGetSpy()
-      return {
-        1: {
-          name: 'Ella',
-        },
-        2: {
-          name: 'Felix',
-        },
-        3: {
-          name: 'Gelard',
-        },
-      }
+      return database.cats
     })
+    jvGetStub.withArgs('cats/1').callsFake(() => jvGetStub('cats')[1])
+    jvGetStub.withArgs('cats/2').callsFake(() => jvGetStub('cats')[2])
+    jvGetStub.withArgs('cats/3').callsFake(() => jvGetStub('cats')[3])
 
     const sldProp = {
       name: 'people',
@@ -104,49 +135,15 @@ describe('Collection.js', function() {
 
     globalstore = {
       dispatch: jvPatchStub,
-      getters: {
-        'jv/get': jvGetStub,
-      },
+      getters: { 'jv/get': jvGetStub },
     }
 
     collection = new Collection(sldProp, localstore, globalstore)
 
     collection.searchResults = {
-      1: {
-        first_name: 'Alice',
-        last_name: 'Smith',
-        cats: {},
-      },
-      2: {
-        first_name: 'Bob',
-        last_name: 'Smithers',
-        cats: {
-          1: {
-            _jv: {
-              type: 'cats',
-              id: 1,
-            },
-          },
-        },
-      },
-      3: {
-        first_name: 'Charlie',
-        last_name: 'Smithson',
-        cats: {
-          1: {
-            _jv: {
-              type: 'cats',
-              id: 1,
-            },
-          },
-          2: {
-            _jv: {
-              type: 'cats',
-              id: 2,
-            },
-          },
-        },
-      },
+      1: database.people['1'],
+      2: database.people['2'],
+      3: database.people['3'],
     }
   })
 
@@ -182,6 +179,7 @@ describe('Collection.js', function() {
           },
         ],
         previewOrder: ['last_name', 'first_name'],
+        show: true,
       },
     }
     expect(collection.name).to.equal(expected.name)
@@ -220,11 +218,7 @@ describe('Collection.js', function() {
   })
 
   it('gets an entry from store when it is not in the search', function() {
-    expect(collection.get(4)).to.deep.equal({
-      first_name: 'David',
-      last_name: 'Smith',
-      cats: {},
-    })
+    expect(collection.get(4)).to.deep.equal(database.people['4'])
     expect(jvGetSpy.callCount).to.equal(1)
   })
 
@@ -239,72 +233,30 @@ describe('Collection.js', function() {
 
     expect(jvGetSpy.callCount).to.equal(0)
 
-    expect(collection.get(4, true)).to.deep.equal({
-      first_name: 'David',
-      last_name: 'Smith',
-      cats: {},
-    })
+    expect(collection.get(4, true)).to.deep.equal(database.people['4'])
     expect(jvGetSpy.callCount).to.equal(1)
   })
 
   it('filters entries from a simple search', function() {
     expect(collection.filter('l')).to.deep.equal({
-      1: {
-        first_name: 'Alice',
-        last_name: 'Smith',
-        cats: {},
-      },
-      3: {
-        first_name: 'Charlie',
-        last_name: 'Smithson',
-        cats: {
-          1: {
-            name: 'Ella',
-          },
-          2: {
-            name: 'Felix',
-          },
-        },
-      },
+      1: database.people['1'], // Alice
+      3: database.people['3'], // Charlie
     })
   })
 
   it('filters entries with case sensitive column options', function() {
     // first names are set to case sensitive so 'Alice' won't be matched by 'a'
     expect(collection.filter('a')).to.deep.equal({
-      3: {
-        first_name: 'Charlie',
-        last_name: 'Smithson',
-        cats: {
-          1: {
-            name: 'Ella',
-          },
-          2: {
-            name: 'Felix',
-          },
-        },
-      },
-      4: {
-        first_name: 'David',
-        last_name: 'Smith',
-        cats: {},
-      },
+      3: database.people['3'], // Charlie
+      4: database.people['4'], // David
     })
   })
 
   it('filters entries with different column search operators', function() {
     // surname is set to 'matching' search operator so e.g. 'Smithson' won't appear
     expect(collection.filter('smith')).to.deep.equal({
-      1: {
-        first_name: 'Alice',
-        last_name: 'Smith',
-        cats: {},
-      },
-      4: {
-        first_name: 'David',
-        last_name: 'Smith',
-        cats: {},
-      },
+      1: database.people['1'],
+      4: database.people['4'],
     })
   })
 

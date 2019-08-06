@@ -21,14 +21,13 @@ export default new Vuex.Store({
       return this.collections[index]
     },
     getEntry: function(type, id) {
-      const entry = this.globalstore().getters['jv/get'](type)[id]
+      return this.globalstore().getters['jv/get'](type + '/' + id)
       // if (entry === undefined) {
       //   console.log('GETTING', type + '/' + id)
       //   setTimeout(() => {
       //     this.globalstore().dispatch('jv/get', type + '/' + id)
       //   }, 0)
       // }
-      return entry
     },
     search: '',
     expandedAdvancedSearch: false,

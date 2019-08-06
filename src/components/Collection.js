@@ -64,6 +64,10 @@ export default class Collection {
     return alias
   }
 
+  getEntryFromStore(id) {
+    return this.globalstore.getters['jv/get'](this.name + '/' + id)
+  }
+
   getEntriesFromStore() {
     return this.globalstore.getters['jv/get'](this.name)
   }
@@ -72,7 +76,7 @@ export default class Collection {
     // if it isn't in the search results, add it from the store
     let entry = this.searchResults[id]
     if (entry == undefined) {
-      entry = this.deep(this.localstore.state.getEntry(this.name, id))
+      entry = this.deep(this.getEntryFromStore(id))
     }
     return deep ? this.deep(entry) : entry
   }
