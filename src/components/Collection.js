@@ -178,16 +178,17 @@ export default class Collection {
         // special case for relationship column
         if (column.includes('.')) {
           const relCollection = column.split('.')[0]
-          const relatedItems = this.get(id)._jv.relationships[relCollection]
-            .data
+          // could be array or object
+          const relatedItems = this.localstore.state.getEntry(this.name, id)._jv
+            .relationships[relCollection].data
           const itemCount = relatedItems.length
 
           // 0 items
-          if (itemCount == 0) return '-'
+          if (itemCount === 0) return '-'
 
           // 1 item
-          if (itemCount == 1) {
-            const relatedItem = relatedItems[0]
+          if (itemCount === 1 || itemCount === undefined) {
+            const relatedItem = relatedItems[0] || relatedItems
             const entry = this.globalstore.getters['jv/get'](
               relatedItem.type + '/' + relatedItem.id
             )

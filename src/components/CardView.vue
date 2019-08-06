@@ -5,6 +5,11 @@
     <div
       v-else
       class="sld-card-view"
+      @keydown="
+        (e) => {
+          handleKeyDown(e)
+        }
+      "
       :class="{
         pointer: !isExpanded,
         selected: expanded.id == id,
@@ -15,7 +20,9 @@
       <span class="subtitle">{{ type }} / {{ id }}</span>
       <form v-on:submit.prevent="handleSave">
         <table class="sld-card-view-details">
-          <tr v-for="(column, index) of columnsToShow" :key="column">
+          <!-- invisible element that can be tabbed to -->
+          <div tabindex="0" @focus="focusTop"></div>
+          <tr v-for="column of columnsToShow" :key="column">
             <td class="column">{{ collection.getAlias(column) }}:&nbsp;</td>
             <td class="value">
               <!-- if column is a relationship -->
@@ -26,6 +33,7 @@
                 >
                   <button
                     v-if="getRelatedItem(related, column)"
+                    ref="input"
                     @click="addOverlay(related.type, related.id)"
                     :class="{
                       relationship: isExpanded && !shouldShowOverlay,
@@ -42,17 +50,7 @@
                 {{ entry[column] }}
               </span>
               <!-- otherwise column is editable -->
-              <input
-                v-else
-                @keydown="
-                  (e) => {
-                    handleKeyDown(e, index)
-                  }
-                "
-                ref="input"
-                type="text"
-                v-model="entry[column]"
-              />
+              <input v-else ref="input" type="text" v-model="entry[column]" />
             </td>
           </tr>
         </table>
@@ -74,6 +72,8 @@
         >
           {{ config.SAVE_BUTTON_TEXT }}
         </span>
+        <!-- invisible element that can be tabbed to -->
+        <div tabindex="0" @focus="focusBottom"></div>
       </div>
     </div>
     <!-- child card for when there are overlays -->
@@ -239,25 +239,25 @@ export default {
       this.localstore.state.expansionState.removeOverlay(this.page)
     },
 
+    // when the top invisible element is tabbed to, focus the top table
+    focusTop() {
+      const table = this.localstore.state.topTableInstance
+      if (table === undefined) return
+      table.selectCell(table.countRows() - 1, table.countCols() - 1)
+    },
+
+    // when the bottom invisible element is tabbed to, focus the bottom table
+    focusBottom() {
+      const table = this.localstore.state.bottomTableInstance
+      if (table === undefined) return
+      table.selectCell(0, 0)
+    },
+
     // handles keypresses from the input boxes
-    handleKeyDown(e, index) {
-      const isFirst = index == 0
-      const isLast = index == this.collection.options.columns.length - 1
-      const isTabForward = e.key == 'Tab' && !e.shiftKey
-      const isTabBackward = e.key == 'Tab' && e.shiftKey
+    handleKeyDown(e) {
       const isEnter = e.key == 'Enter'
       const isEscape = e.key == 'Escape'
 
-      // tab out of the card upwards
-      if (isFirst && isTabBackward) {
-        e.preventDefault()
-        this.onTabOutUp()
-      }
-      // tab out of the card downwards
-      if (isLast && isTabForward) {
-        e.preventDefault()
-        this.onTabOutDown()
-      }
       if (isEnter) {
         this.handleSave()
       }

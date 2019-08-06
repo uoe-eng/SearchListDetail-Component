@@ -132,6 +132,9 @@ export default {
         this.tableData.topIDs.forEach((id, index) => {
           topTableInstance.setCellMeta(index, 0, 'id', id)
         })
+        // save the instance to the store so it can be used by other components
+        // (like when focusing from a card tab out)
+        this.localstore.state.topTableInstance = topTableInstance
 
         // exact same thing for the bottom table
         const bottomTableInstance = this.$refs.bottomTable.hotInstance
@@ -139,6 +142,7 @@ export default {
         this.tableData.bottomIDs.forEach((id, index) => {
           bottomTableInstance.setCellMeta(index, 0, 'id', id)
         })
+        this.localstore.state.bottomTableInstance = bottomTableInstance
 
         // sort the tables by the current sorting order
         topTableInstance

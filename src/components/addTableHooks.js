@@ -113,7 +113,7 @@ export default function addTableHooks(context) {
     const col = topTable.getSelected()[0][1]
     const isTopCorner = row == 0 && col == 0
     const isTabForward = e.key == 'Tab' && !e.shiftKey
-    if (isTopCorner && isTabForward && context.expandedID) {
+    if (isTopCorner && isTabForward && context.expanded.id) {
       topTable.deselectCell()
       firstInput.focus()
     }
@@ -127,7 +127,7 @@ export default function addTableHooks(context) {
     const col = bottomTable.getSelected()[0][1]
     const isTopCorner = row == 0 && col == 0
     const isTabBack = e.key == 'Tab' && e.shiftKey
-    if (isTopCorner && isTabBack && context.expandedID) {
+    if (isTopCorner && isTabBack && context.expanded.id) {
       e.preventDefault()
       bottomTable.deselectCell()
       // delay ensures the focus happens after all keypress events (hacky?)
@@ -153,7 +153,7 @@ export default function addTableHooks(context) {
     const isTopCorner = row == 0 && col == 0
     const isTabBack = e.key == 'Tab' && e.shiftKey
 
-    if (isTopCorner && isTabBack && context.expandedID) {
+    if (isTopCorner && isTabBack && context.expanded.id) {
       topTable.deselectCell()
 
       // delay ensures cell selection happens after all keypress events (hacky?)
@@ -175,7 +175,7 @@ export default function addTableHooks(context) {
     const col = bottomTable.getSelected()[0][1]
     const isTopCorner = row == 0 && col == 0
     const isTabForward = e.key == 'Tab' && !e.shiftKey
-    if (isTopCorner && isTabForward && context.expandedID) {
+    if (isTopCorner && isTabForward && context.expanded.id) {
       bottomTable.deselectCell()
       // select the first cell
       topTable.selectCell(0, 0)
