@@ -13,12 +13,14 @@ describe('CardView.vue', function() {
     getCollectionStub,
     getPeopleAliasStub,
     getCatAliasStub,
-    getEntryStub
+    getEntryStub,
+    patchSpy
 
   beforeEach(function() {
     localVue = createLocalVue()
     localVue.use(Vuex)
     getCollectionStub = sinon.stub()
+    patchSpy = sinon.spy()
 
     getPeopleAliasStub = sinon.stub()
     getPeopleAliasStub.withArgs('first_name').returns('First Name')
@@ -86,6 +88,7 @@ describe('CardView.vue', function() {
           firstAttrAsCardTitle: false,
         },
         getEntry: getEntryStub,
+        cleanEntry: (entry) => entry,
         collections: [
           {
             name: 'people',
@@ -135,6 +138,7 @@ describe('CardView.vue', function() {
       },
       actions: {
         setPage: () => {},
+        patch: patchSpy,
       },
     })
 
@@ -444,16 +448,12 @@ describe('CardView.vue', function() {
     const removeOverlaySpy = sinon.spy()
     store.state.expansionState.removeOverlay = removeOverlaySpy
 
-    const patchSpy = sinon.spy()
-    store.state.collections[1].patch = patchSpy
-
     catCard.find('.save').trigger('click')
 
     expect(removeOverlaySpy.callCount).to.equal(1)
     expect(removeOverlaySpy.getCall(0).args).to.deep.equal(['cats'])
 
     expect(patchSpy.callCount).to.equal(1)
-    expect(patchSpy.getCall(0).args).to.deep.equal(['1'])
   })
 
   it('does not write an entry to searchResults on card close if the result does not already exist (bugfix)', function() {

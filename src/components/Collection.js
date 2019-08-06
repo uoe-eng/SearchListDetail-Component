@@ -44,15 +44,6 @@ export default class Collection {
     return this.options.columns.map((column) => column.name)
   }
 
-  // patches an entry to the server
-  patch(id) {
-    // console.debug('patching search result with id', id)
-    const entry = this.getClean(id)
-    this.globalstore.dispatch('jv/patch', entry).then(() => {
-      this.localstore.dispatch('updateSearchResults')
-    })
-  }
-
   // returns the alias for a given column if one is specified, else return column name
   getAlias(columnName) {
     let alias
@@ -79,19 +70,6 @@ export default class Collection {
       entry = this.deep(this.getEntryFromStore(id))
     }
     return deep ? this.deep(entry) : entry
-  }
-
-  // get a version (reference) of a search result without any of the relationships by id
-  getClean(id) {
-    const entry = this.get(id)
-    let clean = {
-      _jv: entry._jv,
-    }
-    Object.keys(entry).forEach((column) => {
-      if (typeof entry[column] === 'object') return
-      clean[column] = entry[column]
-    })
-    return clean
   }
 
   // returns a list of deeply copied entries from the _jv store that match the search

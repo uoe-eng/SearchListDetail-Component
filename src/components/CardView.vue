@@ -232,7 +232,10 @@ export default {
 
       // v-model will already update the values of the entry in the search results
       // so just call a patch which will use the updated values in the search results
-      this.collection.patch(this.id)
+      this.localstore.dispatch(
+        'patch',
+        this.localstore.state.cleanEntry(this.entry)
+      )
       this.localstore.state.expansionState.removeOverlay(this.page)
     },
 

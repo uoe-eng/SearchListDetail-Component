@@ -8,6 +8,13 @@ export default new Vuex.Store({
   state: {
     page: config.ALL_PAGE_NAME,
     collections: [],
+    search: '',
+    expandedAdvancedSearch: false,
+    sldProp: {},
+    pendingRequests: 0,
+    searchTimeout: null,
+    globalstore: () => {},
+    populateTables: () => {},
     getCollection: function(name) {
       const collectionNames = this.collections.map((c) => c.name)
       const index = collectionNames.indexOf(name)
@@ -20,22 +27,26 @@ export default new Vuex.Store({
       }
       return this.collections[index]
     },
-    getEntry: function(type, id) {
-      return this.globalstore().getters['jv/get'](type + '/' + id)
-      // if (entry === undefined) {
-      //   console.log('GETTING', type + '/' + id)
-      //   setTimeout(() => {
-      //     this.globalstore().dispatch('jv/get', type + '/' + id)
-      //   }, 0)
-      // }
+    cleanEntry: function(entry) {
+      let clean = {
+        _jv: entry._jv,
+      }
+      Object.keys(entry).forEach((column) => {
+        if (typeof entry[column] === 'object') return
+        clean[column] = entry[column]
+      })
+      return clean
     },
-    search: '',
-    expandedAdvancedSearch: false,
-    sldProp: {},
-    globalstore: () => {},
-    pendingRequests: 0,
-    searchTimeout: null,
-    populateTables: () => {},
+    getEntry: function(type, id) {
+      const storeEntry = this.globalstore().getters['jv/get'](type + '/' + id)
+      const collection = this.getCollection(type)
+      if (collection === undefined) return storeEntry
+
+      const searchResult = collection.searchResults[id]
+      if (searchResult === undefined) return storeEntry
+
+      return searchResult
+    },
   },
   mutations: {
     setPage(state, page) {
@@ -147,6 +158,14 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    patch(context, entry) {
+      context.state
+        .globalstore()
+        .dispatch('jv/patch', entry)
+        .then(() => {
+          context.dispatch('updateSearchResults')
+        })
+    },
     updateSearchResults(context) {
       // console.debug('updating search results')
       context.commit('updateSearchResults')

@@ -16,7 +16,7 @@
       :localstore="localstore"
       ref="navbar"
     ></NavBar>
-    <span v-if="localstore.state.pendingRequests > 0">Loading...</span>
+    <!-- <span v-if="localstore.state.pendingRequests > 0">Loading...</span> -->
     <CardSearch
       v-if="page == config.ALL_PAGE_NAME && search"
       :localstore="localstore"

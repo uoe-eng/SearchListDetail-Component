@@ -39,10 +39,13 @@ export default function addTableHooks(context) {
     const colName = collection.fromCoordinates(row, col).col
 
     // set the value for the entry in the search results
-    collection.get(id)[colName] = newValue
+    collection.searchResults[id][colName] = newValue
 
     // patch up to the server
-    collection.patch(id)
+    context.localstore.dispatch(
+      'patch',
+      context.localstore.state.cleanEntry(collection.searchResults[id])
+    )
   }
 
   const afterChangeTop = (change) => {

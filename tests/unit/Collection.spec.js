@@ -189,18 +189,6 @@ describe('Collection.js', function() {
     expect(collection.options).to.deep.equal(expected.options)
   })
 
-  it('patches a record to the store and updates the store', function() {
-    collection.getClean = sinon.stub()
-    collection.getClean.withArgs('42').returns('this is an entry')
-    collection.patch('42')
-    expect(jvPatchSpy.args[0]).to.deep.equal(['jv/patch', 'this is an entry'])
-    expect(updateSearchResultsSpy.callCount).to.be.equal(1)
-    // set timeout because the async promise needs to be resolved first
-    // setTimeout(() => {
-    //   expect(updateSearchResultsSpy.callCount).to.be.equal(1)
-    // }, 0)
-  })
-
   it('provides the alias for a column', function() {
     expect(collection.getAlias('first_name')).to.equal('First Name')
     expect(collection.getAlias('last_name')).to.equal('Surname')
