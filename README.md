@@ -28,11 +28,14 @@
 * Can specify an alias for a column (eg. to show "First Name" instead of "preferred_name")
 * Multiple SLD components can be used at the same time (vuex stores are separated)
 * 70+ unit tests covering almost all files
+* A related entry's collection needs to be specified, but it can be hidden from search
+* Results are fetched with a filter on the server side based on user input
+* Relationships for results are fetched if (2) seconds has passed AND if the quick search is completed
 
 ## Next steps
 * Keyboard navigation for switching tabs
-* Filter results on server
-* Can specifty which collections are displayed in search
+* Add buttons to link and unlink relationships
+* Allow complex relationships to be specified in the component prop (more than one dot away)
 
 ## Project setup
 ```
