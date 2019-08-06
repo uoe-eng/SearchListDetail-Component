@@ -26,6 +26,9 @@ describe('NavBar.vue', function() {
               '3': '',
               '4': '',
             },
+            options: {
+              show: true,
+            },
           },
           {
             name: 'phone_numbers',
@@ -34,10 +37,16 @@ describe('NavBar.vue', function() {
               '1': '',
               '2': '',
             },
+            options: {
+              show: true,
+            },
           },
           {
             name: 'emails',
             searchResults: {},
+            options: {
+              show: true,
+            },
           },
         ],
       },
