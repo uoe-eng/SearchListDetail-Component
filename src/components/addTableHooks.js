@@ -101,9 +101,15 @@ export default function addTableHooks(context) {
   // hook for tabbing from the table into the card
   // array of input boxes from the card
 
-  const inputs = context.$refs.cardview && context.$refs.cardview.$refs.input
-  const firstInput = inputs && inputs[0]
-  const lastInput = inputs && inputs[inputs.length - 1]
+  const lastInput = () => {
+    const inputs = context.$refs.cardview && context.$refs.cardview.$refs.input
+    return inputs && inputs[inputs.length - 1]
+  }
+
+  const firstInput = () => {
+    const inputs = context.$refs.cardview && context.$refs.cardview.$refs.input
+    return inputs && inputs[0]
+  }
 
   const tableToCardTop = (e) => {
     if (!topTable.getSelected()) {
@@ -115,7 +121,7 @@ export default function addTableHooks(context) {
     const isTabForward = e.key == 'Tab' && !e.shiftKey
     if (isTopCorner && isTabForward && context.expanded.id) {
       topTable.deselectCell()
-      firstInput.focus()
+      firstInput().focus()
     }
   }
 
@@ -132,7 +138,7 @@ export default function addTableHooks(context) {
       bottomTable.deselectCell()
       // delay ensures the focus happens after all keypress events (hacky?)
       setTimeout(() => {
-        lastInput.focus()
+        lastInput().focus()
       }, 0)
     }
   }

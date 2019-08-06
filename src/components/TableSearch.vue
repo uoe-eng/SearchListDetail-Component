@@ -9,8 +9,6 @@
       :expanded="expanded"
       :isReadOnly="false"
       :isExpanded="true"
-      :onTabOutUp="onTabOutUp"
-      :onTabOutDown="onTabOutDown"
       ref="cardview"
       class="expanded-card"
     ></CardView>
@@ -95,21 +93,6 @@ export default {
     // this.$refs.bottomTable.hotInstance.render()
   },
   methods: {
-    // select the end of the top table
-    onTabOutUp() {
-      setTimeout(() => {
-        const topTable = this.$refs.topTable.hotInstance
-        topTable.selectCell(topTable.countRows() - 1, topTable.countCols() - 1)
-      }, 0)
-    },
-
-    // select the start of the bottom table
-    onTabOutDown() {
-      setTimeout(() => {
-        this.$refs.bottomTable.hotInstance.selectCell(0, 0)
-      }, 0)
-    },
-
     // add data, meta, and hooks to each table
     populateTables() {
       // console.log('populating tables...')
@@ -173,6 +156,14 @@ export default {
       const id = tableInstance.getCellMeta(row, column).id
       // this.expandCard(this.collection.type, id, this.collection.type)
       this.localstore.state.expansionState.setExpanded(this.type, this.type, id)
+      setTimeout(() => {
+        const firstInput = () => {
+          const cardview = this.$refs.cardview
+          const inputs = cardview && cardview.$refs.input
+          return inputs && inputs[0]
+        }
+        firstInput().focus()
+      }, 0)
     },
   },
   components: {

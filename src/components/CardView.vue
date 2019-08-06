@@ -101,14 +101,6 @@ export default {
     id: String, // id of entry in collection
     isReadOnly: Boolean,
     isExpanded: Boolean,
-    onTabOutUp: {
-      type: Function,
-      default: () => {},
-    },
-    onTabOutDown: {
-      type: Function,
-      default: () => {},
-    },
     // must stay as prop (not in store) since the value is modified in a recursive call
     expanded: Object,
   },
@@ -170,10 +162,6 @@ export default {
       }
     },
   },
-  // focus on the first input box when the card is created
-  created() {
-    this.focusFirstInputBox()
-  },
   methods: {
     // creates a child card on top of this
     addOverlay(type, id) {
@@ -224,6 +212,7 @@ export default {
         }
         // remove the top child card
         this.localstore.state.expansionState.removeOverlay(this.page)
+        this.localstore.state.topTableInstance.selectCell(0, 0)
       }, 0)
     },
     handleSave() {
@@ -264,16 +253,6 @@ export default {
       if (isEscape) {
         this.handleClose()
       }
-    },
-    focusFirstInputBox() {
-      // wait for the card to load into the DOM
-      this.$nextTick(() => {
-        // grab a list of dom elements
-        const inputs = this.$refs.input
-        if (inputs && inputs.length > 0) {
-          inputs[0].focus()
-        }
-      })
     },
     getRelatedItem(related, column) {
       const entry = this.localstore.state.getEntry(related.type, related.id)
