@@ -23,7 +23,7 @@
           <!-- invisible element that can be tabbed to -->
           <div tabindex="0" @focus="focusTop"></div>
           <tr v-for="column of columnsToShow" :key="column">
-            <td class="column">{{ collection.getAlias(column) }}:&nbsp;</td>
+            <td class="column">{{ getAlias(column) }}:&nbsp;</td>
             <td class="value">
               <!-- if column is a relationship -->
               <span v-if="column.includes('.')">
@@ -92,6 +92,7 @@
 
 <script>
 import config from './config'
+import util from './util'
 
 export default {
   name: 'CardView',
@@ -108,7 +109,7 @@ export default {
     return {
       // defined here so the template can use it
       config: config,
-      old: this.localstore.state.getEntry(this.type, this.id),
+      old: util.getEntry(this.$store, this.type, this.id),
     }
   },
   computed: {
@@ -116,10 +117,10 @@ export default {
       return this.localstore.state.page
     },
     collection() {
-      return this.localstore.state.getCollection(this.type)
+      return util.getCollection(this.localstore, this.type)
     },
     entry() {
-      return this.localstore.state.getEntry(this.type, this.id)
+      return util.getEntry(this.$store, this.type, this.id)
     },
 
     // boolean to determine if there are overlays to be displayed
@@ -161,6 +162,14 @@ export default {
         return columnsToShow
       }
     },
+
+    topTable() {
+      return this.localstore.state.topTableInstance
+    },
+
+    bottomTable() {
+      return this.localstore.state.bottomTableInstance
+    },
   },
   methods: {
     // creates a child card on top of this
@@ -170,17 +179,16 @@ export default {
       this.localstore.state.expansionState.addOverlay(this.page, type, id)
     },
 
+    getAlias(column) {
+      return util.getColumnAlias(this.collection, column)
+    },
+
     // returns an array of {id, type} for the related entries of this card
-    getRelationships(relColumn) {
-      const relName = relColumn.split('.')[0]
-      if (!this.entry._jv.relationships) return []
-      const relData = this.entry._jv.relationships[relName].data
-      if (Array.isArray(relData)) {
-        return relData
-      } else {
-        // relData is not put in an array if there is only one
-        return [relData]
-      }
+    getRelationships(relationshipColumn) {
+      return util.getRelatedEntries(
+        util.getEntry(this.$store, this.type, this.id),
+        relationshipColumn
+      )
     },
 
     handleClick() {
@@ -205,14 +213,9 @@ export default {
       if (this.shouldShowOverlay) return
       // settimeout to let the click event finish, so it won't reclick when closed
       setTimeout(() => {
-        // overwrite the search result with the old result since changed don't want to be saved
-        // but, if it does not exist in the search results, don't accidentally create a new result
-        if (this.collection.searchResults[this.id] !== undefined) {
-          this.collection.searchResults[this.id] = this.old
-        }
         // remove the top child card
         this.localstore.state.expansionState.removeOverlay(this.page)
-        this.localstore.state.topTableInstance.selectCell(0, 0)
+        this.topTable && this.topTable.selectCell(0, 0)
       }, 0)
     },
     handleSave() {
@@ -221,25 +224,25 @@ export default {
 
       // v-model will already update the values of the entry in the search results
       // so just call a patch which will use the updated values in the search results
-      this.localstore.dispatch(
-        'patch',
-        this.localstore.state.cleanEntry(this.entry)
-      )
+      const cleanEntry = util.cleanEntry(this.entry)
+      util.log(cleanEntry)
+      this.localstore.dispatch('patch', cleanEntry)
       this.localstore.state.expansionState.removeOverlay(this.page)
     },
 
     // when the top invisible element is tabbed to, focus the top table
     focusTop() {
-      const table = this.localstore.state.topTableInstance
-      if (table === undefined) return
-      table.selectCell(table.countRows() - 1, table.countCols() - 1)
+      if (this.topTable === undefined) return
+      this.topTable.selectCell(
+        this.topTable.countRows() - 1,
+        this.topTable.countCols() - 1
+      )
     },
 
     // when the bottom invisible element is tabbed to, focus the bottom table
     focusBottom() {
-      const table = this.localstore.state.bottomTableInstance
-      if (table === undefined) return
-      table.selectCell(0, 0)
+      if (this.bottomTable === undefined) return
+      this.bottomTable.selectCell(0, 0)
     },
 
     // handles keypresses from the input boxes
@@ -255,7 +258,7 @@ export default {
       }
     },
     getRelatedItem(related, column) {
-      const entry = this.localstore.state.getEntry(related.type, related.id)
+      const entry = util.getEntry(this.$store, related.type, related.id)
       return entry && entry[column.split('.')[1]]
     },
   },

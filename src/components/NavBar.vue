@@ -43,7 +43,7 @@ export default {
     },
     countResults(listOfCollections) {
       return listOfCollections.reduce((count, collection) => {
-        return count + Object.keys(collection.searchResults).length
+        return count + collection.searchResults.length
       }, 0)
     },
   },

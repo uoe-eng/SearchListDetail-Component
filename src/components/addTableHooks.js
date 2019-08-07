@@ -1,4 +1,5 @@
 import Handsontable from 'handsontable'
+import util from './util'
 
 export default function addTableHooks(context) {
   const topTable = context.$refs.topTable.hotInstance
@@ -23,7 +24,11 @@ export default function addTableHooks(context) {
     const sorting = destinationSortConfigs[0]
     context.collection.columnSorting = sorting
 
-    context.populateTables()
+    context.localstore
+      .dispatch('updatesearchFilter', context.collection)
+      .then(() => {
+        context.populateTables()
+      })
   }
 
   hooks.add('afterColumnSort', afterColumnSort, topTable)
@@ -34,18 +39,17 @@ export default function addTableHooks(context) {
   // when a cell is edited, the value is updated in the reactive object
 
   const setAndPatch = (row, col, newValue) => {
-    const collection = context.localstore.state.getCollection(context.type)
-    const id = collection.fromCoordinates(row, col).id
-    const colName = collection.fromCoordinates(row, col).col
+    const collection = util.getCollection(context.localstore, context.type)
+    const id = collection.searchResults[row]
+    const colName = collection.columnNames[col]
 
     // set the value for the entry in the search results
-    collection.searchResults[id][colName] = newValue
+    const entry = util.getEntry(context.$store, context.type, id)
+    const cleanEntry = JSON.parse(JSON.stringify(util.cleanEntry(entry)))
+    cleanEntry[colName] = newValue
 
     // patch up to the server
-    context.localstore.dispatch(
-      'patch',
-      context.localstore.state.cleanEntry(collection.searchResults[id])
-    )
+    context.localstore.dispatch('patch', cleanEntry)
   }
 
   const afterChangeTop = (change) => {
@@ -64,7 +68,7 @@ export default function addTableHooks(context) {
     // find the expanded row
     const expansionState = context.localstore.state.expansionState
     const expanded = expansionState[context.localstore.state.page]
-    const expandedRow = context.collection.ids().indexOf(expanded)
+    const expandedRow = context.collection.searchResults.indexOf(expanded)
 
     // interpret details from the given argument 'change'
     // expanded row will always be found since the bottom table only shows when a row is expanded

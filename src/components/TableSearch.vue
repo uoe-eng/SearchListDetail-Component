@@ -29,6 +29,7 @@ import { HotTable } from '@handsontable/vue'
 import CardView from './CardView'
 import CardSearch from './CardSearch'
 import addTableHooks from './addTableHooks'
+import util from './util'
 
 export default {
   props: {
@@ -43,7 +44,7 @@ export default {
       return this.localstore.state.collections
     },
     collection() {
-      return this.localstore.state.getCollection(this.type)
+      return util.getCollection(this.localstore, this.type)
     },
     expanded() {
       return this.localstore.state.expansionState[this.page]
@@ -53,9 +54,10 @@ export default {
     },
     // data for the tables calculated from the collection and expanded id
     tableData() {
-      return this.collection.splitIntoTables(
-        this.expanded,
-        this.sldProp.detailsText
+      return util.getSplitTableData(
+        this.$store,
+        this.expanded.id,
+        this.collection
       )
     },
     sldProp() {
@@ -77,7 +79,7 @@ export default {
       return [this.sldProp.detailsTitle].concat(
         this.collection.columnNames.map((header) => {
           // otherwise get the alias for that header
-          return this.collection.getAlias(header)
+          return util.getColumnAlias(this.collection, header)
         })
       )
     },
@@ -95,7 +97,7 @@ export default {
   methods: {
     // add data, meta, and hooks to each table
     populateTables() {
-      // console.log('populating tables...')
+      util.log('populating tables...')
       // wait for the next tick when the table is loaded into the DOM
       this.$nextTick(() => {
         // stop if the tables don't exist (for example in mobile view)

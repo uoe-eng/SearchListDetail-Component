@@ -2,7 +2,7 @@
   <div id="card-search">
     <span v-if="noResults()">No results :(</span>
     <div v-for="collection of collectionsToShow" :key="collection.name">
-      <div v-for="(entry, id) of collection.searchResults" :key="id">
+      <div v-for="id of collection.searchResults" :key="id">
         <CardView
           class="card-result"
           :type="collection.name"
@@ -19,6 +19,7 @@
 
 <script>
 import CardView from './CardView'
+import util from './util'
 
 export default {
   name: 'CardSearch',
@@ -37,7 +38,7 @@ export default {
     // if specified, only show one collection
     collectionsToShow() {
       if (this.showOnly) {
-        return [this.localstore.state.getCollection(this.showOnly)]
+        return [util.getCollection(this.localstore, this.showOnly)]
       } else {
         return this.collections
       }
@@ -56,7 +57,7 @@ export default {
     noResults() {
       let noResults = true
       this.collectionsToShow.forEach((collection) => {
-        if (Object.keys(collection.searchResults).length !== 0) {
+        if (collection.searchResults.length !== 0) {
           noResults = false
         }
       })

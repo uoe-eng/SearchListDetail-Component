@@ -80,11 +80,7 @@ export default {
     Vue.set(this.localstore.state, 'globalstore', () => this.$store)
 
     const collections = this.options.collections.map((collectionOptions) => {
-      const collection = new Collection(
-        collectionOptions,
-        this.localstore,
-        this.$store
-      )
+      const collection = new Collection(collectionOptions)
 
       // console.debug('getting', url, 'from server...')
       // this.$store.dispatch('jv/get', collectionOptions.name).then(() => {
