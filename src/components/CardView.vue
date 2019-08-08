@@ -18,7 +18,7 @@
     >
       <span v-if="title != null" class="title">{{ title }}</span>
       <span class="subtitle">{{ type }} / {{ id }}</span>
-      <form v-on:submit.prevent="handleSave">
+      <form @submit.prevent="">
         <table class="sld-card-view-details">
           <!-- invisible element that can be tabbed to -->
           <div tabindex="0" @focus="focusTop"></div>
@@ -43,7 +43,21 @@
                     {{ getRelatedItem(related, column) }}
                   </button>
                   <span v-else>loading...</span>
+                  <button
+                    class="unlink"
+                    @click="handleUnlink(index, column)"
+                    v-if="getRelatedItem(related, column) && isExpanded"
+                  >
+                    ×
+                  </button>
                 </span>
+                <button
+                  v-if="isExpanded"
+                  class="add"
+                  @click="handleAdd(column)"
+                >
+                  +
+                </button>
               </span>
               <!-- if column is read only - read only is overruled if there is an overlay -->
               <span v-else-if="isReadOnly || expanded.overlay">
@@ -75,6 +89,7 @@
         <!-- invisible element that can be tabbed to -->
         <div tabindex="0" @focus="focusBottom"></div>
       </div>
+      {{ entry }}
     </div>
     <!-- child card for when there are overlays -->
     <CardView
@@ -109,18 +124,18 @@ export default {
     return {
       // defined here so the template can use it
       config: config,
-      old: util.getEntry(this.$store, this.type, this.id),
+      entry: JSON.parse(
+        JSON.stringify(util.getEntry(this.$store, this.type, this.id))
+      ),
     }
   },
   computed: {
     page() {
       return this.localstore.state.page
     },
+
     collection() {
       return util.getCollection(this.localstore, this.type)
-    },
-    entry() {
-      return util.getEntry(this.$store, this.type, this.id)
     },
 
     // boolean to determine if there are overlays to be displayed
@@ -209,6 +224,7 @@ export default {
       this.localstore.dispatch('setPage', pageToNavTo)
     },
     handleClose() {
+      util.log('closing card')
       // don't allow closing when showing overlay
       if (this.shouldShowOverlay) return
       // settimeout to let the click event finish, so it won't reclick when closed
@@ -219,6 +235,7 @@ export default {
       }, 0)
     },
     handleSave() {
+      util.log('saving card')
       // don't allow saves when showing an overlay
       if (this.shouldShowOverlay) return
 
@@ -257,6 +274,43 @@ export default {
         this.handleClose()
       }
     },
+
+    handleUnlink(index, fromCol) {
+      console.log('unlink', index, fromCol)
+      const rels = this.getRelationships(fromCol)
+      const newRels = rels.filter((rel, pos) => pos !== index)
+      console.log(newRels)
+
+      const relName = fromCol.split('.')[0]
+      this.entry._jv.relationships[relName].data = newRels
+      console.log(this.entry)
+      this.$store.dispatch('jv/patch', this.entry).then(() => {
+        this.localstore.dispatch('updateSearchResults')
+        console.log('done')
+      })
+    },
+
+    handleAdd(fromCol) {
+      console.log('add relationship to', fromCol)
+      const rels = this.getRelationships(fromCol)
+      console.log('rels', rels)
+      const newRels = rels.concat({ id: '20', type: 'email_addresses' })
+
+      const relName = fromCol.split('.')[0]
+      this.entry._jv.relationships[relName].data = newRels
+      this.entry.email_addresses['20'] = {
+        _jv: {
+          id: '20',
+          type: 'email_addresses',
+        }
+      }
+      console.log(this.entry)
+      this.$store.dispatch('jv/patch', this.entry).then((data) => {
+        console.log('done', data)
+        this.localstore.dispatch('updateSearchResults')
+      })
+    },
+
     getRelatedItem(related, column) {
       const entry = util.getEntry(this.$store, related.type, related.id)
       return entry && entry[column.split('.')[1]]
@@ -304,7 +358,9 @@ export default {
   font-size: inherit;
 }
 
-.sld-card-view button.relationship {
+.sld-card-view button.relationship,
+button.unlink,
+button.add {
   padding: 7px;
   margin: 5px;
   border: 1px var(--alt-text-color) solid;
@@ -313,7 +369,9 @@ export default {
   cursor: pointer;
 }
 
-.sld-card-view button.relationship:hover {
+.sld-card-view button.relationship:hover,
+button.unlink:hover,
+button.add:hover {
   background-color: var(--highlight-color);
 }
 
@@ -350,5 +408,10 @@ export default {
 
 .sld-card-view-details {
   padding-top: 10px;
+}
+
+button.unlink,
+button.add {
+  font-weight: bold;
 }
 </style>
