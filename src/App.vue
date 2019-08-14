@@ -26,7 +26,7 @@
               },
               {
                 name: 'matriculation_numbers.matriculation_number',
-                alias: 'Matriculation Number',
+                alias: 'Matric Number',
               },
               {
                 name: 'uun.uun',
@@ -81,8 +81,6 @@
           },
         ],
         firstAttrAsCardTitle: true,
-        detailsTitle: 'details',
-        detailsText: '+',
         countResults: true,
       }"
     ></SearchListDetail>

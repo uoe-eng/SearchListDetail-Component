@@ -33,10 +33,11 @@
 
 <script>
 import Vue from 'vue'
+import config from './config'
+import util from './util'
 import TableSearch from './TableSearch'
 import CardSearch from './CardSearch'
 import NavBar from './NavBar'
-import config from './config'
 import Collection from './Collection'
 import SldStore from './SldStore'
 import SearchBox from './SearchBox'
@@ -75,20 +76,13 @@ export default {
   },
   // on creation, fetch the collections from the server
   created() {
+    util.verifySldProp(this.options)
     Vue.set(this.localstore.state, 'nextTick', this.$nextTick)
     Vue.set(this.localstore.state, 'sldProp', this.options)
     Vue.set(this.localstore.state, 'globalstore', () => this.$store)
 
     const collections = this.options.collections.map((collectionOptions) => {
-      const collection = new Collection(collectionOptions)
-
-      // console.debug('getting', url, 'from server...')
-      // this.$store.dispatch('jv/get', collectionOptions.name).then(() => {
-      //   // console.debug('finished getting', collectionOptions.name)
-      //   this.localstore.dispatch('updateSearchResults')
-      // })
-
-      return collection
+      return new Collection(collectionOptions)
     })
     Vue.set(this.localstore.state, 'collections', collections)
 

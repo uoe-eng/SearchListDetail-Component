@@ -28,11 +28,21 @@ export default new Vuex.Store({
         util.filterEntries(state.globalstore(), collection, state.search)
       )
     },
+    updateOneSearchResult(state, entry) {
+      util.log('updateOneSearchResult')
+      const relationships = Object.keys(entry._jv.relationships)
+      state
+        .globalstore()
+        .dispatch('jv/get', [
+          entry._jv.type,
+          { params: { include: relationships.join(',') } },
+        ])
+    },
     updateSearchResults(state) {
       util.log('updating search results')
 
       const fetchEntries = () => {
-        console.log('short search')
+        util.log('starting short search')
         // for each collection, filter the results from the store and put them into
         // the .searchResults attribute
         state.collections.forEach((collection) => {
@@ -86,11 +96,11 @@ export default new Vuex.Store({
 
       const fetchRelationships = () => {
         if (state.pendingRequests !== 0) {
-          console.log('short search not complete yet...')
+          util.log('short search not complete yet...')
           setTimeout(fetchRelationships, 0)
           return
         }
-        console.log('long search')
+        util.log('starting long search')
         // fetch relationships for all columns
         state.collections.forEach((collection) => {
           if (collection.options.show === false) return
@@ -153,7 +163,7 @@ export default new Vuex.Store({
         .globalstore()
         .dispatch('jv/patch', entry)
         .then(() => {
-          context.dispatch('updateSearchResults')
+          context.commit('updateSearchResults')
         })
     },
     updateSearchResults(context) {

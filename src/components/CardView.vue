@@ -89,7 +89,6 @@
         <!-- invisible element that can be tabbed to -->
         <div tabindex="0" @focus="focusBottom"></div>
       </div>
-      {{ entry }}
     </div>
     <!-- child card for when there are overlays -->
     <CardView
@@ -124,12 +123,13 @@ export default {
     return {
       // defined here so the template can use it
       config: config,
-      entry: JSON.parse(
-        JSON.stringify(util.getEntry(this.$store, this.type, this.id))
-      ),
     }
   },
   computed: {
+    entry() {
+      return util.getEntry(this.$store, this.type, this.id)
+    },
+
     page() {
       return this.localstore.state.page
     },
@@ -200,10 +200,12 @@ export default {
 
     // returns an array of {id, type} for the related entries of this card
     getRelationships(relationshipColumn) {
-      return util.getRelatedEntries(
-        util.getEntry(this.$store, this.type, this.id),
+      const rels = util.getRelatedEntries(
+        // util.getEntry(this.$store, this.type, this.id),
+        this.entry,
         relationshipColumn
       )
+      return rels
     },
 
     handleClick() {
@@ -242,7 +244,7 @@ export default {
       // v-model will already update the values of the entry in the search results
       // so just call a patch which will use the updated values in the search results
       const cleanEntry = util.cleanEntry(this.entry)
-      util.log(cleanEntry)
+      util.log('cleanEntry', cleanEntry)
       this.localstore.dispatch('patch', cleanEntry)
       this.localstore.state.expansionState.removeOverlay(this.page)
     },
@@ -275,39 +277,45 @@ export default {
       }
     },
 
+    // the relationship tables need to be set to nullable, so that a
+    // relationship can be removed from an object without breaking the table
     handleUnlink(index, fromCol) {
-      console.log('unlink', index, fromCol)
+      util.log('unlink', index, fromCol)
       const rels = this.getRelationships(fromCol)
       const newRels = rels.filter((rel, pos) => pos !== index)
-      console.log(newRels)
 
       const relName = fromCol.split('.')[0]
       this.entry._jv.relationships[relName].data = newRels
-      console.log(this.entry)
       this.$store.dispatch('jv/patch', this.entry).then(() => {
-        this.localstore.dispatch('updateSearchResults')
-        console.log('done')
+        util.log('finished unlinking')
+        this.$store.dispatch('jv/get', [
+          this.type + '/' + this.id,
+          {
+            params: {
+              include: relName,
+            },
+          },
+        ])
       })
     },
 
     handleAdd(fromCol) {
-      console.log('add relationship to', fromCol)
+      util.log('add relationship to', fromCol)
       const rels = this.getRelationships(fromCol)
-      console.log('rels', rels)
-      const newRels = rels.concat({ id: '20', type: 'email_addresses' })
+      const newRels = rels.concat({ id: '9', type: 'email_addresses' })
 
       const relName = fromCol.split('.')[0]
       this.entry._jv.relationships[relName].data = newRels
-      this.entry.email_addresses['20'] = {
-        _jv: {
-          id: '20',
-          type: 'email_addresses',
-        }
-      }
-      console.log(this.entry)
-      this.$store.dispatch('jv/patch', this.entry).then((data) => {
-        console.log('done', data)
-        this.localstore.dispatch('updateSearchResults')
+      this.$store.dispatch('jv/patch', this.entry).then(() => {
+        util.log('finished adding link')
+        this.$store.dispatch('jv/get', [
+          this.type + '/' + this.id,
+          {
+            params: {
+              include: relName,
+            },
+          },
+        ])
       })
     },
 
@@ -408,10 +416,5 @@ button.add:hover {
 
 .sld-card-view-details {
   padding-top: 10px;
-}
-
-button.unlink,
-button.add {
-  font-weight: bold;
 }
 </style>

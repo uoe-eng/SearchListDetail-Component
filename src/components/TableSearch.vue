@@ -30,6 +30,7 @@ import CardView from './CardView'
 import CardSearch from './CardSearch'
 import addTableHooks from './addTableHooks'
 import util from './util'
+import config from './config'
 
 export default {
   props: {
@@ -76,7 +77,7 @@ export default {
     },
     // returns an array of all headers to be show in handsontable
     colHeaders() {
-      return [this.sldProp.detailsTitle].concat(
+      return [config.DETAILS_TITLE].concat(
         this.collection.columnNames.map((header) => {
           // otherwise get the alias for that header
           return util.getColumnAlias(this.collection, header)

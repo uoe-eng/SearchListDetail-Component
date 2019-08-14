@@ -20,7 +20,7 @@ export default {
     return globalstore.getters['jv/get'](collectionName + '/' + id)
   },
 
-  // returns all entries from a present in the _jv store
+  // returns all entries from a collection present in the _jv store
   getEntries: function(globalstore, collectionName) {
     return globalstore.getters['jv/get'](collectionName)
   },
@@ -43,6 +43,8 @@ export default {
     const relatedEntries = entry._jv.relationships[relCollectionName].data
     if (Array.isArray(relatedEntries)) {
       return relatedEntries
+    } else if (relatedEntries === null) {
+      return [{}]
     } else {
       return [relatedEntries]
     }
@@ -181,7 +183,17 @@ export default {
     return alias
   },
 
+  // verfies the props passed into the main component
+  verifySldProp: function(options) {
+    if (typeof options !== 'object') console.error('SLD prop must be an object')
+  },
+
   log: function(...args) {
     console.debug(...args)
+  },
+
+  copyDeep: function(object) {
+    if (object === undefined) return undefined
+    return JSON.parse(JSON.stringify(object))
   },
 }
