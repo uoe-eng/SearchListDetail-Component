@@ -198,10 +198,13 @@ export default {
       return util.getColumnAlias(this.collection, column)
     },
 
+    getEntries(collectionName) {
+      return util.getEntries(this.$store, collectionName)
+    },
+
     // returns an array of {id, type} for the related entries of this card
     getRelationships(relationshipColumn) {
       const rels = util.getRelatedEntries(
-        // util.getEntry(this.$store, this.type, this.id),
         this.entry,
         relationshipColumn
       )
@@ -302,7 +305,9 @@ export default {
     handleAdd(fromCol) {
       util.log('add relationship to', fromCol)
       const rels = this.getRelationships(fromCol)
-      const newRels = rels.concat({ id: '9', type: 'email_addresses' })
+      const type = window.prompt('Collection type')
+      const id = window.prompt('Entry ID')
+      const newRels = rels.concat({ id: id, type: type })
 
       const relName = fromCol.split('.')[0]
       this.entry._jv.relationships[relName].data = newRels
