@@ -150,7 +150,7 @@ export default {
     // the string for the title of the card (null if titles are disabled)
     title() {
       // don't set the title unless specified
-      if (this.localstore.state.sldProp.firstAttrAsCardTitle) {
+      if (config.FIRST_ATTR_AS_CARD_TITLE) {
         if (this.isExpanded) {
           return this.entry[this.collection.options.columns[0].name]
         } else {
@@ -173,7 +173,7 @@ export default {
       // card must also be read-only, since when editing it will be needed in the body
       if (
         this.expanded.overlay ||
-        (this.localstore.state.sldProp.firstAttrAsCardTitle && this.isReadOnly)
+        (config.FIRST_ATTR_AS_CARD_TITLE && this.isReadOnly)
       ) {
         // take all columns except the first
         return columnsToShow.slice(1)

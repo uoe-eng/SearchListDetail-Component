@@ -61,9 +61,6 @@ export default {
         this.collection
       )
     },
-    sldProp() {
-      return this.localstore.state.sldProp
-    },
     // common settings for both the top and bottom table (no data)
     tableSettings() {
       return {

@@ -151,7 +151,7 @@ describe('util.js', function() {
     expect(util.getRelatedEntries(entry, 'dogs.name')).to.deep.equal([
       { type: 'dogs', id: '3' },
     ])
-    expect(util.getRelatedEntries(entry, 'jobs.title')).to.deep.equal([{}])
+    expect(util.getRelatedEntries(entry, 'jobs.title')).to.deep.equal([])
   })
 
   it('logs an error when a relationship does not exist', function() {

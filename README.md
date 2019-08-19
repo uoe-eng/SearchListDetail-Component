@@ -1,4 +1,4 @@
-# SearchListDetail Component
+# SearchListDetail component
 
 ## Project setup
 ```

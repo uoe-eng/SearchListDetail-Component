@@ -193,11 +193,12 @@ export default {
   },
 
   // verfies the props passed into the main component
-  verifySldProp: function(options) {
-    if (typeof options !== 'object') console.error('SLD prop must be an object')
+  verifySldProp: function(sldProp) {
+    if (!Array.isArray(sldProp)) console.error('SLD prop must be an array')
   },
 
-  log: function(...args) {
+  // enable to see various debugging logs
+  log: function() {
     // console.debug(...args)
   },
 

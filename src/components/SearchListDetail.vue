@@ -12,7 +12,7 @@
     ></AdvancedSearch>
     <NavBar
       v-if="search != ''"
-      :displayResultCount="options.countResults"
+      :displayResultCount="config.COUNT_RESULTS_IN_TABS"
       :localstore="localstore"
       ref="navbar"
     ></NavBar>
@@ -47,7 +47,7 @@ import ExpansionState from './ExpansionState'
 export default {
   name: 'SearchListDetail',
   props: {
-    options: Object,
+    collections: Array,
   },
   components: {
     NavBar,
@@ -76,12 +76,12 @@ export default {
   },
   // on creation, fetch the collections from the server
   created() {
-    util.verifySldProp(this.options)
+    util.verifySldProp(this.collections)
     Vue.set(this.localstore.state, 'nextTick', this.$nextTick)
-    Vue.set(this.localstore.state, 'sldProp', this.options)
+    Vue.set(this.localstore.state, 'sldProp', this.collections)
     Vue.set(this.localstore.state, 'globalstore', () => this.$store)
 
-    const collections = this.options.collections.map((collectionOptions) => {
+    const collections = this.collections.map((collectionOptions) => {
       return new Collection(collectionOptions)
     })
     Vue.set(this.localstore.state, 'collections', collections)
@@ -90,7 +90,7 @@ export default {
       this.localstore.state,
       'expansionState',
       // argument is an array of the column names
-      new ExpansionState(this.options.collections.map((c) => c.name))
+      new ExpansionState(this.collections.map((c) => c.name))
     )
   },
   methods: {
