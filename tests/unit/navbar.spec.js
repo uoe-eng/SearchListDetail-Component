@@ -19,31 +19,21 @@ describe('NavBar.vue', function() {
         collections: [
           {
             name: 'people',
-            searchResults: {
-              '0': '',
-              '1': '',
-              '2': '',
-              '3': '',
-              '4': '',
-            },
+            searchResults: ['', '', '', '', ''],
             options: {
               show: true,
             },
           },
           {
             name: 'phone_numbers',
-            searchResults: {
-              '0': '',
-              '1': '',
-              '2': '',
-            },
+            searchResults: ['', '', ''],
             options: {
               show: true,
             },
           },
           {
             name: 'emails',
-            searchResults: {},
+            searchResults: [],
             options: {
               show: true,
             },

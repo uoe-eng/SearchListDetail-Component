@@ -2,224 +2,223 @@ import Vuex from 'vuex'
 import { expect } from 'chai'
 import { shallowMount, createLocalVue } from '@vue/test-utils'
 import sinon from 'sinon'
-// import config from '@/components/config'
 import CardView from '@/components/CardView'
+import SldStore from '@/components/SldStore'
+import Collection from '@/components/Collection'
+import ExpansionState from '@/components/ExpansionState'
 
 describe('CardView.vue', function() {
-  let store,
-    localVue,
-    personCard,
-    catCard,
-    getCollectionStub,
-    getPeopleAliasStub,
-    getCatAliasStub,
-    getEntryStub,
-    patchSpy
-
+  let localVue, personCard, catCard, localstore, store, sldProp, database
+  
   beforeEach(function() {
     localVue = createLocalVue()
     localVue.use(Vuex)
-    getCollectionStub = sinon.stub()
-    patchSpy = sinon.spy()
 
-    getPeopleAliasStub = sinon.stub()
-    getPeopleAliasStub.withArgs('first_name').returns('First Name')
-    getPeopleAliasStub.withArgs('last_name').returns('Surname')
-    getPeopleAliasStub.withArgs('cat_name').returns('Cat Name')
-
-    getCatAliasStub = sinon.stub()
-    getCatAliasStub.withArgs('name').returns('Name')
-    getCatAliasStub.withArgs('owners.first_name').returns('Owners')
-    getCatAliasStub.withArgs('siblings.name').returns('Siblings')
-
-    getEntryStub = sinon.stub()
-    getEntryStub.withArgs('people', '1').returns({
-      first_name: 'Alice',
-      last_name: 'Smith',
-      cat_name: 'Ella',
-    })
-    getEntryStub.withArgs('people', '2').returns({
-      first_name: 'Bob',
-      last_name: 'Smithers',
-      cat_name: 'Felix',
-    })
-    getEntryStub.withArgs('people', '3').returns({
-      first_name: 'Charlie',
-      last_name: 'Smithson',
-      cat_name: 'Felix',
-    })
-    getEntryStub.withArgs('cats', '1').returns({
-      name: 'Ella',
-      _jv: {
-        relationships: {
-          owners: {
-            data: { type: 'people', id: '1' },
-          },
-          siblings: {
-            data: { type: 'cats', id: '2' },
-          },
+    database = {
+      people: {
+        1: {
+          first_name: 'Alice',
+          last_name: 'Smith',
+          _jv: { relationships: { cats: { data: null } } },
         },
-      },
-    })
-    getEntryStub.withArgs('cats', '2').returns({
-      name: 'Felix',
-      _jv: {
-        relationships: {
-          owners: {
-            data: [{ type: 'people', id: '2' }, { type: 'people', id: '3' }],
-          },
-          siblings: {
-            data: { type: 'cats', id: '1' },
-          },
+        2: {
+          first_name: 'Bob',
+          last_name: 'Smithers',
+          _jv: { relationships: { cats: { data: { type: 'cats', id: 1 } } } },
         },
-      },
-    })
-
-    // prettier-ignore
-    store = new Vuex.Store({
-      state: {
-        page: 'people',
-        getCollection: getCollectionStub,
-        expansionState: {
-          cats: {},
-          people: {},
-        },
-        sldProp: {
-          firstAttrAsCardTitle: false,
-        },
-        getEntry: getEntryStub,
-        cleanEntry: (entry) => entry,
-        collections: [
-          {
-            name: 'people',
-            columnNames: ['first_name', 'last_name', 'cat_name'],
-            getAlias: getPeopleAliasStub,
-            options: {
-              columns: [
-                {
-                  name: 'first_name',
-                  alias: 'First Name',
-                },
-                {
-                  name: 'last_name',
-                  alias: 'Surname',
-                },
-                {
-                  name: 'cat_name',
-                  alias: 'Cat Name',
-                },
-              ],
-              previewOrder: ['first_name', 'last_name'],
+        3: {
+          first_name: 'Charlie',
+          last_name: 'Smithson',
+          _jv: {
+            relationships: {
+              cats: {
+                data: [{ type: 'cats', id: 1 }, { type: 'cats', id: 2 }],
+              },
             },
           },
-          {
-            name: 'cats',
-            columnNames: ['name', 'owners.first_name', 'siblings.name'],
-            getAlias: getCatAliasStub,
-            options: {
-              columns: [
-                {
-                  name: 'name',
-                  alias: 'Name',
-                },
-                {
-                  name: 'owners.first_name',
-                  alias: 'Owners',
-                },
-                {
-                  name: 'siblings.name',
-                  alias: 'Siblings',
-                }
-              ],
-              previewOrder: ['name', 'owners.first_name'],
+        },
+        4: {
+          first_name: 'David',
+          last_name: 'Smith',
+          _jv: { relationships: { cats: { data: [] } } },
+        },
+      },
+      cats: {
+        1: {
+          name: 'Ella',
+          _jv: {
+            relationships: {
+              owners: {
+                data: [{ type: 'person', id: 2 }, { type: 'person', id: 3 }],
+              },
             },
           },
-        ],
+        },
+        2: {
+          name: 'Felix',
+          _jv: {
+            relationships: { owners: { data: { type: 'person', id: 3 } } },
+          },
+        },
+        3: {
+          name: 'Gelard',
+          _jv: { relationships: { owners: { data: null } } },
+        },
       },
-      actions: {
-        setPage: () => {},
-        patch: patchSpy,
-      },
-    })
+    }
 
-    getCollectionStub.withArgs('people').returns(store.state.collections[0])
-    getCollectionStub.withArgs('cats').returns(store.state.collections[1])
+    sldProp = {
+      collections: [
+        {
+          name: 'people',
+          columns: [
+            { name: 'first_name', alias: 'First Name', caseSensitive: true },
+            { name: 'last_name', alias: 'Surname', searchOperator: 'matches' },
+            { name: 'cats.name' },
+          ],
+          previewOrder: ['last_name', 'first_name'],
+        },
+        {
+          name: 'phone_numbers',
+          columns: [{ name: 'phone_number', alias: 'Number' }],
+          show: false,
+        },
+        {
+          name: 'cats',
+          columns: [
+            { name: 'name', alias: 'Name' },
+            { name: 'owners.first_name' },
+          ],
+        },
+      ],
+      firstAttrAsCardTitle: true,
+      countResults: true,
+    }
+
+    localstore = SldStore
+
+    store = {
+      getters: {
+        'jv/get': (query) => {
+          switch (query) {
+            case 'people':
+              return database.people
+            case 'cats':
+              return database.cats
+            case 'people/1':
+              return database.people['1']
+            case 'people/2':
+              return database.people['2']
+            case 'people/3':
+              return database.people['3']
+            case 'people/4':
+              return database.people['4']
+            case 'cats/1':
+              return database.cats['1']
+            case 'cats/2':
+              return database.cats['2']
+            case 'cats/3':
+              return database.cats['3']
+          }
+        },
+      },
+    }
+
+    localstore.state.sldProp = sldProp
+    localstore.state.globalstore = () => store
+    localstore.state.collections = sldProp.collections.map((options) => {
+      return new Collection(options)
+    })
+    localstore.state.expansionState = new ExpansionState(
+      sldProp.collections.map((c) => c.name)
+    )
 
     personCard = shallowMount(CardView, {
-      localVue,
+      store,
       propsData: {
-        localstore: store,
+        localstore: localstore,
         type: 'people',
         id: '2',
         isReadOnly: true,
         isExpanded: false,
-        expanded: store.state.expansionState.people,
+        expanded: localstore.state.expansionState.people,
       },
     })
 
     catCard = shallowMount(CardView, {
-      localVue,
+      store,
       propsData: {
-        localstore: store,
+        localstore: localstore,
         type: 'cats',
         id: '1',
         isReadOnly: true,
         isExpanded: false,
-        expanded: store.state.expansionState.cats,
+        expanded: localstore.state.expansionState.cats,
       },
     })
+  })
+
+  it('does something', function() {
+    // console.log('localstore', localstore)
+    console.log('personCard.html()', personCard.html())
+    console.log('catCard.html()', catCard.html())
   })
 
   it('does not show input boxes for read only cards', function() {
     const inputs = personCard.findAll('input')
     expect(inputs.length).to.equal(0)
   })
-
+  
   it('shows data for a preview read only card', function() {
+    localstore.state.sldProp.firstAttrAsCardTitle = false
     const columns = personCard.findAll('.column')
     expect(columns.length).to.equal(2)
-    expect(columns.at(0).text()).to.equal('First Name:')
-    expect(columns.at(1).text()).to.equal('Surname:')
+    expect(columns.at(0).text()).to.equal('Surname:')
+    expect(columns.at(1).text()).to.equal('First Name:')
 
     const values = personCard.findAll('.value')
     expect(values.length).to.equal(2)
-    expect(values.at(0).text()).to.equal('Bob')
-    expect(values.at(1).text()).to.equal('Smithers')
+    expect(values.at(0).text()).to.equal('Smithers')
+    expect(values.at(1).text()).to.equal('Bob')
   })
 
   it('shows data for an expanded read only card', function() {
+    localstore.state.sldProp.firstAttrAsCardTitle = false
     personCard.setProps({ isExpanded: true })
 
     const columns = personCard.findAll('.column')
     expect(columns.length).to.equal(3)
     expect(columns.at(0).text()).to.equal('First Name:')
     expect(columns.at(1).text()).to.equal('Surname:')
-    expect(columns.at(2).text()).to.equal('Cat Name:')
+    expect(columns.at(2).text()).to.equal('cats.name:')
 
     const values = personCard.findAll('.value')
-    expect(values.length).to.equal(3)
+    expect(values.length).to.equal(3) // relationship is also a value
     expect(values.at(0).text()).to.equal('Bob')
     expect(values.at(1).text()).to.equal('Smithers')
-    expect(values.at(2).text()).to.equal('Felix')
+
+    const relationships = personCard.findAll('.relationship')
+    expect(relationships.at(0).text()).to.equal('Ella')
   })
 
   it('shows data for a preview read only card with title', function() {
-    store.state.sldProp.firstAttrAsCardTitle = true
+    localstore.state.sldProp.firstAttrAsCardTitle = true
+    console.log('personCard', personCard.html())
 
     const title = personCard.find('.title')
-    expect(title.text()).to.equal('Bob')
+    expect(title.text()).to.equal('Smithers')
 
     const columns = personCard.findAll('.column')
     expect(columns.length).to.equal(1)
-    expect(columns.at(0).text()).to.equal('Surname:')
+    expect(columns.at(0).text()).to.equal('First Name:')
 
     const values = personCard.findAll('.value')
     expect(values.length).to.equal(1)
-    expect(values.at(0).text()).to.equal('Smithers')
+    expect(values.at(0).text()).to.equal('Bob')
   })
 
   it('shows data for an expanded read only card with title', function() {
-    store.state.sldProp.firstAttrAsCardTitle = true
+    localstore.state.sldProp.firstAttrAsCardTitle = true
     personCard.setProps({ isExpanded: true })
 
     const title = personCard.find('.title')

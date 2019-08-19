@@ -6,32 +6,15 @@
           {
             name: 'people',
             columns: [
-              {
-                name: 'preferred_name',
-                alias: 'First Name',
-                // caseSensitive defaults to false
-                // searchOperator defaults to 'contains'
-              },
-              {
-                name: 'family_name',
-                alias: 'Last Name',
-              },
-              {
-                name: 'email_addresses.email_address',
-                alias: 'Email',
-              },
-              {
-                name: 'phone_number.phone_number',
-                alias: 'Phone',
-              },
+              { name: 'preferred_name', alias: 'First Name' },
+              { name: 'family_name', alias: 'Last Name' },
+              { name: 'email_addresses.email_address', alias: 'Email' },
+              { name: 'phone_number.phone_number', alias: 'Phone' },
               {
                 name: 'matriculation_numbers.matriculation_number',
                 alias: 'Matric Number',
               },
-              {
-                name: 'uun.uun',
-                alias: 'UUN',
-              },
+              { name: 'uun.uun', alias: 'UUN' },
             ],
             previewOrder: [
               'preferred_name',
@@ -41,42 +24,24 @@
           },
           {
             name: 'phone_numbers',
-            columns: [
-              {
-                name: 'phone_number',
-                alias: 'Number',
-              },
-            ],
+            columns: [{ name: 'phone_number', alias: 'Number' }],
             show: false,
           },
           {
             name: 'email_addresses',
             columns: [
-              {
-                name: 'email_address',
-                alias: 'Email',
-              },
-              {
-                name: 'person.preferred_name',
-              },
+              { name: 'email_address', alias: 'Email' },
+              { name: 'person.preferred_name' },
             ],
           },
           {
             name: 'matriculation_numbers',
-            columns: [
-              {
-                name: 'matriculation_number',
-              },
-            ],
+            columns: [{ name: 'matriculation_number' }],
             show: false,
           },
           {
             name: 'usernames',
-            columns: [
-              {
-                name: 'uun',
-              },
-            ],
+            columns: [{ name: 'uun' }],
             show: false,
           },
         ],

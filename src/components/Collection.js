@@ -4,7 +4,7 @@ export default class Collection {
     this.options = options
 
     // represents the search results (empty to begin with)
-    this.searchResults = {}
+    this.searchResults = []
 
     // fill out defaults for options
     this.options.columns.forEach((column) => {

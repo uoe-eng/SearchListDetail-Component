@@ -151,7 +151,11 @@ export default {
     title() {
       // don't set the title unless specified
       if (this.localstore.state.sldProp.firstAttrAsCardTitle) {
-        return this.entry[this.collection.options.columns[0].name]
+        if (this.isExpanded) {
+          return this.entry[this.collection.options.columns[0].name]
+        } else {
+          return this.entry[this.collection.options.previewOrder[0]]
+        }
       } else {
         return null
       }
@@ -204,10 +208,7 @@ export default {
 
     // returns an array of {id, type} for the related entries of this card
     getRelationships(relationshipColumn) {
-      const rels = util.getRelatedEntries(
-        this.entry,
-        relationshipColumn
-      )
+      const rels = util.getRelatedEntries(this.entry, relationshipColumn)
       return rels
     },
 
@@ -291,14 +292,15 @@ export default {
       this.entry._jv.relationships[relName].data = newRels
       this.$store.dispatch('jv/patch', this.entry).then(() => {
         util.log('finished unlinking')
-        this.$store.dispatch('jv/get', [
-          this.type + '/' + this.id,
-          {
-            params: {
-              include: relName,
-            },
-          },
-        ])
+        this.localstore.dispatch('updateSearchResults')
+        // this.$store.dispatch('jv/get', [
+        //   this.type + '/' + this.id,
+        //   {
+        //     params: {
+        //       include: relName,
+        //     },
+        //   },
+        // ])
       })
     },
 
@@ -313,14 +315,15 @@ export default {
       this.entry._jv.relationships[relName].data = newRels
       this.$store.dispatch('jv/patch', this.entry).then(() => {
         util.log('finished adding link')
-        this.$store.dispatch('jv/get', [
-          this.type + '/' + this.id,
-          {
-            params: {
-              include: relName,
-            },
-          },
-        ])
+        this.localstore.dispatch('updateSearchResults')
+        // this.$store.dispatch('jv/get', [
+        //   this.type + '/' + this.id,
+        //   {
+        //     params: {
+        //       include: relName,
+        //     },
+        //   },
+        // ])
       })
     },
 

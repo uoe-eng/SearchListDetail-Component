@@ -40,11 +40,20 @@ export default {
   // returns an array of {id, type} representing the related entries of an entry
   getRelatedEntries: function(entry, relationshipColumn) {
     const relCollectionName = relationshipColumn.split('.')[0]
+    if (entry._jv.relationships[relCollectionName] === undefined) {
+      console.error(
+        'Related collection',
+        relCollectionName,
+        'does not exist for entry',
+        entry
+      )
+      return
+    }
     const relatedEntries = entry._jv.relationships[relCollectionName].data
     if (Array.isArray(relatedEntries)) {
       return relatedEntries
     } else if (relatedEntries === null) {
-      return [{}]
+      return []
     } else {
       return [relatedEntries]
     }
@@ -189,7 +198,7 @@ export default {
   },
 
   log: function(...args) {
-    console.debug(...args)
+    // console.debug(...args)
   },
 
   copyDeep: function(object) {
