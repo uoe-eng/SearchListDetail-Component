@@ -31,8 +31,8 @@ export default {
     CardView,
   },
   computed: {
-    collections() {
-      return this.localstore.state.collections
+    collectionsOptions() {
+      return this.localstore.state.collectionsOptions
     },
     // returns a list of collections that should be displayed on the page
     // if specified, only show one collection
@@ -40,7 +40,7 @@ export default {
       if (this.showOnly) {
         return [util.getCollection(this.localstore, this.showOnly)]
       } else {
-        return this.collections
+        return this.collectionsOptions
       }
     },
     expanded() {

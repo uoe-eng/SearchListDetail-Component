@@ -52,7 +52,7 @@ export default {
       return this.localstore.state.page
     },
     collections() {
-      return this.localstore.state.collections.filter((collection) => {
+      return this.localstore.state.collectionsOptions.filter((collection) => {
         return collection.options.show
       })
     },

@@ -42,7 +42,7 @@ export default {
       return this.localstore.state.search
     },
     collections() {
-      return this.localstore.state.collections
+      return this.localstore.state.collectionsOptions
     },
     collection() {
       return util.getCollection(this.localstore, this.type)

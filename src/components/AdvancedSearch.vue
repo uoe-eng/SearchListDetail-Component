@@ -3,7 +3,7 @@
     <div>ADVANCED SEARCH</div>
     <div
       class="collection"
-      v-for="collection in collections"
+      v-for="collection in collectionsOptions"
       :key="collection.name"
     >
       <b class="title">{{
@@ -49,8 +49,8 @@ export default {
     opened() {
       return this.localstore.state.expandedAdvancedSearch
     },
-    collections() {
-      return this.localstore.state.collections
+    collectionsOptions() {
+      return this.localstore.state.collectionsOptions
     },
   },
   methods: {

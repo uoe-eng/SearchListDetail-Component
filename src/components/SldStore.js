@@ -8,7 +8,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     page: config.ALL_PAGE_NAME,
-    collections: [],
+    collectionsOptions: [],
     search: '',
     expandedAdvancedSearch: false,
     sldProp: {},
@@ -45,7 +45,7 @@ export default new Vuex.Store({
         util.log('starting short search')
         // for each collection, filter the results from the store and put them into
         // the .searchResults attribute
-        state.collections.forEach((collection) => {
+        state.collectionsOptions.forEach((collection) => {
           if (collection.options.show === false) return
 
           // do a quick filter in case no columns are ticked
@@ -86,11 +86,8 @@ export default new Vuex.Store({
           ))
           state.populateTables()
 
+          // long search will only commence if there are no more pending requests
           state.pendingRequests--
-          // if this is the last request to finish
-          if (state.pendingRequests === 0) {
-            // fetchRelationships()
-          }
         })
       }
 
@@ -102,7 +99,7 @@ export default new Vuex.Store({
         }
         util.log('starting long search')
         // fetch relationships for all columns
-        state.collections.forEach((collection) => {
+        state.collectionsOptions.forEach((collection) => {
           if (collection.options.show === false) return
 
           if (collection.searchResults.length === 0) return

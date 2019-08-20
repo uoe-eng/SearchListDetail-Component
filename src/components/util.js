@@ -3,7 +3,9 @@ import config from './config'
 export default {
   // returns a collection from the local store
   getCollection: function(localstore, collectionName) {
-    const collectionNames = localstore.state.collections.map((c) => c.name)
+    const collectionNames = localstore.state.collectionsOptions.map(
+      (collection) => collection.name
+    )
     const index = collectionNames.indexOf(collectionName)
     if (index === -1) {
       console.error(
@@ -12,7 +14,7 @@ export default {
         'was not found, make sure it is specified in the props.'
       )
     }
-    return localstore.state.collections[index]
+    return localstore.state.collectionsOptions[index]
   },
 
   // returns an entry from the _jv store
@@ -25,7 +27,7 @@ export default {
     return globalstore.getters['jv/get'](collectionName)
   },
 
-  // keeps attributes for an entry only if they are not objects
+  // keeps columns for an entry only if they are not objects
   // returns an entry
   cleanEntry: function(entry) {
     let clean = {
@@ -177,7 +179,7 @@ export default {
       return itemCount + ' items...'
     }
 
-    // normal attribute column
+    // normal case
     return entry[columnName]
   },
 

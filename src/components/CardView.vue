@@ -150,7 +150,7 @@ export default {
     // the string for the title of the card (null if titles are disabled)
     title() {
       // don't set the title unless specified
-      if (config.FIRST_ATTR_AS_CARD_TITLE) {
+      if (config.FIRST_COL_AS_CARD_TITLE) {
         if (this.isExpanded) {
           return this.entry[this.collection.options.columns[0].name]
         } else {
@@ -173,7 +173,7 @@ export default {
       // card must also be read-only, since when editing it will be needed in the body
       if (
         this.expanded.overlay ||
-        (config.FIRST_ATTR_AS_CARD_TITLE && this.isReadOnly)
+        (config.FIRST_COL_AS_CARD_TITLE && this.isReadOnly)
       ) {
         // take all columns except the first
         return columnsToShow.slice(1)
@@ -208,8 +208,7 @@ export default {
 
     // returns an array of {id, type} for the related entries of this card
     getRelationships(relationshipColumn) {
-      const rels = util.getRelatedEntries(this.entry, relationshipColumn)
-      return rels
+      return util.getRelatedEntries(this.entry, relationshipColumn)
     },
 
     handleClick() {
@@ -293,22 +292,17 @@ export default {
       this.$store.dispatch('jv/patch', this.entry).then(() => {
         util.log('finished unlinking')
         this.localstore.dispatch('updateSearchResults')
-        // this.$store.dispatch('jv/get', [
-        //   this.type + '/' + this.id,
-        //   {
-        //     params: {
-        //       include: relName,
-        //     },
-        //   },
-        // ])
       })
     },
 
     handleAdd(fromCol) {
       util.log('add relationship to', fromCol)
       const rels = this.getRelationships(fromCol)
+
+      // temporary solution to add different entries
       const type = window.prompt('Collection type')
       const id = window.prompt('Entry ID')
+
       const newRels = rels.concat({ id: id, type: type })
 
       const relName = fromCol.split('.')[0]
@@ -316,14 +310,6 @@ export default {
       this.$store.dispatch('jv/patch', this.entry).then(() => {
         util.log('finished adding link')
         this.localstore.dispatch('updateSearchResults')
-        // this.$store.dispatch('jv/get', [
-        //   this.type + '/' + this.id,
-        //   {
-        //     params: {
-        //       include: relName,
-        //     },
-        //   },
-        // ])
       })
     },
 

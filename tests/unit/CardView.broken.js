@@ -126,11 +126,11 @@ describe('CardView.vue', function() {
 
     localstore.state.sldProp = sldProp
     localstore.state.globalstore = () => store
-    localstore.state.collections = sldProp.collections.map((options) => {
+    localstore.state.collectionsOptions = sldProp.collections.map((options) => {
       return new Collection(options)
     })
     localstore.state.expansionState = new ExpansionState(
-      sldProp.collections.map((c) => c.name)
+      sldProp.collections.map((collection) => collection.name)
     )
 
     personCard = shallowMount(CardView, {
@@ -426,7 +426,7 @@ describe('CardView.vue', function() {
     const spy = sinon.spy()
     store.state.expansionState.removeOverlay = spy
 
-    store.state.collections[1].searchResults = { '1': 'new value to replace' }
+    store.state.collectionsOptions[1].searchResults = { '1': 'new value to replace' }
     store.state.page = 'cats'
 
     catCard.find('.close').trigger('click')
@@ -434,7 +434,7 @@ describe('CardView.vue', function() {
       expect(spy.callCount).to.equal(1)
       expect(spy.getCall(0).args).to.deep.equal(['cats'])
       // on close, search result is reset to the old value
-      expect(store.state.collections[1].searchResults).to.deep.equal({
+      expect(store.state.collectionsOptions[1].searchResults).to.deep.equal({
         '1': getEntryStub('cats', '1'),
       })
     }, 0)
@@ -458,7 +458,7 @@ describe('CardView.vue', function() {
   it('does not write an entry to searchResults on card close if the result does not already exist (bugfix)', function() {
     catCard.setProps({ isReadOnly: false, isExpanded: true })
 
-    store.state.collections[1].searchResults = {}
+    store.state.collectionsOptions[1].searchResults = {}
     store.state.page = 'cats'
 
     store.state.expansionState.removeOverlay = () => {}
@@ -466,7 +466,7 @@ describe('CardView.vue', function() {
     catCard.find('.close').trigger('click')
     setTimeout(() => {
       // on close, search result is not set because it does not exist in the search results
-      expect(store.state.collections[1].searchResults).to.deep.equal({})
+      expect(store.state.collectionsOptions[1].searchResults).to.deep.equal({})
     }, 0)
   })
 })

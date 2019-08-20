@@ -81,16 +81,16 @@ export default {
     Vue.set(this.localstore.state, 'sldProp', this.collections)
     Vue.set(this.localstore.state, 'globalstore', () => this.$store)
 
-    const collections = this.collections.map((collectionOptions) => {
-      return new Collection(collectionOptions)
+    const collectionsOptions = this.collections.map((options) => {
+      return new Collection(options)
     })
-    Vue.set(this.localstore.state, 'collections', collections)
+    Vue.set(this.localstore.state, 'collectionsOptions', collectionsOptions)
 
     Vue.set(
       this.localstore.state,
       'expansionState',
       // argument is an array of the column names
-      new ExpansionState(this.collections.map((c) => c.name))
+      new ExpansionState(this.collections.map((collection) => collection.name))
     )
   },
   methods: {

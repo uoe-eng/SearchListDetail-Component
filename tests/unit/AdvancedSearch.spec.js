@@ -116,8 +116,8 @@ describe('AdvancedSearch.vue', function() {
 
   // prettier-ignore
   const expectState = (state) => {
-    const peopleColumns = store.state.collections[0].options.columns
-    const catsColumns =   store.state.collections[1].options.columns
+    const peopleColumns = store.state.collectionsOptions[0].options.columns
+    const catsColumns =   store.state.collectionsOptions[1].options.columns
     expect(peopleColumns[0].searchable).to.equal(state[0])
     expect(peopleColumns[1].searchable).to.equal(state[1])
     expect(peopleColumns[2].searchable).to.equal(state[2])

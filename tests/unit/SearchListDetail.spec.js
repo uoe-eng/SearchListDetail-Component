@@ -155,12 +155,12 @@ describe('SearchListDetail.vue', function() {
   })
 
   it('initialises the collections in the store', function() {
-    expect(wrapper.vm.localstore.state.collections[0].name).to.equal('people')
-    expect(wrapper.vm.localstore.state.collections[1].name).to.equal('cats')
-    expect(wrapper.vm.localstore.state.collections[0].options).to.deep.equal(
+    expect(wrapper.vm.localstore.state.collectionsOptions[0].name).to.equal('people')
+    expect(wrapper.vm.localstore.state.collectionsOptions[1].name).to.equal('cats')
+    expect(wrapper.vm.localstore.state.collectionsOptions[0].options).to.deep.equal(
       new Collection(sldProp[0], null, null).options
     )
-    expect(wrapper.vm.localstore.state.collections[1].options).to.deep.equal(
+    expect(wrapper.vm.localstore.state.collectionsOptions[1].options).to.deep.equal(
       new Collection(sldProp[1], null, null).options
     )
   })

@@ -107,8 +107,8 @@ describe('TableSearch.vue', function() {
       },
     })
 
-    getCollectionStub.withArgs('people').returns(store.state.collections[0])
-    getCollectionStub.withArgs('cats').returns(store.state.collections[1])
+    getCollectionStub.withArgs('people').returns(store.state.collectionsOptions[0])
+    getCollectionStub.withArgs('cats').returns(store.state.collectionsOptions[1])
 
     wrapper = shallowMount(TableSearch, {
       localVue,

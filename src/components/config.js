@@ -14,7 +14,7 @@ export default {
   ADV_SEARCH_COLLECTION_TITLE_PREPEND: 'Collection: ',
   SHORT_SEARCH_TIMEOUT: 500,
   LONG_SEARCH_TIMEOUT: 2000,
-  FIRST_ATTR_AS_CARD_TITLE: true,
+  FIRST_COL_AS_CARD_TITLE: true,
   COUNT_RESULTS_IN_TABS: true,
   SEARCH_OPERATORS: {
     contains: (value, search) => {
