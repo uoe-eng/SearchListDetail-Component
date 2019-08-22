@@ -1,6 +1,6 @@
 {
   "name": "search-list-detail",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": false,
   "main": "src/index.js",
   "scripts": {
@@ -14,9 +14,11 @@
     "fakeapiserver": "node fake-json-api-server.js"
   },
   "dependencies": {
+    "@handsontable/vue": "^4.0.0",
     "axios": "^0.19.0",
     "core-js": "^2.6.5",
     "istanbul-instrumenter-loader": "^3.0.1",
+    "handsontable": "^7.1.1",
     "jest": "^24.8.0",
     "jsonapi-vuex": "^2.0.0",
     "jsonpath": "^1.0.2",
@@ -30,7 +32,6 @@
     "vuex": "^3.0.1"
   },
   "devDependencies": {
-    "@handsontable/vue": "^4.0.0",
     "@vue/cli-plugin-babel": "^3.8.0",
     "@vue/cli-plugin-e2e-nightwatch": "^3.8.0",
     "@vue/cli-plugin-eslint": "^3.8.0",
@@ -44,7 +45,6 @@
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
     "fake-json-api-server": "^1.6.0",
-    "handsontable": "^7.1.1",
     "lodash.clonedeep": "^4.5.0",
     "lodash.get": "^4.4.2",
     "lodash.isequal": "^4.5.0",
