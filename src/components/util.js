@@ -76,7 +76,7 @@ export default {
         if (column.searchable === false) return false
         const value = entry[column.name]
         // for example for relationships
-        if (value === undefined) return false
+        if (value === undefined || value === null) return false
         const operator = config.SEARCH_OPERATORS[column.searchOperator]
         if (column.caseSensitive) {
           return operator(value, search)
