@@ -1,7 +1,8 @@
 {
-  "name": "search_list_detail",
-  "version": "0.1.0",
-  "private": true,
+  "name": "search-list-detail",
+  "version": "1.0.2",
+  "private": false,
+  "main": "src/index.js",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -43,7 +44,7 @@
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
     "fake-json-api-server": "^1.6.0",
-    "handsontable": "^7.1.0",
+    "handsontable": "^7.1.1",
     "lodash.clonedeep": "^4.5.0",
     "lodash.get": "^4.4.2",
     "lodash.isequal": "^4.5.0",

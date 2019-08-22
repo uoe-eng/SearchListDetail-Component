@@ -5094,10 +5094,10 @@ handlebars@^4.1.2:
   optionalDependencies:
     uglify-js "^3.1.4"
 
-handsontable@^7.1.0:
-  version "7.1.0"
-  resolved "https://registry.yarnpkg.com/handsontable/-/handsontable-7.1.0.tgz#530f2d574b93739467832bffd47ef758fd7c2c24"
-  integrity sha512-EQT8k2A4RPzMOyzZf/xpEEfRSdd4fT6JcWNQnRhi5cJ8NX6Zg+6nQavWh7fb5amsRN9BBlwh1Je/pbPREgS0zQ==
+handsontable@^7.1.1:
+  version "7.1.1"
+  resolved "https://registry.yarnpkg.com/handsontable/-/handsontable-7.1.1.tgz#97553bbd6d615cce5d1203c4f7522d7aa7248d9f"
+  integrity sha512-qE7z6/IBrNq8r/jQT8trFAqiBYa05mDvyuqfhiBg6r09GKcqPs74S6RbmR+dAKfszvFhpukk19SZKUQOoYDbWg==
   dependencies:
     "@types/pikaday" "1.6.0"
     core-js "^3.0.0"
