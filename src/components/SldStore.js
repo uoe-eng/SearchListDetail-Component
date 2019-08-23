@@ -156,9 +156,12 @@ export default new Vuex.Store({
   },
   actions: {
     patch(context, entry) {
+      util.log('patching:', entry)
+      const cleanEntry = util.cleanEntry(entry)
+      util.log('cleaned:', cleanEntry)
       context.state
         .globalstore()
-        .dispatch('jv/patch', entry)
+        .dispatch('jv/patch', cleanEntry)
         .then(() => {
           context.commit('updateSearchResults')
         })
@@ -167,7 +170,7 @@ export default new Vuex.Store({
       context.commit('updateSearchResults')
     },
     setPage(context, page) {
-      console.debug('setting page', page)
+      util.log('setting page', page)
       context.commit('setPage', null)
       context.state.nextTick(() => {
         context.commit('setPage', page)

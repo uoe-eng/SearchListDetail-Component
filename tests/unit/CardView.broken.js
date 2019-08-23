@@ -158,12 +158,6 @@ describe('CardView.vue', function() {
     })
   })
 
-  it('does something', function() {
-    // console.log('localstore', localstore)
-    console.log('personCard.html()', personCard.html())
-    console.log('catCard.html()', catCard.html())
-  })
-
   it('does not show input boxes for read only cards', function() {
     const inputs = personCard.findAll('input')
     expect(inputs.length).to.equal(0)
@@ -203,7 +197,6 @@ describe('CardView.vue', function() {
 
   it('shows data for a preview read only card with title', function() {
     localstore.state.sldProp.firstAttrAsCardTitle = true
-    console.log('personCard', personCard.html())
 
     const title = personCard.find('.title')
     expect(title.text()).to.equal('Smithers')

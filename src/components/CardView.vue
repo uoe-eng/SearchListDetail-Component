@@ -46,13 +46,13 @@
                   <button
                     class="unlink"
                     @click="handleUnlink(index, column)"
-                    v-if="getRelatedItem(related, column) && isExpanded"
+                    v-if="getRelatedItem(related, column) && shouldShowButtons"
                   >
                     ×
                   </button>
                 </span>
                 <button
-                  v-if="isExpanded"
+                  v-if="shouldShowButtons"
                   class="add"
                   @click="handleAdd(column)"
                 >
@@ -145,6 +145,10 @@ export default {
         this.expanded.type == this.type &&
         this.expanded.id == this.id
       )
+    },
+
+    shouldShowButtons() {
+      return this.isExpanded && !this.shouldShowOverlay
     },
 
     // the string for the title of the card (null if titles are disabled)
@@ -289,10 +293,7 @@ export default {
 
       const relName = fromCol.split('.')[0]
       this.entry._jv.relationships[relName].data = newRels
-      this.$store.dispatch('jv/patch', this.entry).then(() => {
-        util.log('finished unlinking')
-        this.localstore.dispatch('updateSearchResults')
-      })
+      this.localstore.dispatch('patch', this.entry)
     },
 
     handleAdd(fromCol) {
@@ -307,10 +308,7 @@ export default {
 
       const relName = fromCol.split('.')[0]
       this.entry._jv.relationships[relName].data = newRels
-      this.$store.dispatch('jv/patch', this.entry).then(() => {
-        util.log('finished adding link')
-        this.localstore.dispatch('updateSearchResults')
-      })
+      this.localstore.dispatch('patch', this.entry)
     },
 
     getRelatedItem(related, column) {
