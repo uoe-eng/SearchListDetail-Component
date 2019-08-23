@@ -54,7 +54,7 @@ The component takes a single prop called `collections` which is of type `Array`.
 Each `<collection>` is an object with the following keys
 ```
 {
-  name: String,                  // required
+  name: String,                  // required (equal to table name)
   columns: Array of Objects,     // required
   previewOrder: Array of String, // optional (default = all column names)
   show: Boolean,                 // optional (default = true)
@@ -89,7 +89,7 @@ This example shows a simple use case for describing the columns as well as a rel
 
 *Note that even though you don't want the `matriclation_numbers` collection to be searchable, you must still describe it in order to fetch the data to display a person's relationships.*
 ```
-<SearchListDetail>
+<SearchListDetail
   :collections="[
     {
       name: 'people',
@@ -116,7 +116,7 @@ This example shows a simple use case for describing the columns as well as a rel
       show: false,
     },
   ]"
-</SearchListDetail>
+></SearchListDetail>
 ```
 
 # Technical guide
