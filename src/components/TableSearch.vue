@@ -26,6 +26,7 @@
 
 <script>
 import { HotTable } from '@handsontable/vue'
+import 'handsontable/dist/handsontable.full.css'
 import CardView from './CardView'
 import CardSearch from './CardSearch'
 import addTableHooks from './addTableHooks'
@@ -173,5 +174,3 @@ export default {
   },
 }
 </script>
-
-<style src="../../node_modules/handsontable/dist/handsontable.full.css"></style>

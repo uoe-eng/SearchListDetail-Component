@@ -5094,10 +5094,10 @@ handlebars@^4.1.2:
   optionalDependencies:
     uglify-js "^3.1.4"
 
-handsontable@^7.1.0:
-  version "7.1.0"
-  resolved "https://registry.yarnpkg.com/handsontable/-/handsontable-7.1.0.tgz#530f2d574b93739467832bffd47ef758fd7c2c24"
-  integrity sha512-EQT8k2A4RPzMOyzZf/xpEEfRSdd4fT6JcWNQnRhi5cJ8NX6Zg+6nQavWh7fb5amsRN9BBlwh1Je/pbPREgS0zQ==
+handsontable@^7.1.1:
+  version "7.1.1"
+  resolved "https://registry.yarnpkg.com/handsontable/-/handsontable-7.1.1.tgz#97553bbd6d615cce5d1203c4f7522d7aa7248d9f"
+  integrity sha512-qE7z6/IBrNq8r/jQT8trFAqiBYa05mDvyuqfhiBg6r09GKcqPs74S6RbmR+dAKfszvFhpukk19SZKUQOoYDbWg==
   dependencies:
     "@types/pikaday" "1.6.0"
     core-js "^3.0.0"
@@ -6601,16 +6601,16 @@ json5@^2.1.0:
   dependencies:
     minimist "^1.2.0"
 
-jsonapi-vuex@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/jsonapi-vuex/-/jsonapi-vuex-2.0.0.tgz#dadc41fdde05fd421e5c035fcc9f44d078157803"
-  integrity sha512-Izxrlgia8F4JGxDx7pZDIZm5PomAlchsz23RQvh5rrJhR2LVSKckhS7zPKhb8lkLrX6hht1cDjGjOVMU90sgUg==
+jsonapi-vuex@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/jsonapi-vuex/-/jsonapi-vuex-2.1.0.tgz#8b6837d03719f6d68bf8fbefea6a59e6a948d0f0"
+  integrity sha512-qLCkgxJE4SzQaTFgyEIJuWbv6gDMFWCSPA/xvysMAmXXDTnFMC+/qxgKZt1dZucQr1PpP1/dhywUWftbfpHIWg==
   dependencies:
     jsonpath "^1.0.0"
     lodash.clonedeep "^4.5.0"
     lodash.get "^4.4.2"
     lodash.isequal "^4.5.0"
-    lodash.merge "^4.6.1"
+    lodash.merge "^4.6.2"
 
 jsonfile@^4.0.0:
   version "4.0.0"
@@ -6960,6 +6960,11 @@ lodash.merge@^4.6.1:
   version "4.6.1"
   resolved "https://registry.yarnpkg.com/lodash.merge/-/lodash.merge-4.6.1.tgz#adc25d9cb99b9391c59624f379fbba60d7111d54"
   integrity sha512-AOYza4+Hf5z1/0Hztxpm2/xiPZgi/cjMqdnKTUWTBSKchJlxXXuUSxCCl8rJlf4g6yww/j6mA8nC8Hw/EZWxKQ==
+
+lodash.merge@^4.6.2:
+  version "4.6.2"
+  resolved "https://registry.yarnpkg.com/lodash.merge/-/lodash.merge-4.6.2.tgz#558aa53b43b661e1925a0afdfa36a9a1085fe57a"
+  integrity sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==
 
 lodash.mergewith@^4.0.0:
   version "4.6.1"

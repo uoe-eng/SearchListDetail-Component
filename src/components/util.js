@@ -27,16 +27,15 @@ export default {
     return globalstore.getters['jv/get'](collectionName)
   },
 
-  // keeps columns for an entry only if they are not objects
+  // remove circular references and relationships from the top level attribute
   // returns an entry
   cleanEntry: function(entry) {
-    let clean = {
-      _jv: entry._jv,
-    }
-    Object.keys(entry).forEach((column) => {
-      if (typeof entry[column] !== 'object') clean[column] = entry[column]
+    const deep = this.copyDeep(entry)
+    const relationships = Object.keys(deep._jv.relationships)
+    relationships.forEach((rel) => {
+      delete deep[rel]
     })
-    return clean
+    return deep
   },
 
   // returns an array of {id, type} representing the related entries of an entry
@@ -76,7 +75,7 @@ export default {
         if (column.searchable === false) return false
         const value = entry[column.name]
         // for example for relationships
-        if (value === undefined) return false
+        if (value === undefined || value === null) return false
         const operator = config.SEARCH_OPERATORS[column.searchOperator]
         if (column.caseSensitive) {
           return operator(value, search)
@@ -195,11 +194,55 @@ export default {
   },
 
   // verfies the props passed into the main component
+  // prettier-ignore
   verifySldProp: function(sldProp) {
-    if (!Array.isArray(sldProp)) console.error('SLD prop must be an array')
+    const collectionKeys = ['name', 'columns', 'previewOrder', 'show']
+    const columnKeys = ['name', 'alias', 'searchOperator', 'caseSensitive', 'searchable']
+    if (!Array.isArray(sldProp)) {
+      console.error('Collections must be an array')
+    }
+    sldProp.forEach((collection) => {
+      if (!collection.name) {
+        console.error('A collection must have a name. Faulty collection:', collection)
+      }
+      if (!collection.columns || collection.columns.length < 1) {
+        console.error('A collection must have at least one column. Faulty collection:', collection)
+      }
+      if (!Array.isArray(collection.columns)) {
+        console.error('A collection\'s columns must be an array. Faulty collection:', collection)
+      }
+      Object.keys(collection).forEach((key) => {
+        if (collectionKeys.includes(key) === false) {
+          console.error('You cannot have a key called', key, 'in a collection. It needs to be one of', collectionKeys, 'Faulty collection:', collection)
+        }
+      })
+      if (collection.previewOrder) {
+        if (collection.previewOrder.length === 0) {
+          console.error('A collection\' previewOrder must have at least one column. Faulty collection:', collection)
+        }
+        if (!Array.isArray(collection.previewOrder)) {
+          console.error('A collection\'s previewOrder must be an array. Faulty collection:', collection)
+        }
+        collection.previewOrder.forEach((preview) => {
+          if (typeof preview !== 'string') {
+            console.error('Items in the previewOrder array must be strings. Faulty collection:', collection)
+          }
+        })
+      }
+      collection.columns.forEach((column) => {
+        if (!column.name) {
+          console.error('A column must have a name. Faulty column:', column)
+        }
+        Object.keys(column).forEach((key) => {
+          if (columnKeys.includes(key) === false) {
+            console.error('You cannot have a key called', key, 'in a column. It needs to be one of', columnKeys, 'Faulty column:', column)
+          }
+        })
+      })
+    })
   },
 
-  // enable to see various debugging logs
+  // enable to see various logs
   log: function() {
     // console.debug(...args)
   },
