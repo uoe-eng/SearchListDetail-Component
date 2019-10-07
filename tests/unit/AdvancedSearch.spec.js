@@ -16,7 +16,7 @@ describe('AdvancedSearch.vue', function() {
     store = new Vuex.Store({
       state: {
         expandedAdvancedSearch: false,
-        collections: [
+        collectionsOptions: [
           {
             name: 'people',
             options: {
@@ -92,6 +92,7 @@ describe('AdvancedSearch.vue', function() {
   it('displays the collections', function() {
     // open
     wrapper.find('.advanced-search-button').trigger('click')
+    expect(store.state.expandedAdvancedSearch).to.be.true
 
     const titles = wrapper.findAll('#advanced-search .collection .title')
     const toggleAllBtns = wrapper.findAll('#advanced-search .collection button')
