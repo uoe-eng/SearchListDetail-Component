@@ -16,7 +16,7 @@ describe('NavBar.vue', function() {
     store = new Vuex.Store({
       state: {
         page: config.ALL_PAGE_NAME,
-        collections: [
+        collectionsOptions: [
           {
             name: 'people',
             searchResults: ['', '', '', '', ''],

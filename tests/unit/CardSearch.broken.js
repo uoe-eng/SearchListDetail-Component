@@ -23,7 +23,7 @@ describe('CardSearch.vue', function() {
           people: {},
           cats: {},
         },
-        collections: [
+        collectionsOptions: [
           {
             name: 'people',
             options: {

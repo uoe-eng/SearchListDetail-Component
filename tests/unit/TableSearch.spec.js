@@ -29,7 +29,7 @@ describe('TableSearch.vue', function() {
           detailsTitle: 'details',
           detailsText: '+',
         },
-        collections: [
+        collectionsOptions: [
           {
             name: 'people',
             columnNames: ['first_name', 'last_name', 'cat.name'],
