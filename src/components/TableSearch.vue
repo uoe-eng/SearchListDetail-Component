@@ -3,24 +3,24 @@
     <hot-table ref="topTable" :settings="tableSettings"></hot-table>
     <CardView
       v-if="expanded && expanded.id != null"
-      :localstore="localstore"
-      :type="type"
       :id="expanded.id"
-      :expanded="expanded"
-      :isReadOnly="false"
-      :isExpanded="true"
       ref="cardview"
       class="expanded-card"
+      :expanded="expanded"
+      :is-read-only="false"
+      :is-expanded="true"
+      :localstore="localstore"
+      :type="type"
     ></CardView>
     <hot-table ref="bottomTable" :settings="tableSettings"></hot-table>
   </div>
   <CardSearch
     v-else
-    :collections="collections"
-    :showOnly="type"
-    :localstore="localstore"
     ref="cardsearch"
     class="cardsearch"
+    :collections="collections"
+    :localstore="localstore"
+    :show-only="type"
   ></CardSearch>
 </template>
 
@@ -34,9 +34,20 @@ import util from './util'
 import config from './config'
 
 export default {
+  components: {
+    HotTable,
+    CardView,
+    CardSearch,
+  },
   props: {
-    localstore: Object,
-    type: String,
+    localstore: {
+      type: Object,
+      default: () => {},
+    },
+    type: {
+      type: String,
+      default: '',
+    },
   },
   computed: {
     searchTerm() {
@@ -166,11 +177,6 @@ export default {
         firstInput().focus()
       }, 0)
     },
-  },
-  components: {
-    HotTable,
-    CardView,
-    CardSearch,
   },
 }
 </script>

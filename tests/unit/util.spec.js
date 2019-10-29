@@ -87,7 +87,7 @@ describe('util.js', function() {
   it('gets a collection from the store by name', function() {
     const localstore = {
       state: {
-        collections: [{ name: 'people' }, { name: 'cats' }, { name: 'dogs' }],
+        collectionsOptions: [{ name: 'people' }, { name: 'cats' }, { name: 'dogs' }],
       },
     }
 
@@ -105,7 +105,7 @@ describe('util.js', function() {
   it('logs an error when collection does not exist', function() {
     const localstore = {
       state: {
-        collections: [{ name: 'people' }, { name: 'cats' }, { name: 'dogs' }],
+        collectionsOptions: [{ name: 'people' }, { name: 'cats' }, { name: 'dogs' }],
       },
     }
 
@@ -113,9 +113,29 @@ describe('util.js', function() {
     expect(errorSpy.callCount).to.equal(1)
   })
 
-  it('cleans an entry', function() {
+  it('cleans an entry with no relationships', function() {
     const entry = {
       _jv: { data: '_jv' },
+      name: 'Alice',
+      surname: 'Alison',
+    }
+
+    expect(util.cleanEntry(entry)).to.deep.equal({
+      _jv: { data: '_jv' },
+      name: 'Alice',
+      surname: 'Alison',
+    })
+  })
+
+  it('cleans an entry with relationships', function() {
+    const entry = {
+      _jv: {
+        data: '_jv',
+        relationships: {
+          cats: { data: 'cat1' },
+          dogs: { data: 'dog1' },
+        }
+      },
       name: 'Alice',
       surname: 'Alison',
       cats: { data: 'cat1' },
@@ -123,7 +143,13 @@ describe('util.js', function() {
     }
 
     expect(util.cleanEntry(entry)).to.deep.equal({
-      _jv: { data: '_jv' },
+      _jv: {
+        data: '_jv',
+        relationships: {
+          cats: { data: 'cat1' },
+          dogs: { data: 'dog1' },
+        }
+      },
       name: 'Alice',
       surname: 'Alison',
     })
