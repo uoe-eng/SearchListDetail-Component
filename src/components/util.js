@@ -31,7 +31,7 @@ export default {
   // returns an entry
   cleanEntry: function(entry) {
     const deep = this.copyDeep(entry)
-    if(deep._jv.hasOwnProperty('relationships')) {
+    if (Object.prototype.hasOwnProperty.call(deep._jv, 'relationships')) {
       const relationships = Object.keys(deep._jv.relationships)
       relationships.forEach((rel) => {
         delete deep[rel]

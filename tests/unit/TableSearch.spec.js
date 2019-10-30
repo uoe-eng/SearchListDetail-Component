@@ -124,7 +124,6 @@ describe('TableSearch.vue', function() {
   })
 
   it('gets aliases for the table headers', function() {
-    console.log('HERE')
     expect(wrapper.vm.colHeaders).to.deep.equal([
       'details',
       'First Name',

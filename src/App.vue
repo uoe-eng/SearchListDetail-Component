@@ -11,10 +11,7 @@
             { name: 'email_addresses.email_address', alias: 'Email' },
             { name: 'phone_number.phone_number', alias: 'Phone' },
           ],
-          previewOrder: [
-            'family_name',
-            'preferred_name',
-          ],
+          previewOrder: ['family_name', 'preferred_name'],
         },
         {
           name: 'phone_numbers',
