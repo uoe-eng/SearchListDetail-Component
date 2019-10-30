@@ -87,7 +87,11 @@ describe('util.js', function() {
   it('gets a collection from the store by name', function() {
     const localstore = {
       state: {
-        collectionsOptions: [{ name: 'people' }, { name: 'cats' }, { name: 'dogs' }],
+        collectionsOptions: [
+          { name: 'people' },
+          { name: 'cats' },
+          { name: 'dogs' },
+        ],
       },
     }
 
@@ -105,7 +109,11 @@ describe('util.js', function() {
   it('logs an error when collection does not exist', function() {
     const localstore = {
       state: {
-        collectionsOptions: [{ name: 'people' }, { name: 'cats' }, { name: 'dogs' }],
+        collectionsOptions: [
+          { name: 'people' },
+          { name: 'cats' },
+          { name: 'dogs' },
+        ],
       },
     }
 
@@ -134,7 +142,7 @@ describe('util.js', function() {
         relationships: {
           cats: { data: 'cat1' },
           dogs: { data: 'dog1' },
-        }
+        },
       },
       name: 'Alice',
       surname: 'Alison',
@@ -148,7 +156,7 @@ describe('util.js', function() {
         relationships: {
           cats: { data: 'cat1' },
           dogs: { data: 'dog1' },
-        }
+        },
       },
       name: 'Alice',
       surname: 'Alison',
