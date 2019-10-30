@@ -107,8 +107,12 @@ describe('TableSearch.vue', function() {
       },
     })
 
-    getCollectionStub.withArgs('people').returns(store.state.collectionsOptions[0])
-    getCollectionStub.withArgs('cats').returns(store.state.collectionsOptions[1])
+    getCollectionStub
+      .withArgs('people')
+      .returns(store.state.collectionsOptions[0])
+    getCollectionStub
+      .withArgs('cats')
+      .returns(store.state.collectionsOptions[1])
 
     wrapper = shallowMount(TableSearch, {
       localVue,
@@ -120,6 +124,7 @@ describe('TableSearch.vue', function() {
   })
 
   it('gets aliases for the table headers', function() {
+    console.log('HERE')
     expect(wrapper.vm.colHeaders).to.deep.equal([
       'details',
       'First Name',
